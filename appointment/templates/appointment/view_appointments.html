@@ -1,0 +1,38 @@
+{% extends 'Hospital/base.html' %}
+{% load static %}
+{% block title %}Appointment List{% endblock %}
+{% block content %}
+    <div class="container">
+        <h2> Appointment List </h2>
+        <div class="row">
+          <div class="col-sm">
+          <table class="table">
+          <tr>
+            <th>id</th>
+            <th>Patient Name</th>
+            <th>Doctor name</th>
+            <th>department</th>
+            <th>Date</th>
+            <th>Timeslot</th>
+            <th>Disease Info</th>
+
+            </tr>
+            {% for apt in appointment %}
+              <tr>
+                <td>{{ apt.id }}</td>
+                <td>{{ apt.user }}</td>
+                <td>{{ apt.staff }}</td>
+                <td>{{ apt.department }}</td>
+                <td>{{ apt.date }}</td>
+                <td>{{ apt.timeslot }}</td>
+                <td>{{ apt.disease }}</td>
+{#                {% if request.user.is_superuser %}#}
+{#                  <td> <a href="#"><button type="button" class="btn btn-primary">Edit Entry</button></td>#}
+{#                {% endif %}#}
+              </tr>
+            {% endfor %}
+          </table>
+          </div>
+        </div>
+    </div>
+{% endblock %}
