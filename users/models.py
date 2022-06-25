@@ -6,6 +6,9 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 
 def validate_age(age):
+    """
+    function for age validation of users.
+    """
     if age < 21:
         raise ValidationError('Please enter age above 21')
 
