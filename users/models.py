@@ -26,7 +26,6 @@ class CustomUser(AbstractUser):
         ('D', 'Doctor'),
         ('P', 'Patient'),
         ('N', 'Nurse'),
-        ('W', 'Word-boy')
     )
     email = models.EmailField(null=True)
     phone = PhoneNumberField(null=True, help_text='Please use following format for phone number: +917834442134')
