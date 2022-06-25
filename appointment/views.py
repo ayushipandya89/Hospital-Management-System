@@ -16,6 +16,10 @@ class BookAppointments(SuccessMessageMixin, CreateView):
     success_url = '/'
     success_message = 'Your appointment is booked'
 
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
 
 class ViewAppointments(ListView):
     """
