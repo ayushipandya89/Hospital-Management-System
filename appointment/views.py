@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
-from django.views.generic import CreateView, ListView
+from django.views.generic import CreateView, ListView, DeleteView
 from .forms import PatientAppointmentForm
 from .models import Appointments
 
@@ -18,6 +18,9 @@ class BookAppointments(SuccessMessageMixin, CreateView):
 
 
 class ViewAppointments(ListView):
+    """
+    This class is for view patients appointment.
+    """
     model = Appointments
     template_name = 'appointment/view_appointments.html'
     context_object_name = 'appointment'
@@ -29,4 +32,18 @@ class ViewAppointments(ListView):
 
     def get_queryset(self):
         return self.model.objects.filter(user=self.request.user.id).order_by('-id')
-#nkldsn
+
+
+class DeleteAppointmentView(DeleteView):
+    """
+    class for deleting appointments
+    """
+    model = Appointments
+    template_name = 'appointment/appointment_confirm_delete.html'
+    success_url = reverse_lazy('view-appointments')
+
+    def test_func(self):
+        appointments = self.get_object()
+        if self.request.user == appointments.user:
+            return True
+        return False
