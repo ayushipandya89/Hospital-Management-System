@@ -33,6 +33,9 @@ class Register(SuccessMessageMixin, CreateView):
                 staff.save()
                 messages.success(request, 'Profile created successfully')
             return redirect('login')
+        else:
+            messages.error(request, "Error. Please enter correct data")
+            return redirect('register')
 
 
 class UpdateProfile(SuccessMessageMixin, UpdateView):
