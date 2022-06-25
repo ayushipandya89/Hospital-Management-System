@@ -4,7 +4,7 @@ from appointment.models import Appointments
 
 class PatientAppointmentForm(forms.ModelForm):
     """
-    for making appointment form
+    for making appointment form.
     """
 
     class Meta:
