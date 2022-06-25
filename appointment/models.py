@@ -3,6 +3,9 @@ from users.models import CustomUser, Staff
 
 
 class Appointments(models.Model):
+    """
+    This class is for creating table of appointment.
+    """
     DEPARTMENT_CHOICE = (
         ('MD Doctor', 'MD Doctor'),
         ('Pediatricians', 'Pediatricians'),
@@ -24,7 +27,7 @@ class Appointments(models.Model):
     )
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
-    date = models.DateField(help_text="Use that Format:YYYY-MM-DD...For example: 2022/6/26")
+    date = models.DateField(help_text="Use that Format:YYYY-MM-DD...For example: 2022-6-26")
     timeslot = models.CharField(max_length=100, choices=TIMESLOT_LIST)
     department = models.CharField(max_length=50, choices=DEPARTMENT_CHOICE)
     disease = models.CharField(max_length=300)
@@ -32,6 +35,3 @@ class Appointments(models.Model):
     def __str__(self):
         return f"Patient: {self.user} | Time: {self.timeslot}"
 
-    @property
-    def time(self):
-        return self.TIMESLOT_LIST[self.timeslot][1]

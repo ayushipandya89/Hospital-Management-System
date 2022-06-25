@@ -32,7 +32,7 @@ class Register(SuccessMessageMixin, CreateView):
                 staff = Staff.objects.create(staff=user_obj)
                 staff.save()
                 messages.success(request, 'Profile created successfully')
-        return redirect('login')
+            return redirect('login')
 
 
 class UpdateProfile(SuccessMessageMixin, UpdateView):

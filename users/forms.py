@@ -19,6 +19,7 @@ class UserUpdateForm(forms.ModelForm):
     """
     This class is used to update fields of custom user.
     """
+
     class Meta:
         model = CustomUser
         fields = ['username', 'email', 'phone', 'age', 'gender', 'address', 'profile']
@@ -32,4 +33,3 @@ class PatientRegistrationForm(forms.ModelForm):
     class Meta:
         model = Patient
         fields = ['patient']
-

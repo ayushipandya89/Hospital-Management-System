@@ -1,7 +1,13 @@
 import uuid
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+
+
+def validate_age(age):
+    if age < 21:
+        raise ValidationError('Please enter age above 21')
 
 
 class CustomUser(AbstractUser):
@@ -21,7 +27,7 @@ class CustomUser(AbstractUser):
     )
     email = models.EmailField(null=True)
     phone = PhoneNumberField(null=True, help_text='Please use following format for phone number: +917834442134')
-    age = models.IntegerField(null=True)
+    age = models.IntegerField(null=True, validators=[validate_age])
     address = models.CharField(max_length=300, null=True)
     profile = models.ImageField(default='default.jpg', upload_to='profile_pic/', null=True)
     gender = models.CharField(max_length=15, choices=GENDER_CHOICES, null=True)
