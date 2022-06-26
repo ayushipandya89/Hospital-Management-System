@@ -14,9 +14,9 @@ def home(request):
             is_user_approved = Staff.objects.filter(staff=fetch_id).filter(is_approve=True)
             print(is_user_approved)
             if is_user_approved:
-                return render(request, 'Hospital/home.html')
-            else:
                 return render(request, 'Hospital/doc_home.html')
+            else:
+                return render(request, 'Hospital/doc_notapprove_home.html')
     else:
         return render(request, 'Hospital/home.html')
 
