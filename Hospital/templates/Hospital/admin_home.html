@@ -1,0 +1,49 @@
+{% extends 'Hospital/base.html' %}
+{% block content %}
+	<h1>Admin Home Page</h1>
+    <div class="card-deck">
+        <div class="card" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">Add User</h5>
+            <a href="{% url 'register' %}" class="btn btn-primary">Add</a>
+          </div>
+        </div>
+        <div class="card" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">View/Update/Delete User</h5>
+            <a href="{% url 'view-user' %}" class="btn btn-primary">Go</a>
+          </div>
+        </div>
+    </div>
+{#    staff details   #}
+    <div class="card-deck" style="margin-top: 30px">
+        <div class="card" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">Add Staff</h5>
+            <a href="{% url 'register' %}" class="btn btn-primary">Add</a>
+          </div>
+        </div>
+        <div class="card" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">View/Update/Delete Staff</h5>
+            <a href="{% url 'view-staff' %}" class="btn btn-primary">Go</a>
+          </div>
+        </div>
+    </div>
+    <div class="card-deck" style="margin-top: 30px">
+        <div class="card" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">View appointment</h5>
+            <a href="#" class="btn btn-primary">View</a>
+          </div>
+        </div>
+        <div class="card" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">Delete appointment</h5>
+            <a href="#" class="btn btn-primary">Delete</a>
+          </div>
+        </div>
+    </div>
+{% endblock content %}
+
+

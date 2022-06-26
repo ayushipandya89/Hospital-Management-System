@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.views.generic import CreateView, UpdateView, DeleteView
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 from .forms import UserRegisterForm, UserUpdateForm, PatientRegistrationForm
 from .models import CustomUser, Patient, Staff
 
@@ -14,7 +14,8 @@ class Register(SuccessMessageMixin, CreateView):
     form_class = UserRegisterForm
     patient_form_class = PatientRegistrationForm
     template_name = 'users/register.html'
-    success_url = '../login'
+
+    # success_url = '../login'
 
     def form_valid(self, form):
         print(form.cleaned_data)
@@ -27,11 +28,13 @@ class Register(SuccessMessageMixin, CreateView):
             if user_obj.role == 'P':
                 patient = Patient.objects.create(patient=user_obj)
                 patient.save()
-                messages.success(request, 'Profile created successfully')
+                messages.success(request, 'Patient Profile created successfully')
             if user_obj.role == 'D' or user_obj == 'N':
                 staff = Staff.objects.create(staff=user_obj)
                 staff.save()
                 messages.success(request, 'Profile created successfully')
+            if request.user.is_superuser:
+                return redirect('Hospital-home')
             return redirect('login')
 
 
@@ -64,3 +67,27 @@ class DeleteProfile(SuccessMessageMixin, DeleteView):
         if self.request.user == profile.username:
             return True
         return False
+
+
+class ViewUser(ListView):
+    """
+    class for view the list of customuser
+    """
+    model = CustomUser
+    template_name = 'users/view_user.html'
+    context_object_name = 'user'
+
+    def get_queryset(self):
+        return self.model.objects.all().order_by('id')
+
+
+class ViewStaff(ListView):
+    """
+    class for view the list of customuser
+    """
+    model = Staff
+    template_name = 'users/view_staff.html'
+    context_object_name = 'staff'
+
+    def get_queryset(self):
+        return self.model.objects.all().order_by('id')
