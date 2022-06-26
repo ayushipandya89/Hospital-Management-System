@@ -2,35 +2,66 @@
 {% load static %}
 {% block title %}Appointment List{% endblock %}
 {% block content %}
-    <div class="container">
-        <h2> Appointment List </h2>
-        <div class="row">
-          <div class="col-sm">
-          <table class="table">
-          <tr>
-            <th>id</th>
-            <th>Patient Name</th>
-            <th>Doctor name</th>
-            <th>department</th>
-            <th>Date</th>
-            <th>Timeslot</th>
-            <th>Disease Info</th>
-
-            </tr>
-            {% for apt in appointment %}
+    {% if user.role == 'P' %}
+        <div class="container">
+            <h2> Appointment List </h2>
+            <div class="row">
+              <div class="col-sm">
+              <table class="table">
               <tr>
-                <td>{{ apt.id }}</td>
-                <td>{{ apt.user }}</td>
-                <td>{{ apt.staff }}</td>
-                <td>{{ apt.department }}</td>
-                <td>{{ apt.date }}</td>
-                <td>{{ apt.timeslot }}</td>
-                <td>{{ apt.disease }}</td>
-                <td> <a href="{% url 'delete-appointments' pk=apt.pk %}"><button type="button" class="btn btn-outline-danger">Delete Appointment</button></td>
-              </tr>
-            {% endfor %}
-          </table>
-          </div>
+                <th>id</th>
+                <th>Patient Name</th>
+                <th>Doctor name</th>
+                <th>department</th>
+                <th>Date</th>
+                <th>Timeslot</th>
+                <th>Disease Info</th>
+
+                </tr>
+                {% for apt in appointment %}
+                  <tr>
+                    <td>{{ apt.id }}</td>
+                    <td>{{ apt.user }}</td>
+                    <td>{{ apt.staff }}</td>
+                    <td>{{ apt.department }}</td>
+                    <td>{{ apt.date }}</td>
+                    <td>{{ apt.timeslot }}</td>
+                    <td>{{ apt.disease }}</td>
+                    <td> <a href="{% url 'delete-appointments' pk=apt.pk %}"><button type="button" class="btn btn-outline-danger">Delete Appointment</button></td>
+                  </tr>
+                {% endfor %}
+              </table>
+              </div>
+            </div>
         </div>
-    </div>
+    {% elif user.role == 'D' %}
+        <div class="container">
+            <h2> Appointment List </h2>
+            <div class="row">
+              <div class="col-sm">
+              <table class="table">
+              <tr>
+                <th>id</th>
+                <th>Patient Name</th>
+                <th>Doctor name</th>
+                <th>Date</th>
+                <th>Timeslot</th>
+                <th>Disease Info</th>
+
+                </tr>
+                {% for apt in appointment %}
+                  <tr>
+                    <td>{{ apt.id }}</td>
+                    <td>{{ apt.user }}</td>
+                    <td>{{ apt.staff }}</td>
+                    <td>{{ apt.date }}</td>
+                    <td>{{ apt.timeslot }}</td>
+                    <td>{{ apt.disease }}</td>
+                  </tr>
+                {% endfor %}
+              </table>
+              </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}

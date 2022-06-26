@@ -43,7 +43,7 @@ class Appointments(models.Model):
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     date = models.DateField(validators=[date_validation],
                             help_text="Use that Format:YYYY-MM-DD...For example: 2022-6-26")
-    timeslot = models.CharField(max_length=100, choices=TIMESLOT_LIST, validators=[timeslot_validation])
+    timeslot = models.CharField(max_length=100, choices=TIMESLOT_LIST)
     disease = models.CharField(max_length=300)
 
     def __str__(self):

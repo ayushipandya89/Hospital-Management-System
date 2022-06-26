@@ -51,3 +51,12 @@ class DeleteAppointmentView(DeleteView):
         if self.request.user == appointments.user:
             return True
         return False
+
+
+class ViewDoctorsAppointments(ListView):
+    """
+    This class is for view patients appointment.
+    """
+    model = Appointments
+    template_name = 'appointment/view_appointments.html'
+    context_object_name = 'appointment'

@@ -1,7 +1,18 @@
 {% extends 'Hospital/base.html' %}
 {% block content %}
-	<h1>Hello {{user}}!!!!</h1>
-	<h2>You are not approved yet</h2>
-	<h2>Please check after some time..</h2>
+    <div class="card-deck">
+        <div class="card" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">View Appointment</h5>
+            <a href="{% url 'view-doc-appointments' %}" class="btn btn-primary">View</a>
+          </div>
+        </div>
+{#        <div class="card" style="width: 18rem;">#}
+{#          <div class="card-body">#}
+{#            <h5 class="card-title">VIEW APPOINTMENT</h5>#}
+{#            <a href="{% url 'view-appointments' %}" class="btn btn-primary">View</a>#}
+{#          </div>#}
+{#        </div>#}
+    </div>
 {% endblock content %}
 
