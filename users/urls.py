@@ -2,6 +2,8 @@ from django.urls import path, include
 from . import views as user_views
 from django.contrib.auth import views as auth_views
 
+from .views import ViewUser, ViewStaff
+
 urlpatterns = [
     path('register/', user_views.Register.as_view(), name='register'),
     path('login/', auth_views.LoginView.as_view(template_name='users/login.html'), name='login'),
@@ -19,6 +21,8 @@ urlpatterns = [
          name='password_reset_complete'),
     path('<pk>/update/', user_views.UpdateProfile.as_view(), name='update-profile'),
     path('<pk>/delete/', user_views.DeleteProfile.as_view(), name='delete-profile'),
+    path('view_user/', ViewUser.as_view(), name='view-user'),
+    path('view_staff/', ViewStaff.as_view(), name='view-staff'),
     path('', include('Hospital.urls')),
 
 ]

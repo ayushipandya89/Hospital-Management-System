@@ -55,8 +55,9 @@ class DeleteAppointmentView(DeleteView):
 
 class ViewDoctorsAppointments(ListView):
     """
-    This class is for view patients appointment.
+        This class is for view patients appointment by doctor.
     """
     model = Appointments
     template_name = 'appointment/view_appointments.html'
     context_object_name = 'appointment'
+

@@ -1,0 +1,39 @@
+{% extends 'Hospital/base.html' %}
+{% load static %}
+{% block title %}Users List{% endblock %}
+{% block content %}
+    <div class="container">
+        <h2> User List </h2>
+        <div class="row">
+          <div class="col-sm">
+          <table class="table">
+          <tr>
+            <th>id</th>
+            <th>User Name</th>
+            <th>Email</th>
+            <th>Phone no</th>
+            <th>Age</th>
+            <th>Address</th>
+            <th>Gender</th>
+            <th>Role</th>
+
+            </tr>
+            {% for u in user %}
+              <tr>
+                <td>{{ u.id }}</td>
+                <td>{{ u.username }}</td>
+                <td>{{ u.email }}</td>
+                <td>{{ u.phone }}</td>
+                <td>{{ u.age }}</td>
+                <td>{{ u.address }}</td>
+                <td>{{ u.gender }}</td>
+                <td>{{ u.role }}</td>
+                <td> <a href="#"><button type="button" class="btn btn-outline-primary">Update</button></td>
+                <td> <a href="#"><button type="button" class="btn btn-outline-danger">Delete</button></td>
+              </tr>
+            {% endfor %}
+          </table>
+          </div>
+        </div>
+    </div>
+{% endblock %}
