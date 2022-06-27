@@ -1,5 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
+from django.core.exceptions import ValidationError
+
 from .models import CustomUser, Patient
 
 
@@ -12,7 +14,14 @@ class UserRegisterForm(UserCreationForm):
         fields = ['username', 'email', 'phone', 'age', 'address', 'gender', 'role', 'password1', 'password2', 'profile']
 
     def clean(self):
-        pass
+        cleaned_data = super().clean()
+        fetch_age = cleaned_data.get("age")
+        # print(fetch_age, '------------------------')
+
+        if int(fetch_age) < 21:
+            raise ValidationError(
+                "age can not be less than 21"
+            )
 
 
 class UserUpdateForm(forms.ModelForm):
