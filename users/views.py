@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 from .forms import UserRegisterForm, UserUpdateForm, PatientRegistrationForm
@@ -14,8 +14,6 @@ class Register(SuccessMessageMixin, CreateView):
     form_class = UserRegisterForm
     patient_form_class = PatientRegistrationForm
     template_name = 'users/register.html'
-
-    # success_url = '../login'
 
     def form_valid(self, form):
         print(form.cleaned_data)
@@ -36,6 +34,8 @@ class Register(SuccessMessageMixin, CreateView):
             if request.user.is_superuser:
                 return redirect('Hospital-home')
             return redirect('login')
+        else:
+            return render(request, 'users/register.html', {'form': form})
 
 
 class UpdateProfile(SuccessMessageMixin, UpdateView):

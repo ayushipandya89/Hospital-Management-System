@@ -3,6 +3,8 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, ListView, DeleteView
+
+from users.models import Staff
 from .forms import PatientAppointmentForm
 from .models import Appointments
 
@@ -19,6 +21,11 @@ class BookAppointments(SuccessMessageMixin, CreateView):
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)
+
+    def get_queryset(self):
+        staff = Staff.objects.all().filter(staff__username='Ayushi')
+        print(staff)
+        return staff
 
 
 class ViewAppointments(ListView):
@@ -60,4 +67,3 @@ class ViewDoctorsAppointments(ListView):
     model = Appointments
     template_name = 'appointment/view_appointments.html'
     context_object_name = 'appointment'
-
