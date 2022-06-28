@@ -16,7 +16,6 @@ class UserRegisterForm(UserCreationForm):
     def clean(self):
         cleaned_data = super().clean()
         fetch_age = cleaned_data.get("age")
-        # print(fetch_age, '------------------------')
 
         if int(fetch_age) < 21:
             raise ValidationError(

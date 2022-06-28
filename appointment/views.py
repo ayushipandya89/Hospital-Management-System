@@ -1,11 +1,9 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.utils.decorators import method_decorator
-from django.views.generic import CreateView, ListView, DeleteView
-
-from users.models import Staff
-from .forms import PatientAppointmentForm
+from django.views.generic import CreateView, ListView, DeleteView, UpdateView
+from .forms import PatientAppointmentForm, PatientTimeslotsUpdate
 from .models import Appointments
 
 
@@ -15,17 +13,33 @@ class BookAppointments(SuccessMessageMixin, CreateView):
     """
     form_class = PatientAppointmentForm
     template_name = 'appointment/book_appointments.html'
-    success_url = '/'
-    success_message = 'Your appointment is booked'
+
+    # success_url = '/'
+    # success_message = 'Your appointment is booked'
 
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)
 
+    def get_success_url(self):
+        return reverse("appointment-timeslot", kwargs={'pk': self.object.pk})
+
+
+class AppointmentTimeslotUpdate(SuccessMessageMixin, UpdateView):
+    """
+    This class is for adding the timeslot information.
+    """
+    form_class = PatientTimeslotsUpdate
+    template_name = 'appointment/book_appointments_timeslots.html'
+    success_message = "Your appointment was created successfully"
+
     def get_queryset(self):
-        staff = Staff.objects.all().filter(staff__username='Ayushi')
-        print(staff)
-        return staff
+        query_set = Appointments.objects.filter(id=self.kwargs['pk'])
+        print(query_set)
+        return query_set
+
+    def get_success_url(self):
+        return reverse("Hospital-home")
 
 
 class ViewAppointments(ListView):
