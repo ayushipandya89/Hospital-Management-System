@@ -16,14 +16,14 @@ class PatientAppointmentForm(forms.ModelForm):
     print(time, '-----------', time.hour)
     print(current_time.split(':')[0], '+++++++')
     query = Appointments.objects.all().values('timeslot')
-    y=query[0]
+    # y=query[0]
     print(query)
     for i in range(9, 20):
         if i > int(current_time.split(':')[0]):
-            y=query[0]
-            if i in query:
-                print('nn')
-
+            # y=query[0]
+            # if i in query:
+            #     print('nn')
+            #
             # time_slot_choices.append((i, i))
             time_slot_choices.append((f"{i}:00", f"{i}:00"))
     print(time_slot_choices)
