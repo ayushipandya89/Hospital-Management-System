@@ -1,8 +1,8 @@
 from datetime import datetime
 from django import forms
 from django.core.exceptions import ValidationError
-from appointment.models import Appointments
-from users.models import Staff
+from appointment.models import Appointments, Room
+from users.models import Staff, CustomUser
 
 
 class PatientAppointmentForm(forms.ModelForm):
@@ -21,7 +21,8 @@ class PatientAppointmentForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         fetch_date = cleaned_data.get("date")
-        fetch_time = Appointments.objects.filter(date=fetch_date).values('timeslot')
+        fetch_staff = cleaned_data.get("staff")
+        fetch_time = Appointments.objects.filter(date=fetch_date).filter(staff=fetch_staff).values('timeslot')
         data = []
         user_data = []
         time_slot_choices = []
@@ -36,7 +37,7 @@ class PatientAppointmentForm(forms.ModelForm):
                     time_slot_choices.append(f"{i}:00")
         available_time = []
         if int(current_time.split(':')[0]) >= 19:
-            raise ValidationError('The Hospital is close for today please choose another date')
+            raise ValidationError('The Hospital is close for today please choose another date or another staff')
         else:
             if fetch_date == date:
                 # gathering the data of available choices
@@ -86,3 +87,25 @@ class PatientTimeslotsUpdate(forms.ModelForm):
             staff=staff_query)
         if time_query:
             raise ValidationError('This slot is already booked please choose another slot')
+
+
+class CreateRoomForm(forms.ModelForm):
+    """
+    class for entering the rooms date
+    """
+    fetch_admin = CustomUser.objects.filter(is_superuser=True)
+    if not fetch_admin:
+        raise ValidationError('You are not admin you can not edit this form')
+
+    class Meta:
+        model = Room
+        fields = ['charge', 'AC', 'is_ICU', 'room_type']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        fetch_charge = cleaned_data.get("charge")
+        print(fetch_charge)
+        if fetch_charge <= 0:
+            raise ValidationError(
+                "charge can not be less than zero"
+            )

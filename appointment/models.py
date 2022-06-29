@@ -28,17 +28,6 @@ class Appointments(models.Model):
     """
     This class is for creating table of appointment.
     """
-    TIMESLOT_LIST = (
-        ('09:00 – 09:30', '09:00 – 09:30'),
-        ('10:00 – 10:30', '10:00 – 10:30'),
-        ('11:00 – 11:30', '11:00 – 11:30'),
-        ('12:00 – 12:30', '12:00 – 12:30'),
-        ('13:00 – 13:30', '13:00 – 13:30'),
-        ('14:00 – 14:30', '14:00 – 14:30'),
-        ('15:00 – 15:30', '15:00 – 15:30'),
-        ('16:00 – 16:30', '16:00 – 16:30'),
-        ('17:00 – 17:30', '17:00 – 17:30'),
-    )
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     date = models.DateField(validators=[date_validation],
@@ -59,7 +48,6 @@ class Room(models.Model):
         ('Private', 'Private'),
         ('Semi-Private', 'Semi-Private')
     )
-    room_no = models.IntegerField()
     charge = models.IntegerField()
     AC = models.BooleanField(default=False)
     is_ICU = models.BooleanField(default=False)

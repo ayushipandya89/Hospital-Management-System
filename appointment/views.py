@@ -1,9 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
+from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, ListView, DeleteView, UpdateView
-from .forms import PatientAppointmentForm, PatientTimeslotsUpdate
+from .forms import PatientAppointmentForm, PatientTimeslotsUpdate, CreateRoomForm
 from .models import Appointments
 
 
@@ -13,9 +14,6 @@ class BookAppointments(SuccessMessageMixin, CreateView):
     """
     form_class = PatientAppointmentForm
     template_name = 'appointment/book_appointments.html'
-
-    # success_url = '/'
-    # success_message = 'Your appointment is booked'
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -35,7 +33,6 @@ class AppointmentTimeslotUpdate(SuccessMessageMixin, UpdateView):
 
     def get_queryset(self):
         query_set = Appointments.objects.filter(id=self.kwargs['pk'])
-        print(query_set)
         return query_set
 
     def get_success_url(self):
@@ -81,3 +78,22 @@ class ViewDoctorsAppointments(ListView):
     model = Appointments
     template_name = 'appointment/view_appointments.html'
     context_object_name = 'appointment'
+
+
+class EnterRoomData(SuccessMessageMixin, CreateView):
+    """
+    class for adding room data
+    """
+    form_class = CreateRoomForm
+    template_name = 'appointment/create_rooms.html'
+    success_url = reverse_lazy('Hospital-home   ')
+    success_message = 'Your room was created.'
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.user_has_permissions(request):
+            return super(EnterRoomData, self).dispatch(
+                request, *args, **kwargs)
+        return render(request, 'appointment/not_admin.html')
+
+    def user_has_permissions(self, request):
+        return self.request.user.is_superuser
