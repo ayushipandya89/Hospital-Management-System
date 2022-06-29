@@ -9,5 +9,6 @@ urlpatterns = [
     path('view_appointment/', ViewAppointments.as_view(), name='view-appointments'),
     path('<pk>/delete_appointment/', DeleteAppointmentView.as_view(), name='delete-appointments'),
     path('view_doc_appointment/', ViewDoctorsAppointments.as_view(), name='view-doc-appointments'),
+    path('rooms/', views.EnterRoomData.as_view(), name='room'),
 
 ]
