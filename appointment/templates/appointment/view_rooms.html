@@ -1,0 +1,33 @@
+{% extends 'Hospital/base.html' %}
+{% load static %}
+{% block title %}Appointment List{% endblock %}
+{% block content %}
+    {% if user.is_superuser %}
+        <div class="container">
+            <h2> Room List </h2>
+            <div class="row">
+              <div class="col-sm">
+              <table class="table">
+              <tr>
+                <th>id</th>
+                <th>Charge</th>
+                <th>AC</th>
+                <th>ICU</th>
+                <th>Room Type</th>
+
+                </tr>
+                {% for rm in room %}
+                  <tr>
+                    <td>{{ rm.id }}</td>
+                    <td>{{ rm.charge }}</td>
+                    <td>{{ rm.AC }}</td>
+                    <td>{{ rm.is_ICU }}</td>
+                    <td>{{ rm.room_type }}</td>
+                  </tr>
+                {% endfor %}
+              </table>
+              </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

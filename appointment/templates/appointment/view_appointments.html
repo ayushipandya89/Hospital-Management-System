@@ -2,64 +2,32 @@
 {% load static %}
 {% block title %}Appointment List{% endblock %}
 {% block content %}
-    {% if user.role == 'P' %}
-        <div class="container">
-            <h2> Appointment List </h2>
-            <div class="row">
-              <div class="col-sm">
-              <table class="table">
-              <tr>
-                <th>id</th>
-                <th>Patient Name</th>
-                <th>Doctor name</th>
-                <th>Date</th>
-                <th>Timeslot</th>
-                <th>Disease Info</th>
+    <div class="container">
+        <h2> Appointment List </h2>
+        <div class="row">
+          <div class="col-sm">
+          <table class="table">
+          <tr>
+            <th>id</th>
+            <th>Patient Name</th>
+            <th>Doctor name</th>
+            <th>Date</th>
+            <th>Timeslot</th>
+            <th>Disease Info</th>
 
-                </tr>
-                {% for apt in appointment %}
-                  <tr>
-                    <td>{{ apt.id }}</td>
-                    <td>{{ apt.user }}</td>
-                    <td>{{ apt.staff }}</td>
-                    <td>{{ apt.date }}</td>
-                    <td>{{ apt.timeslot }}</td>
-                    <td>{{ apt.disease }}</td>
-                    <td> <a href="{% url 'delete-appointments' pk=apt.pk %}"><button type="button" class="btn btn-outline-danger">Delete Appointment</button></td>
-                  </tr>
-                {% endfor %}
-              </table>
-              </div>
-            </div>
-        </div>
-    {% elif user.role == 'D' %}
-        <div class="container">
-            <h2> Appointment List </h2>
-            <div class="row">
-              <div class="col-sm">
-              <table class="table">
+            </tr>
+            {% for apt in appointment %}
               <tr>
-                <th>id</th>
-                <th>Patient Name</th>
-                <th>Doctor name</th>
-                <th>Date</th>
-                <th>Timeslot</th>
-                <th>Disease Info</th>
-
-                </tr>
-                {% for apt in appointment %}
-                  <tr>
-                    <td>{{ apt.id }}</td>
-                    <td>{{ apt.user }}</td>
-                    <td>{{ apt.staff }}</td>
-                    <td>{{ apt.date }}</td>
-                    <td>{{ apt.timeslot }}</td>
-                    <td>{{ apt.disease }}</td>
-                  </tr>
-                {% endfor %}
-              </table>
-              </div>
-            </div>
+                <td>{{ apt.id }}</td>
+                <td>{{ apt.user }}</td>
+                <td>{{ apt.staff }}</td>
+                <td>{{ apt.date }}</td>
+                <td>{{ apt.timeslot }}</td>
+                <td>{{ apt.disease }}</td>
+              </tr>
+            {% endfor %}
+          </table>
+          </div>
         </div>
-    {% endif %}
+    </div>
 {% endblock %}

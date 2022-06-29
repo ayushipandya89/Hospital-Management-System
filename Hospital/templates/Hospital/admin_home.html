@@ -30,11 +30,12 @@
           </div>
         </div>
     </div>
+{#    appointment detail #}
     <div class="card-deck" style="margin-top: 30px">
         <div class="card" style="width: 18rem;">
           <div class="card-body">
             <h5 class="card-title">View appointment</h5>
-            <a href="#" class="btn btn-primary">View</a>
+            <a href="{% url 'view-all-appointments' %}" class="btn btn-primary">View</a>
           </div>
         </div>
         <div class="card" style="width: 18rem;">
@@ -44,6 +45,7 @@
           </div>
         </div>
     </div>
+{#    room details #}
     <div class="card-deck" style="margin-top: 30px">
         <div class="card" style="width: 18rem;">
           <div class="card-body">
@@ -53,8 +55,8 @@
         </div>
         <div class="card" style="width: 18rem;">
           <div class="card-body">
-            <h5 class="card-title">Delete Room</h5>
-            <a href="#" class="btn btn-primary">Delete</a>
+            <h5 class="card-title">View Room</h5>
+            <a href="{% url 'view-rooms' %}" class="btn btn-primary">View</a>
           </div>
         </div>
     </div>
