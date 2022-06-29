@@ -31,7 +31,7 @@ class CustomUser(AbstractUser):
     phone = PhoneNumberField(null=True, help_text='Please use following format for phone number: +917834442134')
     age = models.IntegerField(null=True, validators=[validate_age])
     address = models.CharField(max_length=300, null=True)
-    profile = models.ImageField(default='default.jpg', upload_to='profile_pic/', null=True)
+    profile = models.ImageField(default='default.jpg', upload_to='profile_pic/', null=True,blank=True)
     gender = models.CharField(max_length=15, choices=GENDER_CHOICES, null=True)
     role = models.CharField(max_length=15, choices=ROLE_CHOICES, null=True)
 

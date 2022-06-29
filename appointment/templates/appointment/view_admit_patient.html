@@ -1,0 +1,33 @@
+{% extends 'Hospital/base.html' %}
+{% load static %}
+{% block title %}Appointment List{% endblock %}
+{% block content %}
+    <div class="container">
+        <h2> Admit Patient List </h2>
+        <div class="row">
+          <div class="col-sm">
+          <table class="table">
+          <tr>
+            <th>id</th>
+            <th>Patient Name</th>
+            <th>Doctor name</th>
+            <th>Date</th>
+            <th>Timeslot</th>
+            <th>Disease Info</th>
+
+            </tr>
+            {% for apt in appointment %}
+              <tr>
+                <td>{{ apt.id }}</td>
+                <td>{{ apt.user }}</td>
+                <td>{{ apt.staff }}</td>
+                <td>{{ apt.date }}</td>
+                <td>{{ apt.timeslot }}</td>
+                <td>{{ apt.disease }}</td>
+              </tr>
+            {% endfor %}
+          </table>
+          </div>
+        </div>
+    </div>
+{% endblock %}

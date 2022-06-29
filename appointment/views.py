@@ -6,7 +6,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, ListView, DeleteView, UpdateView
 
 from users.models import Staff
-from .forms import PatientAppointmentForm, PatientTimeslotsUpdate, CreateRoomForm
+from .forms import PatientAppointmentForm, PatientTimeslotsUpdate, CreateRoomForm, AdmitPatientForm
 from .models import Appointments, Room
 
 
@@ -117,20 +117,21 @@ class ViewRooms(ListView):
     def user_has_permissions(self, request):
         return self.request.user.is_superuser
 
-# class EnterAdmitPatient(SuccessMessageMixin, CreateView):
-#     """
-#     class for adding admit patient data
-#     """
-#     form_class = AdmitPatientForm
-#     template_name = 'appointment/admit_patient.html'
-#     success_url = reverse_lazy('Hospital-home')
-#     success_message = 'Admitted patient successfully'
-#
-#     def dispatch(self, request, *args, **kwargs):
-#         if self.user_has_permissions(request):
-#             return super(EnterAdmitPatient, self).dispatch(
-#                 request, *args, **kwargs)
-#         return render(request, 'appointment/not_admin.html')
-#
-#     def user_has_permissions(self, request):
-#         return self.request.user.is_superuser
+
+class EnterAdmitPatient(SuccessMessageMixin, CreateView):
+    """
+    class for adding admit patient data
+    """
+    form_class = AdmitPatientForm
+    template_name = 'appointment/admit_patient.html'
+    success_url = reverse_lazy('Hospital-home')
+    success_message = 'Admitted patient successfully'
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.user_has_permissions(request):
+            return super(EnterAdmitPatient, self).dispatch(
+                request, *args, **kwargs)
+        return render(request, 'appointment/not_admin.html')
+
+    def user_has_permissions(self, request):
+        return self.request.user.is_superuser
