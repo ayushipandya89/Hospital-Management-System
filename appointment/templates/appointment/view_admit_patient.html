@@ -9,21 +9,17 @@
           <table class="table">
           <tr>
             <th>id</th>
-            <th>Patient Name</th>
-            <th>Doctor name</th>
-            <th>Date</th>
-            <th>Timeslot</th>
-            <th>Disease Info</th>
+            <th>Patient UUID</th>
+            <th>Admit Date</th>
+            <th>Room No</th>
+          </tr>
 
-            </tr>
-            {% for apt in appointment %}
+            {% for admt in admit %}
               <tr>
-                <td>{{ apt.id }}</td>
-                <td>{{ apt.user }}</td>
-                <td>{{ apt.staff }}</td>
-                <td>{{ apt.date }}</td>
-                <td>{{ apt.timeslot }}</td>
-                <td>{{ apt.disease }}</td>
+                <td>{{ admt.id }}</td>
+                <td>{{ admt.UUID }}</td>
+                <td>{{ admt.in_date }}</td>
+                <td>{{ admt.room_id }}</td>
               </tr>
             {% endfor %}
           </table>
