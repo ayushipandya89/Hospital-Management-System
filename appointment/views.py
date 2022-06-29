@@ -4,8 +4,10 @@ from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, ListView, DeleteView, UpdateView
+
+from users.models import Staff
 from .forms import PatientAppointmentForm, PatientTimeslotsUpdate, CreateRoomForm
-from .models import Appointments
+from .models import Appointments, Room
 
 
 class BookAppointments(SuccessMessageMixin, CreateView):
@@ -48,7 +50,6 @@ class ViewAppointments(ListView):
     context_object_name = 'appointment'
 
     @method_decorator(login_required(login_url=reverse_lazy('accounts:login')))
-    # @method_decorator(user_is_doctor)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(self.request, *args, **kwargs)
 
@@ -71,7 +72,7 @@ class DeleteAppointmentView(DeleteView):
         return False
 
 
-class ViewDoctorsAppointments(ListView):
+class ViewAllAppointments(ListView):
     """
         This class is for view patients appointment by doctor.
     """
@@ -97,3 +98,39 @@ class EnterRoomData(SuccessMessageMixin, CreateView):
 
     def user_has_permissions(self, request):
         return self.request.user.is_superuser
+
+
+class ViewRooms(ListView):
+    """
+    This class is for view rooms.
+    """
+    model = Room
+    template_name = 'appointment/view_rooms.html'
+    context_object_name = 'room'
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.user_has_permissions(request):
+            return super(ViewRooms, self).dispatch(
+                request, *args, **kwargs)
+        return render(request, 'appointment/not_admin.html')
+
+    def user_has_permissions(self, request):
+        return self.request.user.is_superuser
+
+# class EnterAdmitPatient(SuccessMessageMixin, CreateView):
+#     """
+#     class for adding admit patient data
+#     """
+#     form_class = AdmitPatientForm
+#     template_name = 'appointment/admit_patient.html'
+#     success_url = reverse_lazy('Hospital-home')
+#     success_message = 'Admitted patient successfully'
+#
+#     def dispatch(self, request, *args, **kwargs):
+#         if self.user_has_permissions(request):
+#             return super(EnterAdmitPatient, self).dispatch(
+#                 request, *args, **kwargs)
+#         return render(request, 'appointment/not_admin.html')
+#
+#     def user_has_permissions(self, request):
+#         return self.request.user.is_superuser
