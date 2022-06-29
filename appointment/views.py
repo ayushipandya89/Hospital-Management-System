@@ -6,7 +6,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, ListView, DeleteView, UpdateView
 
 from users.models import Staff
-from .forms import PatientAppointmentForm, PatientTimeslotsUpdate, CreateRoomForm, AdmitPatientForm
+from .forms import PatientAppointmentForm, PatientTimeslotsUpdate, CreateRoomForm, AdmitPatientForm, DischargeUpdateForm
 from .models import Appointments, Room, Admit
 
 
@@ -153,3 +153,16 @@ class ViewAdmitPatient(ListView):
 
     def user_has_permissions(self, request):
         return self.request.user.is_superuser
+
+
+class DischargePatient(UpdateView, SuccessMessageMixin):
+    form_class = DischargeUpdateForm
+    template_name = 'appointment/discharge_patient.html'
+    success_message = "Patient Discharge Successfully"
+
+    def get_queryset(self):
+        query_set = Admit.objects.filter(id=self.kwargs['pk'])
+        return query_set
+
+    def get_success_url(self):
+        return reverse("Hospital-home")
