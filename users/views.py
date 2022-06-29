@@ -75,7 +75,7 @@ class ViewUser(ListView):
     """
     model = CustomUser
     template_name = 'users/view_user.html'
-    context_object_name = 'user'
+    context_object_name = 'users'
 
     def get_queryset(self):
         return self.model.objects.all().order_by('id')

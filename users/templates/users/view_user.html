@@ -18,9 +18,10 @@
             <th>Role</th>
 
             </tr>
-            {% for u in user %}
+            {% for u in users %}
               <tr>
                 <td>{{ u.id }}</td>
+{#                  <td>{{ u.id }} (<a href="{% url 'delete-profile' pk=user.id %}">Delete</a>)</td>#}
                 <td>{{ u.username }}</td>
                 <td>{{ u.email }}</td>
                 <td>{{ u.phone }}</td>
@@ -28,7 +29,7 @@
                 <td>{{ u.address }}</td>
                 <td>{{ u.gender }}</td>
                 <td>{{ u.role }}</td>
-                <td> <a href="#"><button type="button" class="btn btn-outline-danger">Delete</button></td>
+                <td><a href="#"><button type="button" class="btn btn-outline-danger">Delete</button></td>
               </tr>
             {% endfor %}
           </table>

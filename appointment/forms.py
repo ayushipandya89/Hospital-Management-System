@@ -123,7 +123,8 @@ class AdmitPatientForm(forms.ModelForm):
     class for creating form for admitted patient
     """
 
-    staff_choices = [(i.id, i.staff.username) for i in Staff.objects.all().filter(is_approve=True).filter(is_available=True)]
+    staff_choices = [(i.id, i.staff.username) for i in
+                     Staff.objects.all().filter(is_approve=True).filter(is_available=True)]
     # print(f"CHOICE {staff_choices}")
     staff = forms.ChoiceField(choices=staff_choices)
 
@@ -132,4 +133,17 @@ class AdmitPatientForm(forms.ModelForm):
         fields = ['room', 'UUID', 'in_date', 'staff']
         widgets = {
             'in_date': InputDate()
+        }
+
+
+class DischargeUpdateForm(forms.ModelForm):
+    """
+    This class is used to discharge patient form
+    """
+
+    class Meta:
+        model = Admit
+        fields = ['UUID', 'out_date', 'charge']
+        widgets = {
+            'out_date   ': InputDate()
         }
