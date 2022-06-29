@@ -1,7 +1,7 @@
 from datetime import datetime
 from django.core.exceptions import ValidationError
 from django.db import models
-from users.models import CustomUser, Staff
+from users.models import CustomUser, Staff, Patient
 
 
 def date_validation(date):
@@ -30,8 +30,7 @@ class Appointments(models.Model):
     """
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
-    date = models.DateField(validators=[date_validation],
-                            help_text="Use that Format:YYYY-MM-DD...For example: 2022-6-26")
+    date = models.DateField(validators=[date_validation])
     timeslot = models.CharField(max_length=200)
     disease = models.CharField(max_length=300)
 
@@ -54,4 +53,24 @@ class Room(models.Model):
     room_type = models.CharField(max_length=100, choices=ROOM_CHOICES)
 
     def __str__(self):
-        return f"Room No:{self.room_no}"
+        return f"Room No:{self.id}"
+
+
+class Admit(models.Model):
+    """
+    class for creating admit table
+    """
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    UUID = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    in_date = models.DateField(blank=False)
+    out_date = models.DateField(null=True)
+    charge = models.IntegerField(null=True)
+
+
+class AdmitMapping(models.Model):
+    """
+    class for creating mapping table for admitted patient
+    """
+    admit = models.ManyToManyField(Admit)
+    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+

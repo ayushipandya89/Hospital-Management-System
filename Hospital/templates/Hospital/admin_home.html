@@ -60,6 +60,20 @@
           </div>
         </div>
     </div>
+    <div class="card-deck" style="margin-top: 30px">
+        <div class="card" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">Admit Patient</h5>
+            <a href="{% url 'admit-patient' %}" class="btn btn-primary">Go</a>
+          </div>
+        </div>
+        <div class="card" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">View Admitted Patient</h5>
+            <a href="{% url 'view-admit-patient' %}" class="btn btn-primary">View</a>
+          </div>
+        </div>
+    </div>
 {% endblock content %}
 
 

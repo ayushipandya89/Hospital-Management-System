@@ -1,8 +1,12 @@
 from datetime import datetime
 from django import forms
 from django.core.exceptions import ValidationError
-from appointment.models import Appointments, Room
+from appointment.models import Appointments, Room, Admit, AdmitMapping
 from users.models import Staff, CustomUser
+
+
+class InputDate(forms.DateInput):
+    input_type = 'date'
 
 
 class PatientAppointmentForm(forms.ModelForm):
@@ -13,6 +17,9 @@ class PatientAppointmentForm(forms.ModelForm):
     class Meta:
         model = Appointments
         fields = ['staff', 'date', 'disease']
+        widgets = {
+            'date': InputDate()
+        }
 
     def __init__(self, *args, **kwargs):
         super(PatientAppointmentForm, self).__init__(*args, **kwargs)
@@ -109,3 +116,20 @@ class CreateRoomForm(forms.ModelForm):
             raise ValidationError(
                 "charge can not be less than zero"
             )
+
+
+class AdmitPatientForm(forms.ModelForm):
+    """
+    class for creating form for admitted patient
+    """
+
+    staff_choices = [(i.id, i.staff.username) for i in Staff.objects.all().filter(is_approve=True).filter(is_available=True)]
+    # print(f"CHOICE {staff_choices}")
+    staff = forms.ChoiceField(choices=staff_choices)
+
+    class Meta:
+        model = Admit
+        fields = ['room', 'UUID', 'in_date', 'staff']
+        widgets = {
+            'in_date': InputDate()
+        }
