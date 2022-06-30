@@ -1,9 +1,9 @@
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import redirect, render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView
-from .forms import UserRegisterForm, UserUpdateForm, PatientRegistrationForm
+from .forms import UserRegisterForm, UserUpdateForm, PatientRegistrationForm, StaffUpdateForm
 from .models import CustomUser, Patient, Staff
 
 
@@ -109,3 +109,19 @@ class ViewStaff(ListView):
 
     def user_has_permissions(self, request):
         return self.request.user.is_superuser
+
+
+class UpdateStaffProfile(SuccessMessageMixin, UpdateView):
+    """
+    This class is for update the profile information of staff.
+    """
+    form_class = StaffUpdateForm
+    template_name = 'users/staff_update.html'
+    success_message = "Your staff profile was updated successfully"
+
+    def get_queryset(self):
+        query_set = Staff.objects.filter(id=self.kwargs['pk'])
+        return query_set
+
+    def get_success_url(self):
+        return reverse("view-staff")
