@@ -1,12 +1,12 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
-from django.shortcuts import render
+from django.contrib import messages
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy, reverse
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, ListView, DeleteView, UpdateView
 
-from users.models import Staff
-from .forms import PatientAppointmentForm, PatientTimeslotsUpdate, CreateRoomForm, AdmitPatientForm
+from .forms import PatientAppointmentForm, PatientTimeslotsUpdate, CreateRoomForm, AdmitPatientForm, DischargeUpdateForm
 from .models import Appointments, Room, Admit
 
 
@@ -137,6 +137,25 @@ class EnterAdmitPatient(SuccessMessageMixin, CreateView):
         return self.request.user.is_superuser
 
 
+class ViewNotDischarged(ListView):
+    model=Admit
+    template_name = 'appointment/view_not_discharge_patient.html'
+    context_object_name = 'admit'
+
+    def get_queryset(self):
+        query = Admit.objects.filter(out_date__isnull=True)
+        return query
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.user_has_permissions(request):
+            return super(ViewNotDischarged, self).dispatch(
+                request, *args, **kwargs)
+        return render(request, 'appointment/not_admin.html')
+
+    def user_has_permissions(self, request):
+        return self.request.user.is_superuser
+
+
 class ViewAdmitPatient(ListView):
     """
     used for view all the admitted patient.
@@ -154,15 +173,13 @@ class ViewAdmitPatient(ListView):
     def user_has_permissions(self, request):
         return self.request.user.is_superuser
 
-#
-# class DischargePatient(UpdateView, SuccessMessageMixin):
-#     form_class = DischargeUpdateForm
-#     template_name = 'appointment/discharge_patient.html'
-#     success_message = "Patient Discharge Successfully"
-#
-#     def get_queryset(self):
-#         query_set = Admit.objects.filter(id=self.kwargs['pk'])
-#         return query_set
-#
-#     def get_success_url(self):
-#         return reverse("Hospital-home")
+
+class DischargePatient(UpdateView, SuccessMessageMixin):
+    form_class = DischargeUpdateForm
+    template_name = 'appointment/discharge_patient.html'
+    success_url = reverse_lazy('Hospital-home')
+    success_message = "Patient Discharge Successfully"
+
+    def get_queryset(self):
+        query_set = Admit.objects.filter(id=self.kwargs['pk'])
+        return query_set

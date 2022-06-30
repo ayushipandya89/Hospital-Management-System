@@ -1,7 +1,8 @@
 from django.urls import path
 from . import views
 from . import views as user_views
-from .views import ViewAppointments, DeleteAppointmentView, ViewAllAppointments, ViewRooms, ViewAdmitPatient
+from .views import ViewAppointments, DeleteAppointmentView, ViewAllAppointments, ViewRooms, ViewAdmitPatient, \
+    ViewNotDischarged
 
 urlpatterns = [
     path('appointments/', views.BookAppointments.as_view(), name='book-appointments'),
@@ -13,6 +14,7 @@ urlpatterns = [
     path('view_rooms/', ViewRooms.as_view(), name='view-rooms'),
     path('admit/', views.EnterAdmitPatient.as_view(), name='admit-patient'),
     path('view_admit/', ViewAdmitPatient.as_view(), name='view-admit-patient'),
-    # path('<pk>/discharge/', user_views.DischargePatient.as_view(), name='discharge-patient'),
+    path('<pk>/discharge/', user_views.DischargePatient.as_view(), name='discharge-patient'),
+    path('view_dicharge/', ViewNotDischarged.as_view(), name='view-discharge-patient'),
 
 ]

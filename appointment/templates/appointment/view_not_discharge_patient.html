@@ -1,0 +1,30 @@
+{% extends 'Hospital/base.html' %}
+{% load static %}
+{% block title %}Discharge List{% endblock %}
+{% block content %}
+    <div class="container">
+        <h2> Discharge List </h2>
+        <div class="row">
+          <div class="col-sm">
+          <table class="table">
+          <tr>
+            <th>id</th>
+            <th>Patient Name</th>
+            <th>Admit Date</th>
+            <th>Room No</th>
+
+            </tr>
+            {% for adm in admit %}
+              <tr>
+                <td>{{ adm.id }}</td>
+                <td>{{ adm.patient.patient }}</td>
+                <td>{{ adm.in_date }}</td>
+                <td>{{ adm.room_id }}</td>
+                <td> <a href="{% url 'discharge-patient' adm.id %}""><button type="button" class="btn btn-outline-secondary">Discharge</button></td>
+              </tr>
+            {% endfor %}
+          </table>
+          </div>
+        </div>
+    </div>
+{% endblock %}
