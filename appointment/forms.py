@@ -1,7 +1,7 @@
 from datetime import datetime
 from django import forms
 from django.core.exceptions import ValidationError
-from appointment.models import Appointments, Room, Admit, AdmitMapping
+from appointment.models import Appointments, Room, Admit
 from users.models import Staff, CustomUser
 
 
@@ -122,28 +122,47 @@ class AdmitPatientForm(forms.ModelForm):
     """
     class for creating form for admitted patient
     """
-
-    staff_choices = [(i.id, i.staff.username) for i in
-                     Staff.objects.all().filter(is_approve=True).filter(is_available=True)]
-    # print(f"CHOICE {staff_choices}")
-    staff = forms.ChoiceField(choices=staff_choices)
-
+    # staff_choices = [(i.id, i.staff.username) for i in
+    #                  Staff.objects.all().filter(is_approve=True).filter(is_available=True)]
+    # # print(f"CHOICE {staff_choices}")
+    # staff = forms.ChoiceField(choices=staff_choices)
     class Meta:
         model = Admit
-        fields = ['room', 'UUID', 'in_date', 'staff']
+        fields = ['room', 'patient', 'in_date', 'staff']
         widgets = {
             'in_date': InputDate()
         }
 
+    # staff = forms.ModelMultipleChoiceField(
+    #     query=Staff.objects.filter(is_approve=True).filter(is_available=True),
+    #     widget = forms.CheckboxSelectMultiple
+    # )
+    def __init__(self, *args, **kwargs):
+        super(AdmitPatientForm, self).__init__(*args, **kwargs)
+        self.fields["staff"].widget = forms.widgets.CheckboxSelectMultiple()
+        self.fields["staff"].queryset = Staff.objects.filter(is_approve=True).filter(is_available=True)
 
-class DischargeUpdateForm(forms.ModelForm):
-    """
-    This class is used to discharge patient form
-    """
-
-    class Meta:
-        model = Admit
-        fields = ['UUID', 'out_date', 'charge']
-        widgets = {
-            'out_date   ': InputDate()
-        }
+#
+# class DischargeUpdateForm(forms.ModelForm):
+#     """
+#     This class is used to discharge patient form
+#     """
+#
+#     # query = Admit.objects.filter()
+#     class Meta:
+#         model = Admit
+#         fields = ['UUID', 'out_date', 'charge']
+#         widgets = {
+#             'out_date   ': InputDate()
+#         }
+#
+#         def clean(self):
+#             print('aai gayu')
+#             cleaned_data = super().clean()
+#             fetch_UUID = cleaned_data.get("UUID")
+#             print(fetch_UUID)
+#             query = Admit.objects.filter(UUID=fetch_UUID).get('out_date')
+#             print(query)
+#             if query:
+#                 print('bdhjhrbjrendm,hjcbjnm')
+#                 raise ValidationError('This patient is already discharged....')

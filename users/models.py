@@ -70,4 +70,4 @@ class Patient(models.Model):
     UUID = models.UUIDField(default=uuid.uuid4, editable=False)
 
     def __str__(self):
-        return str(self.UUID)
+        return f"UUID:{self.UUID} | Patient :{self.patient}"

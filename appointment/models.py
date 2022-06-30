@@ -61,16 +61,8 @@ class Admit(models.Model):
     class for creating admit table
     """
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
-    UUID = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    staff = models.ManyToManyField(Staff)
     in_date = models.DateField(blank=False)
     out_date = models.DateField(null=True)
     charge = models.IntegerField(null=True)
-
-
-class AdmitMapping(models.Model):
-    """
-    class for creating mapping table for admitted patient
-    """
-    admit = models.ManyToManyField(Admit)
-    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
-

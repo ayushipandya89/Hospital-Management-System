@@ -80,6 +80,15 @@ class ViewUser(ListView):
     def get_queryset(self):
         return self.model.objects.all().order_by('id')
 
+    def dispatch(self, request, *args, **kwargs):
+        if self.user_has_permissions(request):
+            return super(ViewUser, self).dispatch(
+                request, *args, **kwargs)
+        return render(request, 'appointment/not_admin.html')
+
+    def user_has_permissions(self, request):
+        return self.request.user.is_superuser
+
 
 class ViewStaff(ListView):
     """
@@ -91,3 +100,12 @@ class ViewStaff(ListView):
 
     def get_queryset(self):
         return self.model.objects.all().order_by('id')
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.user_has_permissions(request):
+            return super(ViewStaff, self).dispatch(
+                request, *args, **kwargs)
+        return render(request, 'appointment/not_admin.html')
+
+    def user_has_permissions(self, request):
+        return self.request.user.is_superuser

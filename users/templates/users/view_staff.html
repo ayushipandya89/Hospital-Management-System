@@ -25,7 +25,7 @@
                 <td>{{ u.salary }}</td>
                 <td>{{ u.is_available }}</td>
                 <td>{{ u.is_approve }}</td>
-                <td> <a href="#"><button type="button" class="btn btn-outline-danger">Delete</button></td>
+                <td> <a href="{% url 'delete-profile' u.staff_id %}""><button type="button" class="btn btn-outline-danger">Delete</button></td>
               </tr>
             {% endfor %}
           </table>
