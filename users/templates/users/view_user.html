@@ -29,7 +29,7 @@
                 <td>{{ u.address }}</td>
                 <td>{{ u.gender }}</td>
                 <td>{{ u.role }}</td>
-                <td><a href="#"><button type="button" class="btn btn-outline-danger">Delete</button></td>
+                <td><a href="{% url 'delete-profile' u.id %}"><button type="button" class="btn btn-outline-danger">Delete</button></td>
               </tr>
             {% endfor %}
           </table>

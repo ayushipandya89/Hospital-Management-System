@@ -13,6 +13,6 @@ urlpatterns = [
     path('view_rooms/', ViewRooms.as_view(), name='view-rooms'),
     path('admit/', views.EnterAdmitPatient.as_view(), name='admit-patient'),
     path('view_admit/', ViewAdmitPatient.as_view(), name='view-admit-patient'),
-    path('<pk>/discharge/', user_views.DischargePatient.as_view(), name='discharge-patient'),
+    # path('<pk>/discharge/', user_views.DischargePatient.as_view(), name='discharge-patient'),
 
 ]
