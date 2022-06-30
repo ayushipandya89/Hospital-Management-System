@@ -66,3 +66,6 @@ class Admit(models.Model):
     in_date = models.DateField(blank=False)
     out_date = models.DateField(null=True)
     charge = models.IntegerField(null=True)
+
+    def __str__(self):
+        return f"Patient:{self.patient}"

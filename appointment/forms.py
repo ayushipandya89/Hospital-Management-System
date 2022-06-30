@@ -1,6 +1,8 @@
 from datetime import datetime
 from django import forms
 from django.core.exceptions import ValidationError
+
+from appointment import models
 from appointment.models import Appointments, Room, Admit
 from users.models import Staff, CustomUser
 
@@ -122,10 +124,6 @@ class AdmitPatientForm(forms.ModelForm):
     """
     class for creating form for admitted patient
     """
-    # staff_choices = [(i.id, i.staff.username) for i in
-    #                  Staff.objects.all().filter(is_approve=True).filter(is_available=True)]
-    # # print(f"CHOICE {staff_choices}")
-    # staff = forms.ChoiceField(choices=staff_choices)
     class Meta:
         model = Admit
         fields = ['room', 'patient', 'in_date', 'staff']
@@ -133,36 +131,37 @@ class AdmitPatientForm(forms.ModelForm):
             'in_date': InputDate()
         }
 
-    # staff = forms.ModelMultipleChoiceField(
-    #     query=Staff.objects.filter(is_approve=True).filter(is_available=True),
-    #     widget = forms.CheckboxSelectMultiple
-    # )
     def __init__(self, *args, **kwargs):
         super(AdmitPatientForm, self).__init__(*args, **kwargs)
         self.fields["staff"].widget = forms.widgets.CheckboxSelectMultiple()
         self.fields["staff"].queryset = Staff.objects.filter(is_approve=True).filter(is_available=True)
 
-#
-# class DischargeUpdateForm(forms.ModelForm):
-#     """
-#     This class is used to discharge patient form
-#     """
-#
-#     # query = Admit.objects.filter()
-#     class Meta:
-#         model = Admit
-#         fields = ['UUID', 'out_date', 'charge']
-#         widgets = {
-#             'out_date   ': InputDate()
-#         }
-#
-#         def clean(self):
-#             print('aai gayu')
-#             cleaned_data = super().clean()
-#             fetch_UUID = cleaned_data.get("UUID")
-#             print(fetch_UUID)
-#             query = Admit.objects.filter(UUID=fetch_UUID).get('out_date')
-#             print(query)
-#             if query:
-#                 print('bdhjhrbjrendm,hjcbjnm')
-#                 raise ValidationError('This patient is already discharged....')
+
+class DischargeUpdateForm(forms.ModelForm):
+    """
+    This class is used to discharge patient form
+    """
+    class Meta:
+        model = Admit
+        fields = ['out_date', 'charge']
+        widgets = {
+            'out_date': InputDate()
+        }
+
+    # def create(self,*args,**kwargs):
+    #     customer_id = self.kwargs['id']
+    #     print(customer_id)
+    #     customers = Admit.objects.get(id=customer_id)
+    #     print(customers)
+
+    # def clean(self):
+    #     print('aai gayu')
+    #     cleaned_data = super().clean()
+    #     user_id = models.Admit.patient
+    #     # # fetch_patient = self.pk
+    #     # print(user_id)
+    #     query = Admit.objects.all().filter(patient=user_id)
+    #     print(query)
+    #     if query:
+    #         print('bdhjhrbjrendm,hjcbjnm')
+    #         raise ValidationError('This patient is already discharged....')
