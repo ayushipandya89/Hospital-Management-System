@@ -2,7 +2,6 @@ from datetime import datetime
 from django import forms
 from django.core.exceptions import ValidationError
 
-from appointment import models
 from appointment.models import Appointments, Room, Admit
 from users.models import Staff, CustomUser
 
@@ -147,21 +146,3 @@ class DischargeUpdateForm(forms.ModelForm):
         widgets = {
             'out_date': InputDate()
         }
-
-    # def create(self,*args,**kwargs):
-    #     customer_id = self.kwargs['id']
-    #     print(customer_id)
-    #     customers = Admit.objects.get(id=customer_id)
-    #     print(customers)
-
-    # def clean(self):
-    #     print('aai gayu')
-    #     cleaned_data = super().clean()
-    #     user_id = models.Admit.patient
-    #     # # fetch_patient = self.pk
-    #     # print(user_id)
-    #     query = Admit.objects.all().filter(patient=user_id)
-    #     print(query)
-    #     if query:
-    #         print('bdhjhrbjrendm,hjcbjnm')
-    #         raise ValidationError('This patient is already discharged....')
