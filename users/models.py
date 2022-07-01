@@ -3,7 +3,6 @@ from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
-# from appointment.models import Admit
 
 
 def validate_age(age):
@@ -74,6 +73,3 @@ class Patient(models.Model):
         return f"UUID:{self.UUID} | Patient :{self.patient}"
 
 
-# class NurseDuty(models.Model):
-#     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
-#     patient = models.ManyToManyField(Admit)
