@@ -35,6 +35,7 @@ ALLOWED_HOSTS = ['ayushis-hms.herokuapp.com','127.0.0.1']
 INSTALLED_APPS = [
     'Hospital.apps.HospitalConfig',
     'users.apps.UsersConfig',
+    'nurse.apps.NurseConfig',
     'crispy_forms',
     'appointment',
     'phonenumber_field',

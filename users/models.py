@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+# from appointment.models import Admit
 
 
 def validate_age(age):
@@ -31,7 +32,7 @@ class CustomUser(AbstractUser):
     phone = PhoneNumberField(null=True, help_text='Please use following format for phone number: +917834442134')
     age = models.IntegerField(null=True, validators=[validate_age])
     address = models.CharField(max_length=300, null=True)
-    profile = models.ImageField(default='default.jpg', upload_to='profile_pic/', null=True,blank=True)
+    profile = models.ImageField(default='default.jpg', upload_to='profile_pic/', null=True, blank=True)
     gender = models.CharField(max_length=15, choices=GENDER_CHOICES, null=True)
     role = models.CharField(max_length=15, choices=ROLE_CHOICES, null=True)
 
@@ -71,3 +72,8 @@ class Patient(models.Model):
 
     def __str__(self):
         return f"UUID:{self.UUID} | Patient :{self.patient}"
+
+
+# class NurseDuty(models.Model):
+#     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+#     patient = models.ManyToManyField(Admit)
