@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 from .forms import UserRegisterForm, UserUpdateForm, PatientRegistrationForm, StaffUpdateForm
@@ -119,9 +119,24 @@ class UpdateStaffProfile(SuccessMessageMixin, UpdateView):
     template_name = 'users/staff_update.html'
     success_message = "Your staff profile was updated successfully"
 
-    def get_queryset(self):
+    def get_queryset(self, *args, **kwargs):
         query_set = Staff.objects.filter(id=self.kwargs['pk'])
+        print(query_set)
+        query = get_object_or_404(Staff, id=self.kwargs.get('pk'))
+        print(query, '//////////////////')
         return query_set
+
+    def form_valid(self, form, *args, **kwargs):
+        data = self.request.POST
+        fetch_speciality = data.get('speciality')
+        fetch_pk = get_object_or_404(Staff, id=self.kwargs.get('pk'))
+        query = CustomUser.objects.filter(username=fetch_pk).values_list('role', flat=True)
+        if query[0] == 'N' and fetch_speciality != 'Nurse':
+            messages.error(self.request,f"you are nurse you can not choose another speciality...please choose nurse "
+                                        f"as speciality")
+            return self.form_invalid(form)
+        else:
+            return super().form_valid(form)
 
     def get_success_url(self):
         return reverse("view-staff")
