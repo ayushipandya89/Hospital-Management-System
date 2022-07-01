@@ -1,0 +1,35 @@
+{% extends 'Hospital/base.html' %}
+{% load static %}
+{% block title %}Duty List{% endblock %}
+{% block content %}
+    {% if user.is_superuser %}
+        <div class="container">
+            <h2> Duty List </h2>
+            <div class="row">
+              <div class="col-sm">
+              <table class="table">
+              <tr>
+                <th>id</th>
+                <th>Staff</th>
+                <th>Patient</th>
+
+              </tr>
+                {% for duty in nurseduty %}
+{#                    {% for data in duty.Admit.all %}#}
+                  <tr>
+                    <td>{{ duty.id }}</td>
+                    <td>{{ duty.staff }}</td>
+                    <td>{{ duty.patient  }}</td>
+{#                      {% for data in duty.Nurseduty_patient.all %}#}
+{#                        <tr>#}
+{#                            <td>{{ data }}</td>#}
+{#                        </tr>#}
+                  </tr>
+{#                    {% endfor %}#}
+                {% endfor %}
+              </table>
+              </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
