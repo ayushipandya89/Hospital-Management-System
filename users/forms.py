@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 
-from .models import CustomUser, Patient, Staff
+from .models import CustomUser, Patient, Staff, Feedback
 
 
 class UserRegisterForm(UserCreationForm):
@@ -61,3 +61,13 @@ class StaffUpdateForm(forms.ModelForm):
     class Meta:
         model = Staff
         fields = ['salary', 'speciality', 'is_approve', 'is_available']
+
+
+class FeedbackForm(forms.ModelForm):
+    """
+    class for creating feedback form for user.
+    """
+
+    class Meta:
+        model = Feedback
+        fields = ['content']

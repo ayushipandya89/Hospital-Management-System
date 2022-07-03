@@ -3,8 +3,8 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView
-from .forms import UserRegisterForm, UserUpdateForm, PatientRegistrationForm, StaffUpdateForm
-from .models import CustomUser, Patient, Staff
+from .forms import UserRegisterForm, UserUpdateForm, PatientRegistrationForm, StaffUpdateForm, FeedbackForm
+from .models import CustomUser, Patient, Staff, Feedback
 
 
 class Register(SuccessMessageMixin, CreateView):
@@ -121,9 +121,7 @@ class UpdateStaffProfile(SuccessMessageMixin, UpdateView):
 
     def get_queryset(self, *args, **kwargs):
         query_set = Staff.objects.filter(id=self.kwargs['pk'])
-        print(query_set)
         query = get_object_or_404(Staff, id=self.kwargs.get('pk'))
-        print(query, '//////////////////')
         return query_set
 
     def form_valid(self, form, *args, **kwargs):
@@ -132,11 +130,50 @@ class UpdateStaffProfile(SuccessMessageMixin, UpdateView):
         fetch_pk = get_object_or_404(Staff, id=self.kwargs.get('pk'))
         query = CustomUser.objects.filter(username=fetch_pk).values_list('role', flat=True)
         if query[0] == 'N' and fetch_speciality != 'Nurse':
-            messages.error(self.request,f"you are nurse you can not choose another speciality...please choose nurse "
-                                        f"as speciality")
+            messages.error(self.request, f"you are nurse you can not choose another speciality...please choose nurse "
+                                         f"as speciality")
             return self.form_invalid(form)
         else:
             return super().form_valid(form)
 
     def get_success_url(self):
         return reverse("view-staff")
+
+
+class EnterFeedback(CreateView, SuccessMessageMixin):
+    form_class = FeedbackForm
+    template_name = 'users/feedback.html'
+
+    def get_queryset(self):
+        query_set = CustomUser.objects.filter(id=self.kwargs['pk'])
+        print(query_set)
+        return query_set
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super(EnterFeedback, self).form_valid(form)
+
+    def get_success_url(self):
+        messages.success(self.request, f"you have successfully submitted your feedback ")
+        return reverse("Hospital-home")
+
+
+class ViewFeedback(ListView):
+    """
+    class for view the list of feedback
+    """
+    model = Feedback
+    template_name = 'users/view_feedback.html'
+    context_object_name = 'feedback'
+
+    def get_queryset(self):
+        return self.model.objects.all().order_by('id')
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.user_has_permissions(request):
+            return super(ViewFeedback, self).dispatch(
+                request, *args, **kwargs)
+        return render(request, 'appointment/not_admin.html')
+
+    def user_has_permissions(self, request):
+        return self.request.user.is_superuser
