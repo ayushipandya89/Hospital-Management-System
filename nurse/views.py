@@ -1,4 +1,5 @@
 from django.contrib.messages.views import SuccessMessageMixin
+from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView
 
@@ -19,6 +20,14 @@ class AssignDuty(SuccessMessageMixin, CreateView):
     #     data = self.request.POST
     #     fetch_patient = data.get('patient')
     #     print(fetch_patient)
+    def dispatch(self, request, *args, **kwargs):
+        if self.user_has_permissions(request):
+            return super(AssignDuty, self).dispatch(
+                request, *args, **kwargs)
+        return render(request, 'appointment/not_admin.html')
+
+    def user_has_permissions(self, request):
+        return self.request.user.is_superuser
 
 
 class ViewDuty(ListView):
@@ -28,3 +37,12 @@ class ViewDuty(ListView):
     model = NurseDuty
     template_name = 'nurse/view_duty.html'
     context_object_name = 'nurseduty'
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.user_has_permissions(request):
+            return super(ViewDuty, self).dispatch(
+                request, *args, **kwargs)
+        return render(request, 'appointment/not_admin.html')
+
+    def user_has_permissions(self, request):
+        return self.request.user.is_superuser
