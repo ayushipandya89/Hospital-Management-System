@@ -1,6 +1,8 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
+
+from appointment.models import Admit
 from .models import CustomUser, Patient, Staff, Feedback, Prescription
 
 
@@ -76,9 +78,14 @@ class PrescriptionForm(forms.ModelForm):
     """
     class for creating prescription form
     """
+
     class Meta:
         model = Prescription
         fields = ['patient', 'medicine', 'time', 'dose']
         widgets = {
             'time': forms.TimeInput(format='%H:%M'),
         }
+
+    def __init__(self, *args, **kwargs):
+        super(PrescriptionForm, self).__init__(*args, **kwargs)
+        self.fields['patient'].queryset = Admit.objects.filter(out_date__isnull=True)
