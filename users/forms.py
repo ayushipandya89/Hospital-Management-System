@@ -1,8 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
-
-from .models import CustomUser, Patient, Staff, Feedback
+from .models import CustomUser, Patient, Staff, Feedback, Prescription
 
 
 class UserRegisterForm(UserCreationForm):
@@ -71,3 +70,15 @@ class FeedbackForm(forms.ModelForm):
     class Meta:
         model = Feedback
         fields = ['content']
+
+
+class PrescriptionForm(forms.ModelForm):
+    """
+    class for creating prescription form
+    """
+    class Meta:
+        model = Prescription
+        fields = ['patient', 'medicine', 'time', 'dose']
+        widgets = {
+            'time': forms.TimeInput(format='%H:%M'),
+        }

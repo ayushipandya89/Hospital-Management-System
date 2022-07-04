@@ -79,3 +79,14 @@ class Feedback(models.Model):
     """
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     content = models.CharField(max_length=500)
+
+
+class Prescription(models.Model):
+    """
+    class for creating table of patient's prescription
+    """
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+    medicine = models.CharField(max_length=500)
+    time = models.TimeField(help_text='Please use that format:%H:%M....for example= 09:00')
+    dose = models.IntegerField()

@@ -1,9 +1,10 @@
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
-from django.shortcuts import redirect, render, get_object_or_404
+from django.shortcuts import redirect, render, get_object_or_404, get_list_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView
-from .forms import UserRegisterForm, UserUpdateForm, PatientRegistrationForm, StaffUpdateForm, FeedbackForm
+from .forms import UserRegisterForm, UserUpdateForm, PatientRegistrationForm, StaffUpdateForm, FeedbackForm, \
+    PrescriptionForm
 from .models import CustomUser, Patient, Staff, Feedback
 
 
@@ -151,7 +152,7 @@ class EnterFeedback(CreateView, SuccessMessageMixin):
 
     def form_valid(self, form):
         form.instance.user = self.request.user
-        return super(EnterFeedback, self).form_valid(form)
+        super(EnterFeedback, self).form_valid(form)
 
     def get_success_url(self):
         messages.success(self.request, f"you have successfully submitted your feedback ")
@@ -177,3 +178,28 @@ class ViewFeedback(ListView):
 
     def user_has_permissions(self, request):
         return self.request.user.is_superuser
+
+
+class PatientPrescription(CreateView, SuccessMessageMixin):
+    form_class = PrescriptionForm
+    template_name = 'users/prescription.html'
+
+    def form_valid(self, form):
+        # query = Staff.objects.filter(staff_id=self.request.user).values_list('id', flat=True)
+        a = self.request.user.id
+        fetch = Staff.objects.filter(staff=a).first()
+        form.instance.staff_id = fetch.id
+        return super(PatientPrescription, self).form_valid(form)
+
+    def get_success_url(self):
+        messages.success(self.request, f"You have successfully submitted prescription ")
+        return reverse("Hospital-home")
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.user_has_permissions(request):
+            return super(PatientPrescription, self).dispatch(
+                request, *args, **kwargs)
+        return render(request, 'appointment/not_admin.html')
+
+    def user_has_permissions(self, request):
+        return request.user.role == 'D'

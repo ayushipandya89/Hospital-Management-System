@@ -24,6 +24,7 @@ urlpatterns = [
     path('<pk>/delete/', user_views.DeleteProfile.as_view(), name='delete-profile'),
     path('view_user/', ViewUser.as_view(), name='view-user'),
     path('view_staff/', ViewStaff.as_view(), name='view-staff'),
+    path('prescription/', user_views.PatientPrescription.as_view(), name='prescription'),
     path('feedback/', user_views.EnterFeedback.as_view(), name='feedback'),
     path('view_feedback/', ViewFeedback.as_view(), name='view-feedback'),
     path('', include('Hospital.urls')),

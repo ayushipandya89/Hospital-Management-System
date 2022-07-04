@@ -16,10 +16,6 @@ class AssignDuty(SuccessMessageMixin, CreateView):
     success_url = reverse_lazy('Hospital-home')
     success_message = 'Duty Assigned successfully to the staff'
 
-    # def form_valid(self, form, *args, **kwargs):
-    #     data = self.request.POST
-    #     fetch_patient = data.get('patient')
-    #     print(fetch_patient)
     def dispatch(self, request, *args, **kwargs):
         if self.user_has_permissions(request):
             return super(AssignDuty, self).dispatch(

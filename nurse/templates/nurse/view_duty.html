@@ -15,17 +15,11 @@
 
               </tr>
                 {% for duty in nurseduty %}
-{#                    {% for data in duty.Admit.all %}#}
                   <tr>
                     <td>{{ duty.id }}</td>
                     <td>{{ duty.staff }}</td>
-                    <td>{{ duty.patient  }}</td>
-{#                      {% for data in duty.Nurseduty_patient.all %}#}
-{#                        <tr>#}
-{#                            <td>{{ data }}</td>#}
-{#                        </tr>#}
+                    <td>{% for patient in duty.patient.all %}{{ patient.patient.patient  }}{% endfor %}</td>
                   </tr>
-{#                    {% endfor %}#}
                 {% endfor %}
               </table>
               </div>

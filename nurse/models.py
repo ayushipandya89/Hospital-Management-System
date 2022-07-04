@@ -10,3 +10,5 @@ class NurseDuty(models.Model):
     """
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     patient = models.ManyToManyField(Admit)
+
+
