@@ -2,8 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 
-from appointment.models import Admit
-from .models import CustomUser, Patient, Staff, Feedback, Prescription
+from .models import CustomUser, Patient, Staff, Feedback, Prescription, Emergency
 
 
 class UserRegisterForm(UserCreationForm):
@@ -99,3 +98,17 @@ class PrescriptionUpdateForm(forms.ModelForm):
     class Meta:
         model = Prescription
         fields = ['medicine', 'time', 'dose']
+
+
+class EmergencyForm(forms.ModelForm):
+    """
+    This class is used for emergency cases forms.
+    """
+
+    class Meta:
+        model = Emergency
+        fields = ['patient', 'staff', 'datetime', 'disease', 'charge']
+
+    def __init__(self, *args, **kwargs):
+        super(EmergencyForm, self).__init__(*args, **kwargs)
+        self.fields['staff'].queryset = Staff.objects.filter(is_approve=True).filter(is_available=True)

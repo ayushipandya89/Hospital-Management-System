@@ -1,4 +1,6 @@
 import uuid
+from django.utils import timezone
+
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -90,3 +92,14 @@ class Prescription(models.Model):
     medicine = models.CharField(max_length=500)
     time = models.TimeField(help_text='Please use that format:%H:%M....for example= 09:00')
     dose = models.IntegerField()
+
+
+class Emergency(models.Model):
+    """
+    class for creating emergency table
+    """
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+    datetime = models.DateTimeField(default=timezone.now)
+    disease = models.CharField(max_length=500)
+    charge = models.IntegerField()

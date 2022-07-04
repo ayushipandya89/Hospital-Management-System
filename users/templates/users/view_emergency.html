@@ -1,0 +1,35 @@
+{% extends 'Hospital/base.html' %}
+{% load static %}
+{% block title %}Emergency List{% endblock %}
+{% block content %}
+    <div class="container">
+        <h2> Emergency List </h2>
+        <div class="row">
+          <div class="col-sm">
+          <table class="table">
+          <tr>
+            <th>id</th>
+            <th>Patient</th>
+            <th>Staff</th>
+            <th>Datetime</th>
+            <th>Disease</th>
+            <th>Charge</th>
+
+
+            </tr>
+            {% for em in emergency %}
+              <tr>
+                <td>{{ em.id }}</td>
+                <td>{{ em.patient.patient }}</td>
+                <td>{{ em.staff }}</td>
+                <td>{{ em.datetime }}</td>
+                <td>{{ em.disease }}</td>
+                <td>{{ em.charge }}</td>
+{#                <td> <a href="{% url 'update-staff-profile' u.id %}""><button type="button" class="btn btn-outline-secondary">Update</button></td>#}
+              </tr>
+            {% endfor %}
+          </table>
+          </div>
+        </div>
+    </div>
+{% endblock %}

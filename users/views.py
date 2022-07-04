@@ -1,12 +1,12 @@
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
-from django.http import Http404
-from django.shortcuts import redirect, render, get_object_or_404, get_list_or_404
+from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 from .forms import UserRegisterForm, UserUpdateForm, PatientRegistrationForm, StaffUpdateForm, FeedbackForm, \
-    PrescriptionForm, PrescriptionUpdateForm
-from .models import CustomUser, Patient, Staff, Feedback, Prescription
+    PrescriptionForm, PrescriptionUpdateForm, EmergencyForm
+
+from .models import CustomUser, Patient, Staff, Feedback, Prescription, Emergency
 
 
 class Register(SuccessMessageMixin, CreateView):
@@ -182,6 +182,9 @@ class ViewFeedback(ListView):
 
 
 class PatientPrescription(CreateView, SuccessMessageMixin):
+    """
+    class used for adding patient prescription
+    """
     form_class = PrescriptionForm
     template_name = 'users/prescription.html'
 
@@ -236,7 +239,7 @@ class ViewPrescription(ListView):
 
     def dispatch(self, request, *args, **kwargs):
         if self.user_has_permissions(request):
-            return super(ViewPrescription, self).dispatch(
+            return super(ViewEmergency, self).dispatch(
                 request, *args, **kwargs)
         return render(request, 'appointment/not_admin.html')
 
@@ -244,3 +247,43 @@ class ViewPrescription(ListView):
         return request.user.role == 'D'
 
 
+class EmergencyCase(CreateView, SuccessMessageMixin):
+    """
+    class used for adding emergency case
+    """
+    form_class = EmergencyForm
+    template_name = 'users/emergency.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.user_has_permissions(request):
+            return super(EmergencyCase, self).dispatch(
+                request, *args, **kwargs)
+        return render(request, 'appointment/not_admin.html')
+
+    def user_has_permissions(self, request):
+        return self.request.user.is_superuser
+
+    def get_success_url(self):
+        messages.success(self.request, f"You have successfully added emergency case")
+        return reverse("Hospital-home")
+
+
+class ViewEmergency(ListView):
+    """
+    class for view the list of emergency cases
+    """
+    model = Prescription
+    template_name = 'users/view_emergency.html'
+    context_object_name = 'emergency'
+
+    def get_queryset(self):
+        return self.model.objects.all().order_by('id')
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.user_has_permissions(request):
+            return super(ViewEmergency, self).dispatch(
+                request, *args, **kwargs)
+        return render(request, 'appointment/not_admin.html')
+
+    def user_has_permissions(self, request):
+        return self.request.user.is_superuser

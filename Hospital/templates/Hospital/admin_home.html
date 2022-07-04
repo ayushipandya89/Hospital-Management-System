@@ -105,6 +105,20 @@
     <div class="card-deck" style="margin-top: 30px">
         <div class="card" style="width: 18rem;">
           <div class="card-body">
+            <h5 class="card-title">Emergency Case</h5>
+            <a href="{% url 'emergency' %}" class="btn btn-primary">View</a>
+          </div>
+        </div>
+        <div class="card" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">View emergency cases</h5>
+            <a href="{% url 'view-emergency' %}" class="btn btn-primary">View</a>
+          </div>
+        </div>
+    </div>
+    <div class="card-deck" style="margin-top: 30px">
+        <div class="card" style="width: 18rem;">
+          <div class="card-body">
             <h5 class="card-title">View all feedback</h5>
             <a href="{% url 'view-feedback' %}" class="btn btn-primary">View</a>
           </div>
