@@ -1,11 +1,12 @@
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
+from django.http import Http404
 from django.shortcuts import redirect, render, get_object_or_404, get_list_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 from .forms import UserRegisterForm, UserUpdateForm, PatientRegistrationForm, StaffUpdateForm, FeedbackForm, \
-    PrescriptionForm
-from .models import CustomUser, Patient, Staff, Feedback
+    PrescriptionForm, PrescriptionUpdateForm
+from .models import CustomUser, Patient, Staff, Feedback, Prescription
 
 
 class Register(SuccessMessageMixin, CreateView):
@@ -193,7 +194,7 @@ class PatientPrescription(CreateView, SuccessMessageMixin):
 
     def get_success_url(self):
         messages.success(self.request, f"You have successfully submitted prescription ")
-        return reverse("Hospital-home")
+        return reverse("view-prescription")
 
     def dispatch(self, request, *args, **kwargs):
         if self.user_has_permissions(request):
@@ -203,3 +204,43 @@ class PatientPrescription(CreateView, SuccessMessageMixin):
 
     def user_has_permissions(self, request):
         return request.user.role == 'D'
+
+
+class PrescriptionUpdate(SuccessMessageMixin, UpdateView):
+    """
+    This class is for update the profile information.
+    """
+    form_class = PrescriptionUpdateForm
+    template_name = 'users/prescription_update.html'
+    success_message = "Your prescription was updated successfully"
+
+    def get_queryset(self):
+        query_set = Prescription.objects.filter(id=self.kwargs['pk'])
+        return query_set
+
+    def get_success_url(self):
+        # pk = self.kwargs["pk"]
+        return reverse('Hospital-home')
+
+
+class ViewPrescription(ListView):
+    """
+    class for view the list of prescription
+    """
+    model = Prescription
+    template_name = 'users/view_prescription.html'
+    context_object_name = 'prescription'
+
+    def get_queryset(self):
+        return self.model.objects.all().order_by('id')
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.user_has_permissions(request):
+            return super(ViewPrescription, self).dispatch(
+                request, *args, **kwargs)
+        return render(request, 'appointment/not_admin.html')
+
+    def user_has_permissions(self, request):
+        return request.user.role == 'D'
+
+

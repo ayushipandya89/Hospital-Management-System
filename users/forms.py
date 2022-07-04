@@ -86,6 +86,16 @@ class PrescriptionForm(forms.ModelForm):
             'time': forms.TimeInput(format='%H:%M'),
         }
 
-    def __init__(self, *args, **kwargs):
-        super(PrescriptionForm, self).__init__(*args, **kwargs)
-        self.fields['patient'].queryset = Admit.objects.filter(out_date__isnull=True)
+    # def __init__(self, *args, **kwargs):
+    #     super(PrescriptionForm, self).__init__(*args, **kwargs)
+    #     self.fields['patient'].queryset = Admit.objects.filter(out_date__isnull=True)
+
+
+class PrescriptionUpdateForm(forms.ModelForm):
+    """
+    This class is used to update fields of prescription.
+    """
+
+    class Meta:
+        model = Prescription
+        fields = ['medicine', 'time', 'dose']

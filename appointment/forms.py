@@ -123,6 +123,7 @@ class AdmitPatientForm(forms.ModelForm):
     """
     class for creating form for admitted patient
     """
+
     class Meta:
         model = Admit
         fields = ['room', 'patient', 'in_date', 'staff']
@@ -140,9 +141,19 @@ class DischargeUpdateForm(forms.ModelForm):
     """
     This class is used to discharge patient form
     """
+
     class Meta:
         model = Admit
         fields = ['out_date', 'charge']
         widgets = {
             'out_date': InputDate()
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        fetch_charge = cleaned_data.get("charge")
+        print(fetch_charge)
+        if fetch_charge <= 0:
+            raise ValidationError(
+                "charge can not be less than zero"
+            )

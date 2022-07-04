@@ -1,0 +1,35 @@
+{% extends 'Hospital/base.html' %}
+{% load static %}
+{% block title %}Prescription List{% endblock %}
+{% block content %}
+    <div class="container">
+        <h2> Prescription List </h2>
+        <div class="row">
+          <div class="col-sm">
+          <table class="table">
+          <tr>
+            <th>id</th>
+            <th>Staff</th>
+            <th>Patient</th>
+            <th>Medicine Name</th>
+            <th>Time</th>
+            <th>Dose</th>
+
+
+            </tr>
+            {% for pre in prescription %}
+              <tr>
+                <td>{{ pre.id }}</td>
+                <td>{{ pre.staff }}</td>
+                <td>{{ pre.patient.patient }}</td>
+                <td>{{ pre.medicine }}</td>
+                <td>{{ pre.time }}</td>
+                <td>{{ pre.dose }}</td>
+                <td> <a href="{% url 'update-prescription' pre.id %}""><button type="button" class="btn btn-outline-secondary">Update</button></td>
+              </tr>
+            {% endfor %}
+          </table>
+          </div>
+        </div>
+    </div>
+{% endblock %}
