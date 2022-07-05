@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 
-from .models import CustomUser, Patient, Staff, Feedback, Emergency, Medicine, Prescription
+from .models import CustomUser, Patient, Staff, Feedback, Emergency, Medicine, Prescription, Bill
 
 
 class UserRegisterForm(UserCreationForm):
@@ -115,7 +115,7 @@ class PrescriptionUpdateForm(forms.ModelForm):
             raise ValidationError(
                 "You can not prescribe this medicine....please add the medicine first"
             )
-        if fetch_count <=0:
+        if fetch_count <= 0:
             raise ValidationError(
                 "count can not be less than zero"
             )
@@ -153,3 +153,21 @@ class MedicineUpdateForm(forms.ModelForm):
     class Meta:
         model = Medicine
         fields = ['medicine_name', 'charge']
+
+
+class CreateBillForm(forms.ModelForm):
+    """
+    class for generating form for bill
+    """
+
+    class Meta:
+        model = Bill
+        fields = ['patient', 'staff_charge', 'other_charge']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        fetch_staff_charge = cleaned_data.get("staff_charge")
+        if fetch_staff_charge < 100:
+            raise ValidationError(
+                "charge can not be less than 100"
+            )

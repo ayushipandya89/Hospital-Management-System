@@ -32,6 +32,7 @@ urlpatterns = [
     path('medicine/', user_views.AddMedicine.as_view(), name='add-medicine'),
     path('<pk>/update_medicine/', user_views.MedicineUpdate.as_view(), name='update-medicine'),
     path('view_medicine/', ViewMedicine.as_view(), name='view-medicine'),
+    path('create_bill/', user_views.CreateBill.as_view(), name='create-bill'),
     path('feedback/', user_views.EnterFeedback.as_view(), name='feedback'),
     path('view_feedback/', ViewFeedback.as_view(), name='view-feedback'),
     path('', include('Hospital.urls')),

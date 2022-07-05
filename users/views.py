@@ -1,10 +1,12 @@
+from decimal import Decimal
+
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 from .forms import UserRegisterForm, UserUpdateForm, PatientRegistrationForm, StaffUpdateForm, FeedbackForm, \
-    EmergencyForm, MedicineForm, MedicineUpdateForm, PrescriptionForm, PrescriptionUpdateForm
+    EmergencyForm, MedicineForm, MedicineUpdateForm, PrescriptionForm, PrescriptionUpdateForm, CreateBillForm
 
 from .models import CustomUser, Patient, Staff, Feedback, Emergency, Medicine, Prescription
 
@@ -353,3 +355,26 @@ class MedicineUpdate(SuccessMessageMixin, UpdateView):
 
     def user_has_permissions(self, request):
         return request.user.role == 'D'
+
+
+class CreateBill(CreateView, SuccessMessageMixin):
+    """
+    class for creating bill
+    """
+    form_class = CreateBillForm
+    template_name = 'users/create_bill.html'
+
+    def form_valid(self, form):
+        data = self.request.POST
+        fetch_staff_charge = data.get('staff_charge')
+        fetch_other_charge = data.get('other_charge')
+        print(fetch_staff_charge,'sssssssssssss')
+        print(fetch_other_charge,'ooooooooooooooooo')
+        total = Decimal(fetch_staff_charge) + Decimal(fetch_other_charge)
+        print(total,'ttttttttttttttttt')
+        form.instance.total_charge = total
+        return super(CreateBill, self).form_valid(form)
+
+    def get_success_url(self):
+        messages.success(self.request, f"Bill created successfully")
+        return reverse("Hospital-home")

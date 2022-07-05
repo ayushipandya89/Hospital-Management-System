@@ -110,3 +110,17 @@ class Medicine(models.Model):
     """
     medicine_name = models.CharField(max_length=200)
     charge = models.DecimalField(max_digits=5, decimal_places=2)
+
+
+class Bill(models.Model):
+    """
+    class for creating bill table
+    """
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    staff_charge = models.DecimalField(max_digits=10, decimal_places=2)
+    medicine_charge = models.DecimalField(default=0, max_digits=5, decimal_places=2, null=True)
+    room_charge = models.DecimalField(default=0, max_digits=5, decimal_places=2, null=True)
+    emergency_charge = models.DecimalField(default=0, max_digits=5, decimal_places=2, null=True)
+    other_charge = models.DecimalField(default=0, max_digits=5, decimal_places=2, null=True, blank=True)
+    total_charge = models.DecimalField(max_digits=5, decimal_places=2)
+    is_paid = models.BooleanField(default=False)
