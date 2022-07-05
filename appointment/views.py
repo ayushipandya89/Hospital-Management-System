@@ -62,11 +62,13 @@ class DeleteAppointmentView(DeleteView):
     class for deleting appointments
     """
     model = Appointments
-    template_name = 'appointment/appointment_confirm_delete.html'
+    # template_name = 'appointment/appointment_confirm_delete.html'
     success_url = reverse_lazy('view-appointments')
 
     def test_func(self):
         appointments = self.get_object()
+        print(appointments,'[[[[[[[[[[[[')
+        print(appointments.user,'////////////')
         if self.request.user == appointments.user:
             return True
         return False

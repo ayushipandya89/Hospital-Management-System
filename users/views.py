@@ -222,7 +222,6 @@ class PrescriptionUpdate(SuccessMessageMixin, UpdateView):
         return query_set
 
     def get_success_url(self):
-        # pk = self.kwargs["pk"]
         return reverse('Hospital-home')
 
 
@@ -239,7 +238,7 @@ class ViewPrescription(ListView):
 
     def dispatch(self, request, *args, **kwargs):
         if self.user_has_permissions(request):
-            return super(ViewEmergency, self).dispatch(
+            return super(ViewPrescription, self).dispatch(
                 request, *args, **kwargs)
         return render(request, 'appointment/not_admin.html')
 
