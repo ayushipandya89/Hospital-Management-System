@@ -28,5 +28,19 @@
           </div>
         </div>
     </div>
+    <div class="card-deck" style="margin-top: 30px">
+        <div class="card" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">Add Medicine</h5>
+            <a href="{% url 'add-medicine' %}" class="btn btn-primary">Add</a>
+          </div>
+        </div>
+        <div class="card" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">View/Update Medicine</h5>
+            <a href="{% url 'view-medicine' %}" class="btn btn-primary">Go</a>
+          </div>
+        </div>
+    </div>
 {% endblock content %}
 

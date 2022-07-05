@@ -1,0 +1,30 @@
+{% extends 'Hospital/base.html' %}
+{% load static %}
+{% block title %}Medicine List{% endblock %}
+{% block content %}
+    <div class="container">
+        <h2> Medicine List </h2>
+        <div class="row">
+          <div class="col-sm">
+          <table class="table">
+          <tr>
+            <th>id</th>
+            <th>Name</th>
+            <th>Charge</th>
+
+
+            </tr>
+            {% for m in medicine %}
+              <tr>
+                <td>{{ m.id }}</td>
+                <td>{{ m.medicine_name }}</td>
+                <td>{{ m.charge }}</td>
+                <td> <a href="{% url 'update-medicine' m.id %}""><button type="button" class="btn btn-outline-secondary">Update</button></td>
+{#                <td> <a href="{% url 'delete-profile' m.id %}""><button type="button" class="btn btn-outline-danger">Delete</button></td>#}
+              </tr>
+            {% endfor %}
+          </table>
+          </div>
+        </div>
+    </div>
+{% endblock %}

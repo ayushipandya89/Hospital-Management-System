@@ -2,7 +2,7 @@ from django.urls import path, include
 from . import views as user_views
 from django.contrib.auth import views as auth_views
 
-from .views import ViewUser, ViewStaff, ViewFeedback, ViewEmergency
+from .views import ViewUser, ViewStaff, ViewFeedback, ViewEmergency, ViewMedicine, ViewPrescription
 
 urlpatterns = [
     path('register/', user_views.Register.as_view(), name='register'),
@@ -25,10 +25,13 @@ urlpatterns = [
     path('view_user/', ViewUser.as_view(), name='view-user'),
     path('view_staff/', ViewStaff.as_view(), name='view-staff'),
     path('prescription/', user_views.PatientPrescription.as_view(), name='prescription'),
-    path('view_prescription/', ViewEmergency.as_view(), name='view-prescription'),
+    path('view_prescription/', ViewPrescription.as_view(), name='view-prescription'),
     path('<pk>/update_prescription/', user_views.PrescriptionUpdate.as_view(), name='update-prescription'),
     path('emergency/', user_views.EmergencyCase.as_view(), name='emergency'),
     path('view_emergency/', ViewEmergency.as_view(), name='view-emergency'),
+    path('medicine/', user_views.AddMedicine.as_view(), name='add-medicine'),
+    path('<pk>/update_medicine/', user_views.MedicineUpdate.as_view(), name='update-medicine'),
+    path('view_medicine/', ViewMedicine.as_view(), name='view-medicine'),
     path('feedback/', user_views.EnterFeedback.as_view(), name='feedback'),
     path('view_feedback/', ViewFeedback.as_view(), name='view-feedback'),
     path('', include('Hospital.urls')),

@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 
-from .models import CustomUser, Patient, Staff, Feedback, Prescription, Emergency
+from .models import CustomUser, Patient, Staff, Feedback, Emergency, Medicine, Prescription
 
 
 class UserRegisterForm(UserCreationForm):
@@ -80,14 +80,21 @@ class PrescriptionForm(forms.ModelForm):
 
     class Meta:
         model = Prescription
-        fields = ['patient', 'medicine', 'time', 'dose']
-        widgets = {
-            'time': forms.TimeInput(format='%H:%M'),
-        }
+        fields = ['patient', 'medicine', 'count']
 
-    # def __init__(self, *args, **kwargs):
-    #     super(PrescriptionForm, self).__init__(*args, **kwargs)
-    #     self.fields['patient'].queryset = Admit.objects.filter(out_date__isnull=True)
+    def clean(self):
+        cleaned_data = super().clean()
+        fetch_medicine = cleaned_data.get("medicine")
+        fetch_count = cleaned_data.get("count")
+        query = Medicine.objects.filter(medicine_name=fetch_medicine)
+        if not query:
+            raise ValidationError(
+                "You can not prescribe this medicine....please add the medicine first"
+            )
+        if fetch_count <= 0:
+            raise ValidationError(
+                "count can not be less than zero"
+            )
 
 
 class PrescriptionUpdateForm(forms.ModelForm):
@@ -97,7 +104,21 @@ class PrescriptionUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Prescription
-        fields = ['medicine', 'time', 'dose']
+        fields = ['medicine', 'count']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        fetch_medicine = cleaned_data.get("medicine")
+        fetch_count = cleaned_data.get("count")
+        query = Medicine.objects.filter(medicine_name=fetch_medicine)
+        if not query:
+            raise ValidationError(
+                "You can not prescribe this medicine....please add the medicine first"
+            )
+        if fetch_count <=0:
+            raise ValidationError(
+                "count can not be less than zero"
+            )
 
 
 class EmergencyForm(forms.ModelForm):
@@ -112,3 +133,23 @@ class EmergencyForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(EmergencyForm, self).__init__(*args, **kwargs)
         self.fields['staff'].queryset = Staff.objects.filter(is_approve=True).filter(is_available=True)
+
+
+class MedicineForm(forms.ModelForm):
+    """
+    class for creating form for adding medicine
+    """
+
+    class Meta:
+        model = Medicine
+        fields = ['medicine_name', 'charge']
+
+
+class MedicineUpdateForm(forms.ModelForm):
+    """
+    This class is used to update fields of medicine table.
+    """
+
+    class Meta:
+        model = Medicine
+        fields = ['medicine_name', 'charge']

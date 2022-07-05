@@ -4,9 +4,9 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 from .forms import UserRegisterForm, UserUpdateForm, PatientRegistrationForm, StaffUpdateForm, FeedbackForm, \
-    PrescriptionForm, PrescriptionUpdateForm, EmergencyForm
+    EmergencyForm, MedicineForm, MedicineUpdateForm, PrescriptionForm, PrescriptionUpdateForm
 
-from .models import CustomUser, Patient, Staff, Feedback, Prescription, Emergency
+from .models import CustomUser, Patient, Staff, Feedback, Emergency, Medicine, Prescription
 
 
 class Register(SuccessMessageMixin, CreateView):
@@ -222,7 +222,7 @@ class PrescriptionUpdate(SuccessMessageMixin, UpdateView):
         return query_set
 
     def get_success_url(self):
-        return reverse('Hospital-home')
+        return reverse('view-prescription')
 
 
 class ViewPrescription(ListView):
@@ -271,7 +271,7 @@ class ViewEmergency(ListView):
     """
     class for view the list of emergency cases
     """
-    model = Prescription
+    model = Emergency
     template_name = 'users/view_emergency.html'
     context_object_name = 'emergency'
 
@@ -286,3 +286,70 @@ class ViewEmergency(ListView):
 
     def user_has_permissions(self, request):
         return self.request.user.is_superuser
+
+
+class AddMedicine(CreateView, SuccessMessageMixin):
+    """
+    class for adding medicines
+    """
+    form_class = MedicineForm
+    template_name = 'users/add_medicine.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.user_has_permissions(request):
+            return super(AddMedicine, self).dispatch(
+                request, *args, **kwargs)
+        return render(request, 'appointment/not_admin.html')
+
+    def user_has_permissions(self, request):
+        return request.user.role == 'D'
+
+    def get_success_url(self):
+        messages.success(self.request, f"Medicine added successfully")
+        return reverse("Hospital-home")
+
+
+class ViewMedicine(ListView):
+    """
+    class for view the list of medicine
+    """
+    model = Medicine
+    template_name = 'users/view_medicine.html'
+    context_object_name = 'medicine'
+
+    def get_queryset(self):
+        return self.model.objects.all().order_by('id')
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.user_has_permissions(request):
+            return super(ViewMedicine, self).dispatch(
+                request, *args, **kwargs)
+        return render(request, 'appointment/not_admin.html')
+
+    def user_has_permissions(self, request):
+        return request.user.role == 'D'
+
+
+class MedicineUpdate(SuccessMessageMixin, UpdateView):
+    """
+    This class is for update the medicine information.
+    """
+    form_class = MedicineUpdateForm
+    template_name = 'users/medicine_update.html'
+    success_message = "Your medicine was updated successfully"
+
+    def get_queryset(self):
+        query_set = Medicine.objects.filter(id=self.kwargs['pk'])
+        return query_set
+
+    def get_success_url(self):
+        return reverse('view-medicine')
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.user_has_permissions(request):
+            return super(MedicineUpdate, self).dispatch(
+                request, *args, **kwargs)
+        return render(request, 'appointment/not_admin.html')
+
+    def user_has_permissions(self, request):
+        return request.user.role == 'D'

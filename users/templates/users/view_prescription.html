@@ -12,8 +12,7 @@
             <th>Staff</th>
             <th>Patient</th>
             <th>Medicine Name</th>
-            <th>Time</th>
-            <th>Dose</th>
+            <th>Count</th>
 
 
             </tr>
@@ -23,8 +22,7 @@
                 <td>{{ pre.staff }}</td>
                 <td>{{ pre.patient.patient }}</td>
                 <td>{{ pre.medicine }}</td>
-                <td>{{ pre.time }}</td>
-                <td>{{ pre.dose }}</td>
+                <td>{{ pre.count }}</td>
                 <td> <a href="{% url 'update-prescription' pre.id %}""><button type="button" class="btn btn-outline-secondary">Update</button></td>
               </tr>
             {% endfor %}

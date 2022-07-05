@@ -90,8 +90,7 @@ class Prescription(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     medicine = models.CharField(max_length=500)
-    time = models.TimeField(help_text='Please use that format:%H:%M....for example= 09:00')
-    dose = models.IntegerField()
+    count = models.IntegerField()
 
 
 class Emergency(models.Model):
@@ -102,4 +101,12 @@ class Emergency(models.Model):
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     datetime = models.DateTimeField(default=timezone.now)
     disease = models.CharField(max_length=500)
-    charge = models.IntegerField()
+    charge = models.DecimalField(max_digits=10, decimal_places=2)
+
+
+class Medicine(models.Model):
+    """
+    class for creating table for medicine
+    """
+    medicine_name = models.CharField(max_length=200)
+    charge = models.DecimalField(max_digits=5, decimal_places=2)
