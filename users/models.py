@@ -71,8 +71,8 @@ class Patient(models.Model):
     patient = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     UUID = models.UUIDField(default=uuid.uuid4, editable=False)
 
-    def __str__(self):
-        return f"UUID:{self.UUID} | Patient :{self.patient}"
+    # def __str__(self):
+    #     return f"UUID:{self.UUID} | Patient :{self.patient}"
 
 
 class Feedback(models.Model):

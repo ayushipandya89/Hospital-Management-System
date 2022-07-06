@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 
+from appointment.models import Appointments, Admit
 from .models import CustomUser, Patient, Staff, Feedback, Emergency, Medicine, Prescription, Bill
 
 
@@ -164,8 +165,19 @@ class CreateBillForm(forms.ModelForm):
         model = Bill
         fields = ['patient', 'staff_charge', 'other_charge']
 
+    def __init__(self, *args, **kwargs):
+        super(CreateBillForm, self).__init__(*args, **kwargs)
+        queryset = Admit.objects.values('patient__patient__username', 'patient__id')
+        query = Appointments.objects.values('user__username', 'user__patient__id')
+        fetch_patient = []
+        for element in queryset.union(query):
+            fetch_patient.append((element.get('patient__id'), element.get('patient__patient__username')))
+        print(fetch_patient)
+        self.fields['patient'] = forms.ChoiceField(choices=fetch_patient)
+
     def clean(self):
         cleaned_data = super().clean()
+        cleaned_data['patient'] = Patient.objects.filter(id=cleaned_data['patient']).first()
         fetch_staff_charge = cleaned_data.get("staff_charge")
         if fetch_staff_charge < 100:
             raise ValidationError(

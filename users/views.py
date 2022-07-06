@@ -4,11 +4,11 @@ from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse, reverse_lazy
-from django.views.generic import CreateView, UpdateView, DeleteView, ListView
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
 from .forms import UserRegisterForm, UserUpdateForm, PatientRegistrationForm, StaffUpdateForm, FeedbackForm, \
     EmergencyForm, MedicineForm, MedicineUpdateForm, PrescriptionForm, PrescriptionUpdateForm, CreateBillForm
 
-from .models import CustomUser, Patient, Staff, Feedback, Emergency, Medicine, Prescription
+from .models import CustomUser, Patient, Staff, Feedback, Emergency, Medicine, Prescription, Bill
 
 
 class Register(SuccessMessageMixin, CreateView):
@@ -125,7 +125,7 @@ class UpdateStaffProfile(SuccessMessageMixin, UpdateView):
 
     def get_queryset(self, *args, **kwargs):
         query_set = Staff.objects.filter(id=self.kwargs['pk'])
-        query = get_object_or_404(Staff, id=self.kwargs.get('pk'))
+        # query = get_object_or_404(Staff, id=self.kwargs.get('pk'))
         return query_set
 
     def form_valid(self, form, *args, **kwargs):
@@ -364,17 +364,66 @@ class CreateBill(CreateView, SuccessMessageMixin):
     form_class = CreateBillForm
     template_name = 'users/create_bill.html'
 
-    def form_valid(self, form):
-        data = self.request.POST
-        fetch_staff_charge = data.get('staff_charge')
-        fetch_other_charge = data.get('other_charge')
-        print(fetch_staff_charge,'sssssssssssss')
-        print(fetch_other_charge,'ooooooooooooooooo')
-        total = Decimal(fetch_staff_charge) + Decimal(fetch_other_charge)
-        print(total,'ttttttttttttttttt')
-        form.instance.total_charge = total
-        return super(CreateBill, self).form_valid(form)
+    def post(self, request, *args, **kwargs):
+        # print(request.POST)
+        # form_class = self.get_form_class()
+        # form_obj = self.get_form(form_class)
+        print("Start")
+        bill_form = CreateBillForm(request.POST)
+        print("before form")
+        print(bill_form.errors)
+        if bill_form.is_valid():
+            print("its valid !!")
+            fetch_patient = request.POST.get('patient')
+            fetch_staff_charge = request.POST.get('staff_charge')
+            fetch_other_charge = request.POST.get('other_charge')
+            patient = Patient.objects.filter(id=fetch_patient).first()
+            print("1: ",fetch_staff_charge)
+            print("2: ",fetch_other_charge)
+            total = Decimal(fetch_staff_charge) + Decimal(fetch_other_charge)
+            print("total", total)
+            # form_obj.patient = patient
+            # bill_form.total_charge = total
+            bill_form.patient = patient
+            bill = bill_form.save(commit=False)
+            bill.total_charge = total
+            bill.save()
+            messages.success(request, f'bill generated.')
+            return redirect('Hospital-home')
+            # return self.form_valid(form_obj, **kwargs)
+            # return super().post(request, *args, **kwargs)
+        else:
+            print("cla", bill_form.errors)
+    # def get_success_url(self):
+    #     messages.success(self.request, f"Medicine added successfully")
+    #     return reverse("Hospital-home")
 
-    def get_success_url(self):
-        messages.success(self.request, f"Bill created successfully")
-        return reverse("Hospital-home")
+    # def form_valid(self, form):
+    #     print('aai gayu')
+    # form_obj = CreateBill(request.POST)
+    # form_obj = self.get_form()
+    # self.object = None
+    # form_obj = self.form_class
+    #     data = self.request.POST
+    #     fetch_patient = data.get('patient')
+    #     fetch_staff_charge = data.get('staff_charge')
+    #     fetch_other_charge = data.get('other_charge')
+    #     total = Decimal(fetch_staff_charge) + Decimal(fetch_other_charge)
+    #     # fetch_medicine = Prescription.objects.filter(patient = fetch_patient)
+    #     # if fetch_medicine:
+    #     #     medicine = Prescription.objects.filter(patient = fetch_patient).get('medicine')
+    #     #     print(medicine)
+    #     #     charge = Medicine.objects.filter(medicine_name=medicine).get('charge')
+    #     #     print(charge)
+    #     #     form.instance
+    #     print(fetch_patient)
+    #     print(fetch_staff_charge,'sssssssssssss')
+    #     print(fetch_other_charge,'ooooooooooooooooo')
+    #     total = Decimal(fetch_staff_charge) + Decimal(fetch_other_charge)
+    #     print(total,'ttttttttttttttttt')
+    #     form.instance.total_charge = total
+    #     return super(CreateBill, self).form_valid(form)
+
+
+class BillDetailView(DetailView):
+    model = Bill

@@ -1,5 +1,5 @@
 from django.urls import path, include
-from . import views as user_views
+from . import views as user_views, views
 from django.contrib.auth import views as auth_views
 
 from .views import ViewUser, ViewStaff, ViewFeedback, ViewEmergency, ViewMedicine, ViewPrescription
@@ -33,6 +33,7 @@ urlpatterns = [
     path('<pk>/update_medicine/', user_views.MedicineUpdate.as_view(), name='update-medicine'),
     path('view_medicine/', ViewMedicine.as_view(), name='view-medicine'),
     path('create_bill/', user_views.CreateBill.as_view(), name='create-bill'),
+    path('bill/<pk>', views.BillDetailView.as_view(), name='bill-detail'),
     path('feedback/', user_views.EnterFeedback.as_view(), name='feedback'),
     path('view_feedback/', ViewFeedback.as_view(), name='view-feedback'),
     path('', include('Hospital.urls')),
