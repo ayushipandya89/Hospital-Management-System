@@ -170,7 +170,6 @@ class CreateBillForm(forms.ModelForm):
         admit_query = Admit.objects.values('patient__patient__username', 'patient__id')
         appointment_query = Appointments.objects.values('user__username', 'user__patient__id')
         emergency_query = Emergency.objects.values('patient__patient__username','patient__id')
-        print('emergency_query',emergency_query)
         fetch_patient = []
         for element in admit_query.union(appointment_query,emergency_query):
             fetch_patient.append((element.get('patient__id'), element.get('patient__patient__username')))
@@ -181,7 +180,20 @@ class CreateBillForm(forms.ModelForm):
         cleaned_data = super().clean()
         cleaned_data['patient'] = Patient.objects.filter(id=cleaned_data['patient']).first()
         fetch_staff_charge = cleaned_data.get("staff_charge")
-        if fetch_staff_charge < 100:
+        bill_generated_already = Bill.objects.filter(patient=cleaned_data['patient'])
+        not_discharge = Admit.objects.filter(patient=cleaned_data['patient']).first()
+        print('out date: ',not_discharge.out_date)
+        print('not_discharge',not_discharge)
+        print('bill_generated_already',bill_generated_already)
+        if not_discharge.out_date:
             raise ValidationError(
-                "charge can not be less than 100"
+                "This patient is not discharged yet..."
+            )
+        if bill_generated_already:
+            raise ValidationError(
+                "Bill of this patient is already generated please choose another patient"
+            )
+        if fetch_staff_charge < 500:
+            raise ValidationError(
+                "charge can not be less than 500"
             )

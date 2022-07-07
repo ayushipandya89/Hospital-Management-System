@@ -19,8 +19,9 @@
                 <td>{{ m.id }}</td>
                 <td>{{ m.medicine_name }}</td>
                 <td>{{ m.charge }}</td>
-                <td> <a href="{% url 'update-medicine' m.id %}""><button type="button" class="btn btn-outline-secondary">Update</button></td>
-{#                <td> <a href="{% url 'delete-profile' m.id %}""><button type="button" class="btn btn-outline-danger">Delete</button></td>#}
+                {% if self.request.user.role == 'D' %}
+                    <td> <a href="{% url 'update-medicine' m.id %}""><button type="button" class="btn btn-outline-secondary">Update</button></td>
+                {% endif %}
               </tr>
             {% endfor %}
           </table>

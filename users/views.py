@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse, reverse_lazy
+from django.views import View
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
 
 from appointment.models import Admit
@@ -331,7 +332,7 @@ class ViewMedicine(ListView):
         return render(request, 'appointment/not_admin.html')
 
     def user_has_permissions(self, request):
-        return request.user.role == 'D'
+        return request.user.role == 'D' or self.request.user.is_superuser
 
 
 class MedicineUpdate(SuccessMessageMixin, UpdateView):
@@ -359,17 +360,19 @@ class MedicineUpdate(SuccessMessageMixin, UpdateView):
         return request.user.role == 'D'
 
 
-class CreateBill(CreateView, SuccessMessageMixin):
+class CreateBill(View, SuccessMessageMixin):
     """
     class for creating bill
     """
     form_class = CreateBillForm
     template_name = 'users/create_bill.html'
 
+    def get(self, request):
+        form = CreateBillForm()
+        context = {'form': form}
+        return render(request, 'users/create_bill.html', context)
+
     def post(self, request, *args, **kwargs):
-        # print(request.POST)
-        # form_class = self.get_form_class()
-        # form_obj = self.get_form(form_class)
         print("Start")
         bill_form = CreateBillForm(request.POST)
         print("before form")
@@ -395,7 +398,7 @@ class CreateBill(CreateView, SuccessMessageMixin):
                 bill.room_charge = admit.room.charge
             for emergency in emergency_obj:
                 total += emergency.charge
-                print('emergency :',emergency.charge)
+                print('emergency :', emergency.charge)
                 bill.emergency_charge = emergency.charge
             if fetch_medicine:
                 print('in medicine')
@@ -408,13 +411,15 @@ class CreateBill(CreateView, SuccessMessageMixin):
                 print(medicine_charge)
                 bill.medicine_charge = medicine_charge
 
-            total += Decimal(fetch_staff_charge) + Decimal(fetch_other_charge) + Decimal(medicine_charge) + Decimal(emergency_charge)
+            total += Decimal(fetch_staff_charge) + Decimal(fetch_other_charge) + Decimal(medicine_charge) + Decimal(
+                emergency_charge)
             bill.total_charge = total
             bill.save()
             messages.success(request, f'bill generated.')
             return redirect('Hospital-home')
+
         else:
-            print("cla", bill_form.errors)
+            return render(request, self.template_name, {'form': bill_form})
 
 
 class BillDetailView(DetailView):

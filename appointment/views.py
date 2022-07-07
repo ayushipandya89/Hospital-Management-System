@@ -67,8 +67,8 @@ class DeleteAppointmentView(DeleteView):
 
     def test_func(self):
         appointments = self.get_object()
-        print(appointments,'[[[[[[[[[[[[')
-        print(appointments.user,'////////////')
+        print(appointments, '[[[[[[[[[[[[')
+        print(appointments.user, '////////////')
         if self.request.user == appointments.user:
             return True
         return False
@@ -89,7 +89,7 @@ class EnterRoomData(SuccessMessageMixin, CreateView):
     """
     form_class = CreateRoomForm
     template_name = 'appointment/create_rooms.html'
-    success_url = reverse_lazy('Hospital-home   ')
+    success_url = reverse_lazy('Hospital-home')
     success_message = 'Your room was created.'
 
     def dispatch(self, request, *args, **kwargs):
@@ -140,7 +140,7 @@ class EnterAdmitPatient(SuccessMessageMixin, CreateView):
 
 
 class ViewNotDischarged(ListView):
-    model=Admit
+    model = Admit
     template_name = 'appointment/view_not_discharge_patient.html'
     context_object_name = 'admit'
 
