@@ -8,9 +8,9 @@ from django.views.generic import CreateView, UpdateView, DeleteView, ListView, D
 
 from appointment.models import Admit
 from .forms import UserRegisterForm, UserUpdateForm, PatientRegistrationForm, StaffUpdateForm, FeedbackForm, \
-    EmergencyForm, MedicineForm, MedicineUpdateForm, PrescriptionForm, PrescriptionUpdateForm, CreateBillForm
+    PrescriptionForm, PrescriptionUpdateForm, CreateBillForm, MedicineUpdateForm, MedicineForm, EmergencyForm
 
-from .models import CustomUser, Patient, Staff, Feedback, Emergency, Medicine, Prescription, Bill
+from .models import CustomUser, Patient, Staff, Feedback, Prescription, Emergency, Bill, Medicine
 
 
 class Register(SuccessMessageMixin, CreateView):
@@ -386,20 +386,29 @@ class CreateBill(CreateView, SuccessMessageMixin):
             bill = bill_form.save(commit=False)
             fetch_medicine = Prescription.objects.filter(patient=fetch_patient).first()
             admit_obj = Admit.objects.filter(patient=fetch_patient)
+            emergency_obj = Emergency.objects.filter(patient=fetch_patient)
             total = 0
             medicine_charge = 0
+            emergency_charge = 0
             for admit in admit_obj:
                 total += admit.room.charge
                 bill.room_charge = admit.room.charge
+            for emergency in emergency_obj:
+                total += emergency.charge
+                print('emergency :',emergency.charge)
+                bill.emergency_charge = emergency.charge
             if fetch_medicine:
                 print('in medicine')
-                print('medicine:',fetch_medicine.medicine)
+                print('medicine:', fetch_medicine.medicine)
                 charge = Medicine.objects.filter(medicine_name=fetch_medicine.medicine).first()
-                print('charge:',charge.charge)
-                medicine_charge = charge.charge
+                print(charge)
+                print('charge:', charge.charge)
+                print('dose:', fetch_medicine.count)
+                medicine_charge = charge.charge * fetch_medicine.count
+                print(medicine_charge)
                 bill.medicine_charge = medicine_charge
 
-            total += Decimal(fetch_staff_charge) + Decimal(fetch_other_charge) + Decimal(medicine_charge)
+            total += Decimal(fetch_staff_charge) + Decimal(fetch_other_charge) + Decimal(medicine_charge) + Decimal(emergency_charge)
             bill.total_charge = total
             bill.save()
             messages.success(request, f'bill generated.')

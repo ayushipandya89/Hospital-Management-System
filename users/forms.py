@@ -167,10 +167,12 @@ class CreateBillForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(CreateBillForm, self).__init__(*args, **kwargs)
-        queryset = Admit.objects.values('patient__patient__username', 'patient__id')
-        query = Appointments.objects.values('user__username', 'user__patient__id')
+        admit_query = Admit.objects.values('patient__patient__username', 'patient__id')
+        appointment_query = Appointments.objects.values('user__username', 'user__patient__id')
+        emergency_query = Emergency.objects.values('patient__patient__username','patient__id')
+        print('emergency_query',emergency_query)
         fetch_patient = []
-        for element in queryset.union(query):
+        for element in admit_query.union(appointment_query,emergency_query):
             fetch_patient.append((element.get('patient__id'), element.get('patient__patient__username')))
         print(fetch_patient)
         self.fields['patient'] = forms.ChoiceField(choices=fetch_patient)
