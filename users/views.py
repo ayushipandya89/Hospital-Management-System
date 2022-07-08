@@ -34,7 +34,7 @@ class Register(SuccessMessageMixin, CreateView):
                 patient = Patient.objects.create(patient=user_obj)
                 patient.save()
                 messages.success(request, 'Patient Profile created successfully')
-            if user_obj.role == 'D' or user_obj == 'N':
+            if user_obj.role == 'D' or user_obj.role == 'N':
                 staff = Staff.objects.create(staff=user_obj)
                 staff.save()
                 messages.success(request, 'Profile created successfully')

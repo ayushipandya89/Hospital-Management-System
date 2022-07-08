@@ -15,6 +15,16 @@ def validate_age(age):
         raise ValidationError('Please enter age above 21')
 
 
+class UserRole(models.Model):
+    """
+    class for creating table of role in hospital
+    """
+    role = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.role
+
+
 class CustomUser(AbstractUser):
     """
     model for custom user table.
@@ -36,9 +46,20 @@ class CustomUser(AbstractUser):
     profile = models.ImageField(default='default.jpg', upload_to='profile_pic/', null=True, blank=True)
     gender = models.CharField(max_length=15, choices=GENDER_CHOICES, null=True)
     role = models.CharField(max_length=15, choices=ROLE_CHOICES, null=True)
+    # role_fk = models.ForeignKey(UserRole,on_delete=models.CASCADE)
 
     def __str__(self):
         return self.username
+
+
+class StaffSpeciality(models.Model):
+    """
+    create class for adding speciality table for staff.
+    """
+    speciality = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.speciality
 
 
 class Staff(models.Model):
@@ -58,7 +79,7 @@ class Staff(models.Model):
     salary = models.IntegerField(default=0)
     is_approve = models.BooleanField(default=False)
     is_available = models.BooleanField(default=False)
-    speciality = models.CharField(max_length=50, choices=SPECIALITY_CHOICES)
+    speciality = models.ForeignKey('StaffSpeciality', on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return self.staff.username
