@@ -18,13 +18,6 @@ class Migration(migrations.Migration):
                 ('speciality', models.CharField(max_length=100)),
             ],
         ),
-        migrations.CreateModel(
-            name='UserRole',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('role', models.CharField(max_length=100)),
-            ],
-        ),
         migrations.AddField(
             model_name='staff',
             name='speciality_fk',

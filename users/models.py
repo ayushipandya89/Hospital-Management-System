@@ -45,8 +45,7 @@ class CustomUser(AbstractUser):
     address = models.CharField(max_length=300, null=True)
     profile = models.ImageField(default='default.jpg', upload_to='profile_pic/', null=True, blank=True)
     gender = models.CharField(max_length=15, choices=GENDER_CHOICES, null=True)
-    role = models.CharField(max_length=15, choices=ROLE_CHOICES, null=True)
-    # role_fk = models.ForeignKey(UserRole,on_delete=models.CASCADE)
+    role = models.ForeignKey('UserRole', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.username
