@@ -1,0 +1,26 @@
+{% extends 'Hospital/base.html' %}
+{% load static %}
+{% block title %}Bill List{% endblock %}
+{% block content %}
+    <div class="container">
+        <h2> Bill List </h2>
+        <div class="row">
+          <div class="col-sm">
+          <table class="table">
+          <tr>
+            <th>id</th>
+            <th>Patient</th>
+
+            </tr>
+            {% for i in bill %}
+              <tr>
+                <td>{{ i.id }}</td>
+                <td>{{ i.patient.patient }}</td>
+                <td> <a href="{% url 'bill-detail' i.id %}""><button type="button" class="btn btn-outline-secondary">View</button></td>
+              </tr>
+            {% endfor %}
+          </table>
+          </div>
+        </div>
+    </div>
+{% endblock %}

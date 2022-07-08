@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse, reverse_lazy
-from django.views import View
+from django.views import View, generic
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
 
 from appointment.models import Admit
@@ -422,5 +422,44 @@ class CreateBill(View, SuccessMessageMixin):
             return render(request, self.template_name, {'form': bill_form})
 
 
-class BillDetailView(DetailView):
+class BillDetailView(generic.DetailView):
     model = Bill
+
+    # def get_queryset(self):
+    #     print (self.kwargs.get('id'))
+    #     a =
+
+    def get_context_data(self, **kwargs):
+        context = super(BillDetailView, self).get_context_data(**kwargs)
+        # cart_product_form = Admit
+        # context['admits'] = Admit.objects.get(id = self.kwargs.id)
+        # context['patient'] = Admit.objects.filter(id=self.object.id)
+        # # print('sedrfghjnhgfdrsedrftghjbn',context['admits'])
+        # print(context['patient'])
+        b= Bill.objects.get(id=self.object.id)
+        p=b.patient
+        a=Admit.objects.get(patient=p)
+        print(b.patient,'123456789')
+        print(a.patient,'[[[[[[[[[[[[[[[[[[[[[[[[[')
+        context['patient'] = b.patient
+        print(context['patient'])
+        # PRINT(CONTEXT)
+        print(context)
+        return context
+
+
+class BillView(ListView):
+    """
+    class for displaying generated bills
+    """
+    model = Bill
+    template_name = 'users/view_bill.html'
+    context_object_name = 'bill'
+
+    def get_queryset(self):
+        return Bill.objects.order_by('id')
+
+    def get_context_data(self, **kwargs):
+        context = super(BillView, self).get_context_data(**kwargs)
+        context['bill_list'] = Bill.objects.order_by('id')
+        return context
