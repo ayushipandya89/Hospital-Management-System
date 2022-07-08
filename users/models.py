@@ -102,6 +102,7 @@ class Emergency(models.Model):
     datetime = models.DateTimeField(default=timezone.now)
     disease = models.CharField(max_length=500)
     charge = models.DecimalField(max_digits=10, decimal_places=2)
+    is_bill_generated = models.BooleanField(default=False)
 
 
 class Medicine(models.Model):

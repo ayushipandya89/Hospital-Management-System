@@ -126,7 +126,7 @@ class AdmitPatientForm(forms.ModelForm):
 
     class Meta:
         model = Admit
-        fields = ['room', 'patient', 'in_date', 'staff']
+        fields = ['room', 'patient', 'disease', 'in_date', 'staff']
         widgets = {
             'in_date': InputDate()
         }

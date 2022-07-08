@@ -138,11 +138,12 @@
             </td>
 
             <td>
-              Doctor Name :<br>
-              {% for admits in patient %}
-                  {{ admits.id. }}
-              {% endfor %}
-
+              Doctor Name :
+                {% if  staff  ==  emergency_staff  %}
+                    {{ staff }}<br>
+                {% else %}
+                    {{ staff }},{{ emergency_staff }}<br>
+                {% endif %}
             </td>
           </tr>
         </table>
@@ -150,20 +151,20 @@
     </tr>
 
     <tr class="heading">
-{#      <td>#}
-{#        Disease and Symptoms#}
-{#      </td>#}
-{#      <td>#}
-{##}
-{#      </td>#}
-{##}
-{#    </tr>#}
-{##}
-{#    <tr class="details">#}
-{#      <td>#}
-{#        {{symptoms}}#}
-{#      </td>#}
-{#    </tr>#}
+      <td>
+        Disease and Symptoms
+      </td>
+      <td>
+
+      </td>
+
+    </tr>
+
+    <tr class="details">
+      <td>
+          {{ disease }}
+      </td>
+    </tr>
     <tr class="heading">
       <td>
         Item
@@ -201,6 +202,16 @@
 
       <td>
         {{ object.medicine_charge}}
+      </td>
+    </tr>
+
+    <tr class="item last">
+      <td>
+        Emergency Charge
+      </td>
+
+      <td>
+        {{ object.emergency_charge}}
       </td>
     </tr>
 

@@ -7,7 +7,7 @@ from django.urls import reverse, reverse_lazy
 from django.views import View, generic
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
 
-from appointment.models import Admit
+from appointment.models import Admit, AdmitStaff
 from .forms import UserRegisterForm, UserUpdateForm, PatientRegistrationForm, StaffUpdateForm, FeedbackForm, \
     PrescriptionForm, PrescriptionUpdateForm, CreateBillForm, MedicineUpdateForm, MedicineForm, EmergencyForm
 
@@ -425,25 +425,25 @@ class CreateBill(View, SuccessMessageMixin):
 class BillDetailView(generic.DetailView):
     model = Bill
 
-    # def get_queryset(self):
-    #     print (self.kwargs.get('id'))
-    #     a =
-
     def get_context_data(self, **kwargs):
         context = super(BillDetailView, self).get_context_data(**kwargs)
-        # cart_product_form = Admit
-        # context['admits'] = Admit.objects.get(id = self.kwargs.id)
-        # context['patient'] = Admit.objects.filter(id=self.object.id)
-        # # print('sedrfghjnhgfdrsedrftghjbn',context['admits'])
-        # print(context['patient'])
-        b= Bill.objects.get(id=self.object.id)
-        p=b.patient
-        a=Admit.objects.get(patient=p)
-        print(b.patient,'123456789')
-        print(a.patient,'[[[[[[[[[[[[[[[[[[[[[[[[[')
-        context['patient'] = b.patient
-        print(context['patient'])
-        # PRINT(CONTEXT)
+        fetch_bill = Bill.objects.get(id=self.object.id)
+        fetch_admit = Admit.objects.filter(patient=fetch_bill.patient_id).first()
+        fetch_emergency = Emergency.objects.filter(patient=fetch_bill.patient_id).first()
+        print('fetch_emergency',fetch_emergency)
+        if fetch_emergency:
+            print(fetch_emergency.staff)
+            context['emergency_staff'] = fetch_emergency.staff
+        if fetch_admit:
+            print('its in!!!')
+            fetch_staff = AdmitStaff.objects.get(id= fetch_admit.pk)
+            print(fetch_staff.staff,'......')
+            print(fetch_bill.patient_id, '123456789')
+            print(fetch_admit.pk, '[[[[[[[[[[[[[[[[[[[[[[[[[')
+            context['patient'] = fetch_admit.patient
+            context['staff'] = fetch_staff.staff
+            context['disease'] = fetch_admit.disease
+            print(context['patient'])
         print(context)
         return context
 

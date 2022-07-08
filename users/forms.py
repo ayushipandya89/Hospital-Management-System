@@ -182,13 +182,15 @@ class CreateBillForm(forms.ModelForm):
         fetch_staff_charge = cleaned_data.get("staff_charge")
         bill_generated_already = Bill.objects.filter(patient=cleaned_data['patient'])
         not_discharge = Admit.objects.filter(patient=cleaned_data['patient']).first()
-        print('out date: ',not_discharge.out_date)
-        print('not_discharge',not_discharge)
-        print('bill_generated_already',bill_generated_already)
-        if not_discharge.out_date:
-            raise ValidationError(
-                "This patient is not discharged yet..."
-            )
+        # print('out date: ',not_discharge.out_date)
+        # print('not_discharge',not_discharge)
+        # print('bill_generated_already',bill_generated_already)
+        print(not_discharge)
+        if not_discharge:
+            if not not_discharge.out_date:
+                raise ValidationError(
+                    "This patient is not discharged yet..."
+                   )
         if bill_generated_already:
             raise ValidationError(
                 "Bill of this patient is already generated please choose another patient"

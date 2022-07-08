@@ -33,6 +33,7 @@ class Appointments(models.Model):
     date = models.DateField(validators=[date_validation])
     timeslot = models.CharField(max_length=200)
     disease = models.CharField(max_length=300)
+    is_bill_generated = models.BooleanField(null=True, default=False)
 
     def __str__(self):
         return f"Patient: {self.user} | Time: {self.timeslot}"
@@ -62,10 +63,23 @@ class Admit(models.Model):
     """
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    staff = models.ManyToManyField(Staff)
+    staff = models.ManyToManyField(Staff, through='AdmitStaff')
+    disease = models.CharField(max_length=200)
     in_date = models.DateField(blank=False)
     out_date = models.DateField(null=True)
     charge = models.IntegerField(null=True)
+    is_bill_generated = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Patient:{self.patient}"
+
+
+class AdmitStaff(models.Model):
+    """
+    class for making through table for admit .
+    """
+    admit = models.ForeignKey(Admit, on_delete=models.CASCADE)
+    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Staff:{self.staff}"
