@@ -9,7 +9,8 @@ from django.views.generic import CreateView, UpdateView, DeleteView, ListView, D
 
 from appointment.models import Admit, AdmitStaff
 from .forms import UserRegisterForm, UserUpdateForm, PatientRegistrationForm, StaffUpdateForm, FeedbackForm, \
-    PrescriptionForm, PrescriptionUpdateForm, CreateBillForm, MedicineUpdateForm, MedicineForm, EmergencyForm
+    PrescriptionForm, PrescriptionUpdateForm, CreateBillForm, MedicineUpdateForm, MedicineForm, EmergencyForm, \
+    AddRoleForm, AddSpecialityForm
 
 from .models import CustomUser, Patient, Staff, Feedback, Prescription, Emergency, Bill, Medicine
 
@@ -43,6 +44,44 @@ class Register(SuccessMessageMixin, CreateView):
             return redirect('login')
         else:
             return render(request, 'users/register.html', {'form': form})
+
+
+class AddRole(CreateView, SuccessMessageMixin):
+    """
+    class for adding data in role table
+    """
+    form_class = AddRoleForm
+    template_name = 'users/add_role.html'
+    success_url = reverse_lazy('Hospital-home')
+    success_message = "You have successfully added role"
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.user_has_permissions(request):
+            return super(AddRole, self).dispatch(
+                request, *args, **kwargs)
+        return render(request, 'appointment/not_admin.html')
+
+    def user_has_permissions(self, request):
+        return self.request.user.is_superuser
+
+
+class AddSpeciality(CreateView, SuccessMessageMixin):
+    """
+    class for adding data in speciality table
+    """
+    form_class = AddSpecialityForm
+    template_name = 'users/add_speciality.html'
+    success_url = reverse_lazy('Hospital-home')
+    success_message = "You have successfully added role"
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.user_has_permissions(request):
+            return super(AddSpeciality, self).dispatch(
+                request, *args, **kwargs)
+        return render(request, 'appointment/not_admin.html')
+
+    def user_has_permissions(self, request):
+        return self.request.user.is_superuser
 
 
 class UpdateProfile(SuccessMessageMixin, UpdateView):
@@ -430,14 +469,14 @@ class BillDetailView(generic.DetailView):
         fetch_bill = Bill.objects.get(id=self.object.id)
         fetch_admit = Admit.objects.filter(patient=fetch_bill.patient_id).first()
         fetch_emergency = Emergency.objects.filter(patient=fetch_bill.patient_id).first()
-        print('fetch_emergency',fetch_emergency)
+        print('fetch_emergency', fetch_emergency)
         if fetch_emergency:
             print(fetch_emergency.staff)
             context['emergency_staff'] = fetch_emergency.staff
         if fetch_admit:
             print('its in!!!')
-            fetch_staff = AdmitStaff.objects.get(id= fetch_admit.pk)
-            print(fetch_staff.staff,'......')
+            fetch_staff = AdmitStaff.objects.get(id=fetch_admit.pk)
+            print(fetch_staff.staff, '......')
             print(fetch_bill.patient_id, '123456789')
             print(fetch_admit.pk, '[[[[[[[[[[[[[[[[[[[[[[[[[')
             context['patient'] = fetch_admit.patient

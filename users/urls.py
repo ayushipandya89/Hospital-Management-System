@@ -6,6 +6,8 @@ from .views import ViewUser, ViewStaff, ViewFeedback, ViewEmergency, ViewMedicin
 
 urlpatterns = [
     path('register/', user_views.Register.as_view(), name='register'),
+    path('add_role/', user_views.AddRole.as_view(), name='add_role'),
+    path('add_speciality/', user_views.AddSpeciality.as_view(), name='add_speciality'),
     path('login/', auth_views.LoginView.as_view(template_name='users/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(template_name='users/logout.html'), name='logout'),
     path('password-reset/', auth_views.PasswordResetView.as_view(template_name='users/password_reset.html'),

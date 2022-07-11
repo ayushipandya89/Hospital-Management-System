@@ -3,7 +3,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 
 from appointment.models import Appointments, Admit
-from .models import CustomUser, Patient, Staff, Feedback, Emergency, Medicine, Prescription, Bill
+from .models import CustomUser, Patient, Staff, Feedback, Emergency, Medicine, Prescription, Bill, UserRole, \
+    StaffSpeciality
 
 
 class UserRegisterForm(UserCreationForm):
@@ -23,6 +24,16 @@ class UserRegisterForm(UserCreationForm):
             raise ValidationError(
                 "age can not be less than 21"
             )
+
+
+class AddRoleForm(forms.ModelForm):
+    """
+    class for creating form for adding role in the table
+    """
+
+    class Meta:
+        model = UserRole
+        fields = ['role']
 
 
 class UserUpdateForm(forms.ModelForm):
@@ -52,6 +63,16 @@ class PatientRegistrationForm(forms.ModelForm):
     class Meta:
         model = Patient
         fields = ['patient']
+
+
+class AddSpecialityForm(forms.ModelForm):
+    """
+    class for creating form for adding speciality
+    """
+
+    class Meta:
+        model = StaffSpeciality
+        fields = ['speciality']
 
 
 class StaffUpdateForm(forms.ModelForm):
@@ -169,9 +190,9 @@ class CreateBillForm(forms.ModelForm):
         super(CreateBillForm, self).__init__(*args, **kwargs)
         admit_query = Admit.objects.values('patient__patient__username', 'patient__id')
         appointment_query = Appointments.objects.values('user__username', 'user__patient__id')
-        emergency_query = Emergency.objects.values('patient__patient__username','patient__id')
+        emergency_query = Emergency.objects.values('patient__patient__username', 'patient__id')
         fetch_patient = []
-        for element in admit_query.union(appointment_query,emergency_query):
+        for element in admit_query.union(appointment_query, emergency_query):
             fetch_patient.append((element.get('patient__id'), element.get('patient__patient__username')))
         print(fetch_patient)
         self.fields['patient'] = forms.ChoiceField(choices=fetch_patient)
@@ -190,7 +211,7 @@ class CreateBillForm(forms.ModelForm):
             if not not_discharge.out_date:
                 raise ValidationError(
                     "This patient is not discharged yet..."
-                   )
+                )
         if bill_generated_already:
             raise ValidationError(
                 "Bill of this patient is already generated please choose another patient"
