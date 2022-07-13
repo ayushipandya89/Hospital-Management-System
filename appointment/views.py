@@ -4,25 +4,47 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy, reverse
 from django.utils.decorators import method_decorator
+from django.views import View
 from django.views.generic import CreateView, ListView, DeleteView, UpdateView
 
 from .forms import PatientAppointmentForm, PatientTimeslotsUpdate, CreateRoomForm, AdmitPatientForm, DischargeUpdateForm
 from .models import Appointments, Room, Admit
 
 
-class BookAppointments(SuccessMessageMixin, CreateView):
-    """
-    This class is for booking appointments.
-    """
+class BookAppointments(View, SuccessMessageMixin):
     form_class = PatientAppointmentForm
     template_name = 'appointment/book_appointments.html'
 
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        return super().form_valid(form)
+    def get(self, request):
+        form = PatientAppointmentForm()
+        time = 9
+        context = {'form': form,'timeslot':time}
+        return render(request, 'users/create_bill.html', context)
 
-    def get_success_url(self):
-        return reverse("appointment-timeslot", kwargs={'pk': self.object.pk})
+    def post(self, request, *args, **kwargs):
+        form = PatientAppointmentForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'appointment generated.')
+            return redirect('Hospital-home')
+
+        else:
+            return render(request, self.template_name, {'form': form})
+
+
+# class BookAppointments(SuccessMessageMixin, CreateView):
+#     """
+#     This class is for booking appointments.
+#     """
+#     form_class = PatientAppointmentForm
+#     template_name = 'appointment/book_appointments.html'
+#
+#     def form_valid(self, form):
+#         form.instance.user = self.request.user
+#         return super().form_valid(form)
+#
+#     def get_success_url(self):
+#         return reverse("appointment-timeslot", kwargs={'pk': self.object.pk})
 
 
 class AppointmentTimeslotUpdate(SuccessMessageMixin, UpdateView):

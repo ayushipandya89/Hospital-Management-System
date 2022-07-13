@@ -70,8 +70,10 @@ class Admit(models.Model):
     charge = models.IntegerField(null=True)
     is_bill_generated = models.BooleanField(default=False)
 
+    # def __str__(self):
+    #     return f"Patient:{self.patient}"
     def __str__(self):
-        return f"Patient:{self.patient}"
+        return self.patient.patient.username
 
 
 class AdmitStaff(models.Model):

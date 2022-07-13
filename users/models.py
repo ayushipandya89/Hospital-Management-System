@@ -92,7 +92,7 @@ class Patient(models.Model):
     UUID = models.UUIDField(default=uuid.uuid4, editable=False)
 
     def __str__(self):
-        return f"UUID:{self.UUID} | Patient :{self.patient}"
+        return self.patient.username
 
 
 class Feedback(models.Model):
@@ -103,13 +103,29 @@ class Feedback(models.Model):
     content = models.CharField(max_length=500)
 
 
+class Medicine(models.Model):
+    """
+    class for creating table for medicine
+    """
+    medicine_name = models.CharField(max_length=200)
+    charge = models.DecimalField(max_digits=10, decimal_places=2)
+
+
 class Prescription(models.Model):
     """
     class for creating table of patient's prescription
     """
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
-    medicine = models.CharField(max_length=500)
+    medicine = models.ManyToManyField(Medicine, through='PrescribeMedicine')
+
+
+class PrescribeMedicine(models.Model):
+    """
+    class for creating through table for prescription
+    """
+    prescription = models.ForeignKey(Prescription, on_delete=models.CASCADE)
+    medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
     count = models.IntegerField()
 
 
@@ -123,14 +139,6 @@ class Emergency(models.Model):
     disease = models.CharField(max_length=500)
     charge = models.DecimalField(max_digits=10, decimal_places=2)
     is_bill_generated = models.BooleanField(default=False)
-
-
-class Medicine(models.Model):
-    """
-    class for creating table for medicine
-    """
-    medicine_name = models.CharField(max_length=200)
-    charge = models.DecimalField(max_digits=10, decimal_places=2)
 
 
 class Bill(models.Model):

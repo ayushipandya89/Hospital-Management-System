@@ -5,14 +5,22 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views import View, generic
-from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 
 from appointment.models import Admit, AdmitStaff
 from .forms import UserRegisterForm, UserUpdateForm, PatientRegistrationForm, StaffUpdateForm, FeedbackForm, \
     PrescriptionForm, PrescriptionUpdateForm, CreateBillForm, MedicineUpdateForm, MedicineForm, EmergencyForm, \
     AddRoleForm, AddSpecialityForm
 
-from .models import CustomUser, Patient, Staff, Feedback, Prescription, Emergency, Bill, Medicine
+from .models import CustomUser, Patient, Staff, Feedback, Prescription, Emergency, Bill, Medicine, PrescribeMedicine
+
+
+def is_admin(user):
+    return CustomUser.objects.filter(username=user).filter(is_superuser=True)
+
+
+def is_doctor(user):
+    return CustomUser.objects.filter(username=user).filter(role=1)
 
 
 class Register(SuccessMessageMixin, CreateView):
@@ -50,19 +58,17 @@ class AddRole(CreateView, SuccessMessageMixin):
     """
     class for adding data in role table
     """
+    print('its in')
     form_class = AddRoleForm
     template_name = 'users/add_role.html'
     success_url = reverse_lazy('Hospital-home')
     success_message = "You have successfully added role"
 
     def dispatch(self, request, *args, **kwargs):
-        if self.user_has_permissions(request):
+        if is_admin(user=self.request.user):
             return super(AddRole, self).dispatch(
                 request, *args, **kwargs)
         return render(request, 'appointment/not_admin.html')
-
-    def user_has_permissions(self, request):
-        return self.request.user.is_superuser
 
 
 class AddSpeciality(CreateView, SuccessMessageMixin):
@@ -75,13 +81,10 @@ class AddSpeciality(CreateView, SuccessMessageMixin):
     success_message = "You have successfully added role"
 
     def dispatch(self, request, *args, **kwargs):
-        if self.user_has_permissions(request):
+        if is_admin(user=self.request.user):
             return super(AddSpeciality, self).dispatch(
                 request, *args, **kwargs)
         return render(request, 'appointment/not_admin.html')
-
-    def user_has_permissions(self, request):
-        return self.request.user.is_superuser
 
 
 class UpdateProfile(SuccessMessageMixin, UpdateView):
@@ -127,13 +130,10 @@ class ViewUser(ListView):
         return self.model.objects.all().order_by('id')
 
     def dispatch(self, request, *args, **kwargs):
-        if self.user_has_permissions(request):
+        if is_admin(user=self.request.user):
             return super(ViewUser, self).dispatch(
                 request, *args, **kwargs)
         return render(request, 'appointment/not_admin.html')
-
-    def user_has_permissions(self, request):
-        return self.request.user.is_superuser
 
 
 class ViewStaff(ListView):
@@ -148,13 +148,10 @@ class ViewStaff(ListView):
         return self.model.objects.all().order_by('id')
 
     def dispatch(self, request, *args, **kwargs):
-        if self.user_has_permissions(request):
+        if is_admin(user=self.request.user):
             return super(ViewStaff, self).dispatch(
                 request, *args, **kwargs)
         return render(request, 'appointment/not_admin.html')
-
-    def user_has_permissions(self, request):
-        return self.request.user.is_superuser
 
 
 class UpdateStaffProfile(SuccessMessageMixin, UpdateView):
@@ -216,41 +213,117 @@ class ViewFeedback(ListView):
         return self.model.objects.all().order_by('id')
 
     def dispatch(self, request, *args, **kwargs):
-        if self.user_has_permissions(request):
+        if is_admin(user=self.request.user):
             return super(ViewFeedback, self).dispatch(
                 request, *args, **kwargs)
         return render(request, 'appointment/not_admin.html')
 
-    def user_has_permissions(self, request):
-        return self.request.user.is_superuser
 
-
-class PatientPrescription(CreateView, SuccessMessageMixin):
-    """
-    class used for adding patient prescription
-    """
+class PatientPrescription(View, SuccessMessageMixin):
     form_class = PrescriptionForm
     template_name = 'users/prescription.html'
 
-    def form_valid(self, form):
-        # query = Staff.objects.filter(staff_id=self.request.user).values_list('id', flat=True)
-        a = self.request.user.id
-        fetch = Staff.objects.filter(staff=a).first()
-        form.instance.staff_id = fetch.id
-        return super(PatientPrescription, self).form_valid(form)
+    def get(self, request):
+        form = PrescriptionForm()
+        context = {'form': form}
+        return render(request, 'users/prescription.html', context)
 
-    def get_success_url(self):
-        messages.success(self.request, f"You have successfully submitted prescription ")
-        return reverse("view-prescription")
+    def post(self, request, *args, **kwargs):
+        bill_form = PrescriptionForm(request.POST)
+        print(bill_form.errors)
+        if bill_form.is_valid():
+            fetch_patient = request.POST.get('patient')
+            fetch_medicine = request.POST.get('medicine')
+            fetch_count = request.POST.get('count')
+            m = Medicine.objects.filter(medicine_name=fetch_medicine).first()
+            print('m:', m.id)
+            patient = Patient.objects.filter(id=fetch_patient).first()
+            bill_form.patient = patient
+            bill = bill_form.save(commit=False)
+            bill.save()
+            id_query = Prescription.objects.latest('id')
+            print('id_query', id_query)
+            prescribe = PrescribeMedicine.objects.create(prescription=id_query, medicine=m, count=fetch_count)
+            prescribe.save()
+            messages.success(request, f'prescription done.')
+            return redirect('Hospital-home')
 
-    def dispatch(self, request, *args, **kwargs):
-        if self.user_has_permissions(request):
-            return super(PatientPrescription, self).dispatch(
-                request, *args, **kwargs)
-        return render(request, 'appointment/not_admin.html')
+    # def form_valid(self, form):
+    #     a = self.request.user.id
+    #     fetch = Staff.objects.filter(staff=a).first()
+    #     # form.instance.staff_id = fetch.id
+    #     return super(PatientPrescription, self).form_valid(form)
 
-    def user_has_permissions(self, request):
-        return request.user.role == 'D'
+
+#
+# def get_context_data(self, **kwargs):
+#     print('gvsdhfbjbdbx')
+#     context = super(PatientPrescription, self).get_context_data(**kwargs)
+#     # form = PrescriptionForm()
+#     patient = CustomUser.objects.all()
+#     # context = {'form': form}
+#     context['staff'] = Staff.objects.all()
+#     return context
+
+
+# class PatientPrescription(BaseCreateView, SuccessMessageMixin):
+#     """
+#     class used for adding patient prescription
+#     """
+#     model = Prescription
+#     form_class = PrescriptionForm
+#     template_name = 'users/prescription.html'
+#
+#     def form_valid(self, form):
+#         result = super(PatientPrescription, self).form_valid(form)
+#         questions_formset = QuestionInlineFormSet(data=form.data, instance=self.object, prefix='questions_formset',
+#
+#                                                   )
+#         if questions_formset.is_valid():
+#             questions_formset.save()
+#         return result
+#
+#     def get_context_data(self, **kwargs):
+#         context = super(PatientPrescription, self).get_context_data(**kwargs)
+#         # context['questions_formset'] = QuestionInlineFormSet(prefix='questions_formset')
+#         return context
+# def get(self, request):
+#     form = PrescriptionForm()
+#     patient = CustomUser.objects.all()
+#     print(patient)
+#     context = {'form': form}
+#     return render(request, 'users/create_bill.html', context)
+#
+# def get_context_data(self, **kwargs):
+#     print(1234567891234589)
+#     context = super(PrescriptionForm, self).get_context_data(**kwargs)
+#     fetch_patient = CustomUser.objects.get(id)
+#     print('fetch_patient', fetch_patient)
+#     # fetch_admit = Admit.objects.filter(patient=fetch_bill.patient_id).first()
+#     # fetch_emergency = Emergency.objects.filter(patient=fetch_bill.patient_id).first()
+#     # print('fetch_emergency', fetch_emergency)
+#     context['patient'] = fetch_patient
+
+# def form_valid(self, form):
+#     # query = Staff.objects.filter(staff_id=self.request.user).values_list('id', flat=True)
+#     a = self.request.user.id
+#     fetch = Staff.objects.filter(staff=a).first()
+#     form.instance.staff_id = fetch.id
+#     return super(PatientPrescription, self).form_valid(form)
+#
+# def get_success_url(self):
+#     messages.success(self.request, f"You have successfully submitted prescription ")
+#     return reverse("view-prescription")
+#
+# def dispatch(self, request, *args, **kwargs):
+#     if self.user_has_permissions(request):
+#         return super(PatientPrescription, self).dispatch(
+#             request, *args, **kwargs)
+#     return render(request, 'appointment/not_admin.html')
+#
+# def user_has_permissions(self, request):
+#     return request.user.role_id == 1
+#
 
 
 class PrescriptionUpdate(SuccessMessageMixin, UpdateView):
@@ -281,13 +354,13 @@ class ViewPrescription(ListView):
         return self.model.objects.all().order_by('id')
 
     def dispatch(self, request, *args, **kwargs):
-        if self.user_has_permissions(request):
+        if is_doctor(user=self.request.user):
             return super(ViewPrescription, self).dispatch(
                 request, *args, **kwargs)
-        return render(request, 'appointment/not_admin.html')
+        return render(request, 'appointment/not_doc.html')
 
-    def user_has_permissions(self, request):
-        return request.user.role == 'D'
+    # def user_has_permissions(self, request):
+    #     return request.user.role == 'D'
 
 
 class EmergencyCase(CreateView, SuccessMessageMixin):
@@ -298,13 +371,10 @@ class EmergencyCase(CreateView, SuccessMessageMixin):
     template_name = 'users/emergency.html'
 
     def dispatch(self, request, *args, **kwargs):
-        if self.user_has_permissions(request):
+        if is_admin(user=self.request.user):
             return super(EmergencyCase, self).dispatch(
                 request, *args, **kwargs)
         return render(request, 'appointment/not_admin.html')
-
-    def user_has_permissions(self, request):
-        return self.request.user.is_superuser
 
     def get_success_url(self):
         messages.success(self.request, f"You have successfully added emergency case")
@@ -323,13 +393,10 @@ class ViewEmergency(ListView):
         return self.model.objects.all().order_by('id')
 
     def dispatch(self, request, *args, **kwargs):
-        if self.user_has_permissions(request):
+        if is_admin(user=self.request.user):
             return super(ViewEmergency, self).dispatch(
                 request, *args, **kwargs)
         return render(request, 'appointment/not_admin.html')
-
-    def user_has_permissions(self, request):
-        return self.request.user.is_superuser
 
 
 class AddMedicine(CreateView, SuccessMessageMixin):
@@ -340,13 +407,10 @@ class AddMedicine(CreateView, SuccessMessageMixin):
     template_name = 'users/add_medicine.html'
 
     def dispatch(self, request, *args, **kwargs):
-        if self.user_has_permissions(request):
+        if is_doctor(user=self.request.user):
             return super(AddMedicine, self).dispatch(
                 request, *args, **kwargs)
-        return render(request, 'appointment/not_admin.html')
-
-    def user_has_permissions(self, request):
-        return request.user.role == 'D'
+        return render(request, 'appointment/not_doc.html')
 
     def get_success_url(self):
         messages.success(self.request, f"Medicine added successfully")
@@ -359,19 +423,18 @@ class ViewMedicine(ListView):
     """
     model = Medicine
     template_name = 'users/view_medicine.html'
-    context_object_name = 'medicine'
+    context_object_name = 'all_search_results'
 
     def get_queryset(self):
-        return self.model.objects.all().order_by('id')
-
-    def dispatch(self, request, *args, **kwargs):
-        if self.user_has_permissions(request):
-            return super(ViewMedicine, self).dispatch(
-                request, *args, **kwargs)
-        return render(request, 'appointment/not_admin.html')
-
-    def user_has_permissions(self, request):
-        return request.user.role == 'D' or self.request.user.is_superuser
+        result = super(ViewMedicine, self).get_queryset()
+        query = self.request.GET.get('search')
+        if query:
+            postresult = Medicine.objects.filter(medicine_name__icontains=query)
+            result = postresult
+        else:
+            postresult = Medicine.objects.all()
+            result = postresult
+        return result
 
 
 class MedicineUpdate(SuccessMessageMixin, UpdateView):
@@ -390,13 +453,10 @@ class MedicineUpdate(SuccessMessageMixin, UpdateView):
         return reverse('view-medicine')
 
     def dispatch(self, request, *args, **kwargs):
-        if self.user_has_permissions(request):
+        if is_doctor(user=self.request.user):
             return super(MedicineUpdate, self).dispatch(
                 request, *args, **kwargs)
-        return render(request, 'appointment/not_admin.html')
-
-    def user_has_permissions(self, request):
-        return request.user.role == 'D'
+        return render(request, 'appointment/not_doc.html')
 
 
 class CreateBill(View, SuccessMessageMixin):

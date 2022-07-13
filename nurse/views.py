@@ -5,6 +5,11 @@ from django.views.generic import CreateView, ListView
 
 from nurse.forms import DutyForm
 from nurse.models import NurseDuty
+from users.models import CustomUser
+
+
+def is_admin(user):
+    return CustomUser.objects.filter(username=user).filter(is_superuser=True)
 
 
 class AssignDuty(SuccessMessageMixin, CreateView):
@@ -17,13 +22,10 @@ class AssignDuty(SuccessMessageMixin, CreateView):
     success_message = 'Duty Assigned successfully to the staff'
 
     def dispatch(self, request, *args, **kwargs):
-        if self.user_has_permissions(request):
+        if is_admin(user=self.request.user):
             return super(AssignDuty, self).dispatch(
                 request, *args, **kwargs)
         return render(request, 'appointment/not_admin.html')
-
-    def user_has_permissions(self, request):
-        return self.request.user.is_superuser
 
 
 class ViewDuty(ListView):
@@ -35,10 +37,7 @@ class ViewDuty(ListView):
     context_object_name = 'nurseduty'
 
     def dispatch(self, request, *args, **kwargs):
-        if self.user_has_permissions(request):
+        if is_admin(user=self.request.user):
             return super(ViewDuty, self).dispatch(
                 request, *args, **kwargs)
         return render(request, 'appointment/not_admin.html')
-
-    def user_has_permissions(self, request):
-        return self.request.user.is_superuser

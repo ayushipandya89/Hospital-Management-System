@@ -2,17 +2,53 @@
 {% load crispy_forms_filters %}
 {% load crispy_forms_tags %}
 {% block content %}
-	<div class="content-section">
-		<form method="POST" enctype="multipart/form-data">
-			{% csrf_token %}
-			<fieldset class="form-group">
-				<legend class="border-bottom mb-4">Book Appointments</legend>
-				{{ form|crispy }}
-			</fieldset>
-			<div class="form-group">
-				<button class="btn btn-outline-info" type='submit'>Next</button>
-			</div>
-		</form>
-	</div>
+{#	<div class="content-section">#}
+{#		<form method="POST" enctype="multipart/form-data">#}
+{#			{% csrf_token %}#}
+{#			<fieldset class="form-group">#}
+{#				<legend class="border-bottom mb-4">Book Appointments</legend>#}
+{#				{{ form|crispy }}#}
+{#			</fieldset>#}
+{#			<div class="form-group">#}
+{#				<button class="btn btn-outline-info" type='submit'>Next</button>#}
+{#			</div>#}
+{#		</form>#}
+{#	</div>#}
+    <form id="" enctype="multipart/form-data">
+        {% csrf_token %}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">Book Appointments</legend>
+            {{ form|crispy }}
+        </fieldset>
+        <div class="form-group">
+            <button id="" class="btn btn-outline-info" type='button'>Book</button>
+        </div>
+    </form>
 {% endblock content %}
 
+
+{% block scripts %}
+<script>
+$(document).ready(function () {
+  $.ajaxSetup({
+       headers: {
+         "X-CSRFToken": $('[name=csrfmiddlewaretoken]').val()
+       }
+   });
+   $("button").click(function() {
+    console.log('Start')
+    event.preventDefault();
+    $.ajax({
+      type: "GET",
+      url: "{% url 'book-appointments'%}",
+       success:  function (data) {        // Getting msg from the view
+       console.log(data);
+
+       },
+    });
+    return false;
+
+  });
+ });
+</script>
+{% endblock scripts %}

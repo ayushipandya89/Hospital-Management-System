@@ -1,10 +1,11 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
+from django.forms import inlineformset_factory
 
 from appointment.models import Appointments, Admit
 from .models import CustomUser, Patient, Staff, Feedback, Emergency, Medicine, Prescription, Bill, UserRole, \
-    StaffSpeciality
+    StaffSpeciality, PrescribeMedicine
 
 
 class UserRegisterForm(UserCreationForm):
@@ -30,8 +31,10 @@ class AddRoleForm(forms.ModelForm):
     """
     class for creating form for adding role in the table
     """
+    print('aai gayu')
 
     class Meta:
+        print(123)
         model = UserRole
         fields = ['role']
 
@@ -96,27 +99,91 @@ class FeedbackForm(forms.ModelForm):
 
 
 class PrescriptionForm(forms.ModelForm):
-    """
-    class for creating prescription form
-    """
+    patient = forms.ModelChoiceField(queryset=None)
+    staff = forms.ModelChoiceField(queryset=None)
+    medicine = forms.CharField()
+    count = forms.IntegerField()
 
     class Meta:
         model = Prescription
-        fields = ['patient', 'medicine', 'count']
+        fields = ['patient', 'staff', 'medicine', 'count']
+
+    def __init__(self, *args, **kwargs):
+        super(PrescriptionForm, self).__init__(*args, **kwargs)
+        self.fields['patient'].queryset = Admit.objects.filter(out_date__isnull=True)
+        self.fields['staff'].queryset = Staff.objects.filter(is_approve=True).filter(is_available=True)
 
     def clean(self):
+        # print('.////////////////////////////')
         cleaned_data = super().clean()
-        fetch_medicine = cleaned_data.get("medicine")
+        print(cleaned_data['patient'], '..................')
+        a = Patient.objects.filter(patient__username=cleaned_data['patient']).first()
+        print( a, ':::::::::::::::::::::::::')
+        cleaned_data['patient'] = a
         fetch_count = cleaned_data.get("count")
-        query = Medicine.objects.filter(medicine_name=fetch_medicine)
-        if not query:
-            raise ValidationError(
-                "You can not prescribe this medicine....please add the medicine first"
-            )
         if fetch_count <= 0:
-            raise ValidationError(
-                "count can not be less than zero"
-            )
+            self._errors["count"] = ["count can npt be less than zero"]
+
+    # def clean(self):
+    #     form_data = self.cleaned_data
+    #     form_data['patient'] = Patient.objects.filter(id=form_data['patient']).first()
+    #     fetch_count = form_data['count']
+    #     if fetch_count <=0:
+    #         self._errors["count"] = ["count can npt be less than zero"]
+
+
+# QuestionInlineFormSet = inlineformset_factory(Prescription, PrescribeMedicine, extra=1, can_delete=False,
+#                                               fields=('medicine', 'count'),
+#                                               # widgets={
+#                                               #     'type': w.Select(attrs={'class': 'form-control'}),
+#                                               #     'text': w.TextInput(attrs={'class': 'form-control'}),
+#                                               # }
+#                                               )
+#
+#
+# class CommonForm:
+#     pass
+#
+#
+# class PrescriptionForm(CommonForm):
+#     """
+#     class for creating prescription form
+#     """
+#
+#     class Meta:
+#         model = Prescription
+#         fields = ['patient', 'medicine']
+
+
+# class PriscribeMedicineForm(forms.ModelForm):
+#     class Meta:
+#         model = PrescribeMedicine
+#         fields = ['medicine', 'count']
+
+
+# class PrescriptionForm(forms.ModelForm):
+#     """
+#     class for creating prescription form
+#     """
+#     # count = forms.IntegerField()
+#
+#     class Meta:
+#         model = Prescription
+#         fields = ['patient', 'medicine']
+#
+#     def clean(self):
+#         cleaned_data = super().clean()
+#         fetch_medicine = cleaned_data.get("medicine")
+#         # fetch_count = cleaned_data.get("count")
+#         query = Medicine.objects.filter(medicine_name=fetch_medicine)
+#         if not query:
+#             raise ValidationError(
+#                 "You can not prescribe this medicine....please add the medicine first"
+#             )
+#         if fetch_count <= 0:
+#             raise ValidationError(
+#                 "count can not be less than zero"
+#             )
 
 
 class PrescriptionUpdateForm(forms.ModelForm):
@@ -126,21 +193,21 @@ class PrescriptionUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Prescription
-        fields = ['medicine', 'count']
+        fields = ['medicine']
 
     def clean(self):
         cleaned_data = super().clean()
         fetch_medicine = cleaned_data.get("medicine")
-        fetch_count = cleaned_data.get("count")
+        # fetch_count = cleaned_data.get("count")
         query = Medicine.objects.filter(medicine_name=fetch_medicine)
         if not query:
             raise ValidationError(
                 "You can not prescribe this medicine....please add the medicine first"
             )
-        if fetch_count <= 0:
-            raise ValidationError(
-                "count can not be less than zero"
-            )
+        # if fetch_count <= 0:
+        #     raise ValidationError(
+        #         "count can not be less than zero"
+        #     )
 
 
 class EmergencyForm(forms.ModelForm):
