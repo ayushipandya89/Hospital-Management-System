@@ -3,13 +3,11 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView
 
+from constants import DUTY_ASSIGN_MSG
 from nurse.forms import DutyForm
 from nurse.models import NurseDuty
 from users.models import CustomUser
-
-
-def is_admin(user):
-    return CustomUser.objects.filter(username=user).filter(is_superuser=True)
+from users.views import is_admin
 
 
 class AssignDuty(SuccessMessageMixin, CreateView):
@@ -19,7 +17,7 @@ class AssignDuty(SuccessMessageMixin, CreateView):
     form_class = DutyForm
     template_name = 'nurse/assign_duty.html'
     success_url = reverse_lazy('Hospital-home')
-    success_message = 'Duty Assigned successfully to the staff'
+    success_message = DUTY_ASSIGN_MSG
 
     def dispatch(self, request, *args, **kwargs):
         if is_admin(user=self.request.user):

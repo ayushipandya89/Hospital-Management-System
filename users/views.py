@@ -8,6 +8,9 @@ from django.views import View, generic
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 
 from appointment.models import Admit, AdmitStaff
+from constants import PRESCRIPTION_SUCCESS_MSG, REGISTER_SUCCESS_MSG, ROLE_SUCCESS_MSG, SPECIALITY_SUCCESS_MSG, \
+    PROFILE_UPDATE_MSG, PROFILE_DELETE_MSG, UPDATE_STAFF_PROFILE, NURSE_ERROR_MSG, FEEDBACK_SUCCESS_MSG, \
+    PRESCRIPTION_UPDATE_MSG, EMERGENCY_SUCCESS_MSG, MEDICINE_SUCCESS_MSG, MEDICINE_UPDATE_MSG, BILL_SUCCESS_MSG
 from .forms import UserRegisterForm, UserUpdateForm, PatientRegistrationForm, StaffUpdateForm, FeedbackForm, \
     PrescriptionForm, PrescriptionUpdateForm, CreateBillForm, MedicineUpdateForm, MedicineForm, EmergencyForm, \
     AddRoleForm, AddSpecialityForm
@@ -42,11 +45,11 @@ class Register(SuccessMessageMixin, CreateView):
             if user_obj.role == 'P':
                 patient = Patient.objects.create(patient=user_obj)
                 patient.save()
-                messages.success(request, 'Patient Profile created successfully')
+                messages.success(request,REGISTER_SUCCESS_MSG)
             if user_obj.role == 'D' or user_obj.role == 'N':
                 staff = Staff.objects.create(staff=user_obj)
                 staff.save()
-                messages.success(request, 'Profile created successfully')
+                messages.success(request, REGISTER_SUCCESS_MSG)
             if request.user.is_superuser:
                 return redirect('Hospital-home')
             return redirect('login')
@@ -62,7 +65,7 @@ class AddRole(CreateView, SuccessMessageMixin):
     form_class = AddRoleForm
     template_name = 'users/add_role.html'
     success_url = reverse_lazy('Hospital-home')
-    success_message = "You have successfully added role"
+    success_message = ROLE_SUCCESS_MSG
 
     def dispatch(self, request, *args, **kwargs):
         if is_admin(user=self.request.user):
@@ -78,7 +81,7 @@ class AddSpeciality(CreateView, SuccessMessageMixin):
     form_class = AddSpecialityForm
     template_name = 'users/add_speciality.html'
     success_url = reverse_lazy('Hospital-home')
-    success_message = "You have successfully added role"
+    success_message = SPECIALITY_SUCCESS_MSG
 
     def dispatch(self, request, *args, **kwargs):
         if is_admin(user=self.request.user):
@@ -93,7 +96,7 @@ class UpdateProfile(SuccessMessageMixin, UpdateView):
     """
     form_class = UserUpdateForm
     template_name = 'users/profile.html'
-    success_message = "Your profile was updated successfully"
+    success_message = PROFILE_UPDATE_MSG
 
     def get_queryset(self):
         query_set = CustomUser.objects.filter(id=self.kwargs['pk'])
@@ -109,6 +112,7 @@ class DeleteProfile(SuccessMessageMixin, DeleteView):
     This class is for delete the user profile.
     """
     model = CustomUser
+    success_message = PROFILE_DELETE_MSG
     success_url = "/"
 
     def test_func(self):
@@ -160,7 +164,7 @@ class UpdateStaffProfile(SuccessMessageMixin, UpdateView):
     """
     form_class = StaffUpdateForm
     template_name = 'users/staff_update.html'
-    success_message = "Your staff profile was updated successfully"
+    success_message = UPDATE_STAFF_PROFILE
 
     def get_queryset(self, *args, **kwargs):
         query_set = Staff.objects.filter(id=self.kwargs['pk'])
@@ -173,8 +177,7 @@ class UpdateStaffProfile(SuccessMessageMixin, UpdateView):
         fetch_pk = get_object_or_404(Staff, id=self.kwargs.get('pk'))
         query = CustomUser.objects.filter(username=fetch_pk).values_list('role', flat=True)
         if query[0] == 'N' and fetch_speciality != 'Nurse':
-            messages.error(self.request, f"you are nurse you can not choose another speciality...please choose nurse "
-                                         f"as speciality")
+            messages.error(self.request, NURSE_ERROR_MSG)
             return self.form_invalid(form)
         else:
             return super().form_valid(form)
@@ -197,7 +200,7 @@ class EnterFeedback(CreateView, SuccessMessageMixin):
         super(EnterFeedback, self).form_valid(form)
 
     def get_success_url(self):
-        messages.success(self.request, f"you have successfully submitted your feedback ")
+        messages.success(self.request,FEEDBACK_SUCCESS_MSG)
         return reverse("Hospital-home")
 
 
@@ -245,7 +248,7 @@ class PatientPrescription(View, SuccessMessageMixin):
             print('id_query', id_query)
             prescribe = PrescribeMedicine.objects.create(prescription=id_query, medicine=m, count=fetch_count)
             prescribe.save()
-            messages.success(request, f'prescription done.')
+            messages.success(request, PRESCRIPTION_SUCCESS_MSG)
             return redirect('Hospital-home')
 
     # def form_valid(self, form):
@@ -332,7 +335,7 @@ class PrescriptionUpdate(SuccessMessageMixin, UpdateView):
     """
     form_class = PrescriptionUpdateForm
     template_name = 'users/prescription_update.html'
-    success_message = "Your prescription was updated successfully"
+    success_message = PRESCRIPTION_UPDATE_MSG
 
     def get_queryset(self):
         query_set = Prescription.objects.filter(id=self.kwargs['pk'])
@@ -359,9 +362,6 @@ class ViewPrescription(ListView):
                 request, *args, **kwargs)
         return render(request, 'appointment/not_doc.html')
 
-    # def user_has_permissions(self, request):
-    #     return request.user.role == 'D'
-
 
 class EmergencyCase(CreateView, SuccessMessageMixin):
     """
@@ -377,7 +377,7 @@ class EmergencyCase(CreateView, SuccessMessageMixin):
         return render(request, 'appointment/not_admin.html')
 
     def get_success_url(self):
-        messages.success(self.request, f"You have successfully added emergency case")
+        messages.success(self.request, EMERGENCY_SUCCESS_MSG)
         return reverse("Hospital-home")
 
 
@@ -413,7 +413,7 @@ class AddMedicine(CreateView, SuccessMessageMixin):
         return render(request, 'appointment/not_doc.html')
 
     def get_success_url(self):
-        messages.success(self.request, f"Medicine added successfully")
+        messages.success(self.request, MEDICINE_SUCCESS_MSG)
         return reverse("Hospital-home")
 
 
@@ -443,7 +443,7 @@ class MedicineUpdate(SuccessMessageMixin, UpdateView):
     """
     form_class = MedicineUpdateForm
     template_name = 'users/medicine_update.html'
-    success_message = "Your medicine was updated successfully"
+    success_message = MEDICINE_UPDATE_MSG
 
     def get_queryset(self):
         query_set = Medicine.objects.filter(id=self.kwargs['pk'])
@@ -514,7 +514,7 @@ class CreateBill(View, SuccessMessageMixin):
                 emergency_charge)
             bill.total_charge = total
             bill.save()
-            messages.success(request, f'bill generated.')
+            messages.success(request, BILL_SUCCESS_MSG)
             return redirect('Hospital-home')
 
         else:

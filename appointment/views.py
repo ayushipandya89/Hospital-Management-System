@@ -7,6 +7,8 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import CreateView, ListView, DeleteView, UpdateView
 
+from constants import APPOINTMENT_SUCCESS_MSG, ROOM_SUCCESS_MSG, ADMIT_SUCCESS_MSG, DISCHARGE_SUCCESS_MSG
+from users.views import is_admin
 from .forms import PatientAppointmentForm, PatientTimeslotsUpdate, CreateRoomForm, AdmitPatientForm, DischargeUpdateForm
 from .models import Appointments, Room, Admit
 
@@ -18,14 +20,14 @@ class BookAppointments(View, SuccessMessageMixin):
     def get(self, request):
         form = PatientAppointmentForm()
         time = 9
-        context = {'form': form,'timeslot':time}
+        context = {'form': form, 'timeslot': time}
         return render(request, 'users/create_bill.html', context)
 
     def post(self, request, *args, **kwargs):
         form = PatientAppointmentForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, f'appointment generated.')
+            messages.success(request, APPOINTMENT_SUCCESS_MSG)
             return redirect('Hospital-home')
 
         else:
@@ -53,7 +55,7 @@ class AppointmentTimeslotUpdate(SuccessMessageMixin, UpdateView):
     """
     form_class = PatientTimeslotsUpdate
     template_name = 'appointment/book_appointments_timeslots.html'
-    success_message = "Your appointment was created successfully"
+    success_message = APPOINTMENT_SUCCESS_MSG
 
     def get_queryset(self):
         query_set = Appointments.objects.filter(id=self.kwargs['pk'])
@@ -112,16 +114,13 @@ class EnterRoomData(SuccessMessageMixin, CreateView):
     form_class = CreateRoomForm
     template_name = 'appointment/create_rooms.html'
     success_url = reverse_lazy('Hospital-home')
-    success_message = 'Your room was created.'
+    success_message = ROOM_SUCCESS_MSG
 
     def dispatch(self, request, *args, **kwargs):
-        if self.user_has_permissions(request):
+        if is_admin(user=self.request.user):
             return super(EnterRoomData, self).dispatch(
                 request, *args, **kwargs)
         return render(request, 'appointment/not_admin.html')
-
-    def user_has_permissions(self, request):
-        return self.request.user.is_superuser
 
 
 class ViewRooms(ListView):
@@ -133,13 +132,10 @@ class ViewRooms(ListView):
     context_object_name = 'room'
 
     def dispatch(self, request, *args, **kwargs):
-        if self.user_has_permissions(request):
+        if is_admin(user=self.request.user):
             return super(ViewRooms, self).dispatch(
                 request, *args, **kwargs)
         return render(request, 'appointment/not_admin.html')
-
-    def user_has_permissions(self, request):
-        return self.request.user.is_superuser
 
 
 class EnterAdmitPatient(SuccessMessageMixin, CreateView):
@@ -149,16 +145,13 @@ class EnterAdmitPatient(SuccessMessageMixin, CreateView):
     form_class = AdmitPatientForm
     template_name = 'appointment/admit_patient.html'
     success_url = reverse_lazy('Hospital-home')
-    success_message = 'Admitted patient successfully'
+    success_message = ADMIT_SUCCESS_MSG
 
     def dispatch(self, request, *args, **kwargs):
-        if self.user_has_permissions(request):
+        if is_admin(user=self.request.user):
             return super(EnterAdmitPatient, self).dispatch(
                 request, *args, **kwargs)
         return render(request, 'appointment/not_admin.html')
-
-    def user_has_permissions(self, request):
-        return self.request.user.is_superuser
 
 
 class ViewNotDischarged(ListView):
@@ -171,13 +164,10 @@ class ViewNotDischarged(ListView):
         return query
 
     def dispatch(self, request, *args, **kwargs):
-        if self.user_has_permissions(request):
+        if is_admin(user=self.request.user):
             return super(ViewNotDischarged, self).dispatch(
                 request, *args, **kwargs)
         return render(request, 'appointment/not_admin.html')
-
-    def user_has_permissions(self, request):
-        return self.request.user.is_superuser
 
 
 class ViewAdmitPatient(ListView):
@@ -189,20 +179,17 @@ class ViewAdmitPatient(ListView):
     context_object_name = 'admit'
 
     def dispatch(self, request, *args, **kwargs):
-        if self.user_has_permissions(request):
+        if is_admin(user=self.request.user):
             return super(ViewAdmitPatient, self).dispatch(
                 request, *args, **kwargs)
         return render(request, 'appointment/not_admin.html')
-
-    def user_has_permissions(self, request):
-        return self.request.user.is_superuser
 
 
 class DischargePatient(UpdateView, SuccessMessageMixin):
     form_class = DischargeUpdateForm
     template_name = 'appointment/discharge_patient.html'
     success_url = reverse_lazy('Hospital-home')
-    success_message = "Patient Discharge Successfully"
+    success_message = DISCHARGE_SUCCESS_MSG
 
     def get_queryset(self):
         query_set = Admit.objects.filter(id=self.kwargs['pk'])
