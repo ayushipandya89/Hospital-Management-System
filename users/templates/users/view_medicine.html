@@ -3,20 +3,16 @@
 {% block title %}Medicine List{% endblock %}
 {% block content %}
     <div class="container">
-        <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search as per name" aria-label="Search" name="search" >
+        <form class="form-inline my-2 my-lg-0" id="medicine_form">
+            <input class="form-control mr-sm-2" id="medicine" type="search" placeholder="Search as per name" aria-label="Search" name="search" >
+            <datalist id="medicine">
+                {% for data in datalist%}
+                    <option value="{{data}}">
+                {% endfor %}
+            </datalist>
             <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
         </form>
         <br>
-{#        <form method="get" action="#">#}
-{#            <p>Filter: <input type="text" value={{filter}} name="filter"/></p>#}
-{#            <p>order_by: <input type="text" value={{orderby}} name="orderby"/></p>#}
-{#            <p><input type="submit" name="submit" value="submit"/></p>#}
-{#        </form>#}
-{#        <form action="" method="get">#}
-{#            {{ filterset.form.as_p }}#}
-{#            <input type="submit" />#}
-{#          </form>#}
         <div class="row">
           <div class="col-sm">
           <table class="table">
@@ -41,19 +37,63 @@
           </div>
         </div>
     </div>
-{#    <ul>#}
-{#      {% for m in object_list %}#}
-{#        <li>#}
-{#          {{ m.medicine_name }}#}
-{#        </li>#}
-{#      {% endfor %}#}
-{#    </ul>#}
-
-{#    <ul>#}
-{#      {% for m in object_list %}#}
-{#        <li>#}
-{#          {{ m.medicine_name }},{{ m.charge }}#}
-{#        </li>#}
-{#      {% endfor %}#}
-{#    </ul>#}
 {% endblock %}
+
+{% block scripts %}
+    <script>
+        $(document).ready(function () {
+            console.log('start')
+            $("#medicine_form").submit(function (event) {
+            var medicine_name = $("#medicine").val()
+            console.log(medicine_name)
+            event.preventDefault();
+            $.ajax({
+              type: "GET",
+              url: "{% url 'view-medicine' %}",
+              data: {
+                'search': medicine_name
+                },
+              success:  function () {
+
+               }
+            });
+            return false;
+        });
+      });
+    </script>
+{% endblock scripts %}
+
+
+{#        <form method="get" action="#">#}
+{#            <p>Filter: <input type="text" value={{filter}} name="filter"/></p>#}
+{#            <p>order_by: <input type="text" value={{orderby}} name="orderby"/></p>#}
+{#            <p><input type="submit" name="submit" value="submit"/></p>#}
+{#        </form>#}
+{#        <form action="" method="get">#}
+{#            {{ filterset.form.as_p }}#}
+{#            <input type="submit" />#}
+{#          </form>#}
+
+{#        <div class="row">#}
+{#          <div class="col-sm">#}
+{#          <table class="table">#}
+{#          <tr>#}
+{#            <th>id</th>#}
+{#            <th>Name</th>#}
+{#            <th>Charge</th>#}
+{#            </tr>#}
+{#            {% for m in all_search_results %}#}
+{#              <tr>#}
+{#                <td>{{ m.id }}</td>#}
+{#                <td>{{ m.medicine_name }}</td>#}
+{#                <td>{{ m.charge }}</td>#}
+{#                {% if self.request.user.role == 'D' %}#}
+{#                    <td> <a href="{% url 'update-medicine' m.id %}""><button type="button" class="btn btn-outline-secondary">Update</button></td>#}
+{#                {% endif %}#}
+{#              </tr>#}
+{#            {% empty %}#}
+{#                <h5>Oops !!! No data found...Please enter correct data...</h5>#}
+{#            {% endfor %}#}
+{#          </table>#}
+{#          </div>#}
+{#        </div>#}

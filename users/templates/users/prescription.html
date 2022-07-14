@@ -24,3 +24,9 @@
 	</div>
 {% endblock content %}
 
+{% block scripts %}
+    <script>
+        const data = '{{ qs_json }}'
+        console.log(data)
+    </script>
+{% endblock scripts %}

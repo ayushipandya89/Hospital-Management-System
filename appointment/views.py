@@ -1,13 +1,11 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.generic import CreateView, ListView, DeleteView, UpdateView
-from django.views.generic.detail import BaseDetailView
+from django.views.generic import CreateView, ListView, UpdateView
 
 from constants import APPOINTMENT_SUCCESS_MSG, ROOM_SUCCESS_MSG, ADMIT_SUCCESS_MSG, DISCHARGE_SUCCESS_MSG, \
     APPOINTMENT_DELETE_MSG
@@ -32,7 +30,6 @@ class BookAppointments(View, SuccessMessageMixin):
             form.save()
             messages.success(request, APPOINTMENT_SUCCESS_MSG)
             return redirect('Hospital-home')
-
         else:
             return render(request, self.template_name, {'form': form})
 

@@ -428,8 +428,10 @@ class ViewMedicine(ListView):
     def get_queryset(self):
         result = super(ViewMedicine, self).get_queryset()
         query = self.request.GET.get('search')
+        print('query:',query)
         if query:
             postresult = Medicine.objects.filter(medicine_name__icontains=query)
+            print(postresult,'////////////')
             result = postresult
         else:
             postresult = Medicine.objects.all()
