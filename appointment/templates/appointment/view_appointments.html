@@ -25,7 +25,11 @@
                 <td>{{ apt.timeslot }}</td>
                 <td>{{ apt.disease }}</td>
                 {% if request.user.is_superuser %}
-                    <td> <a href="{% url 'delete-appointments' apt.id %}""><button type="button" class="btn btn-outline-danger">Delete</button></td>
+                     <td><form action="{% url 'delete-appointments' apt.id %}" method="post">
+                        {% csrf_token %}
+                         <input type="hidden" name="_method" value="delete">
+                         <input type="submit" value="Delete">
+                    </form></td>
                 {% endif %}
               </tr>
             {% endfor %}

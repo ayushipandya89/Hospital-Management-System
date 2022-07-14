@@ -1,13 +1,16 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
-from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import CreateView, ListView, DeleteView, UpdateView
+from django.views.generic.detail import BaseDetailView
 
-from constants import APPOINTMENT_SUCCESS_MSG, ROOM_SUCCESS_MSG, ADMIT_SUCCESS_MSG, DISCHARGE_SUCCESS_MSG
+from constants import APPOINTMENT_SUCCESS_MSG, ROOM_SUCCESS_MSG, ADMIT_SUCCESS_MSG, DISCHARGE_SUCCESS_MSG, \
+    APPOINTMENT_DELETE_MSG
 from users.views import is_admin
 from .forms import PatientAppointmentForm, PatientTimeslotsUpdate, CreateRoomForm, AdmitPatientForm, DischargeUpdateForm
 from .models import Appointments, Room, Admit
@@ -81,21 +84,25 @@ class ViewAppointments(ListView):
         return self.model.objects.filter(user=self.request.user.id).order_by('-id')
 
 
-class DeleteAppointmentView(DeleteView):
+class DeleteAppointmentView(View):
     """
-    class for deleting appointments
+    class for deleting appointment
     """
+    http_method_names = ['delete']
     model = Appointments
-    # template_name = 'appointment/appointment_confirm_delete.html'
-    success_url = reverse_lazy('view-appointments')
 
-    def test_func(self):
-        appointments = self.get_object()
-        print(appointments, '[[[[[[[[[[[[')
-        print(appointments.user, '////////////')
-        if self.request.user == appointments.user:
-            return True
-        return False
+    def dispatch(self, *args, **kwargs):
+        method = self.request.POST.get('_method', '').lower()
+        if method == 'delete':
+            return self.delete(*args, **kwargs)
+        return super(DeleteAppointmentView, self).dispatch(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        fetch_id = kwargs["pk"]
+        query = get_object_or_404(Appointments, pk=int(fetch_id))
+        query.delete()
+        messages.success(self.request, APPOINTMENT_DELETE_MSG)
+        return render(self.request, 'Hospital/admin_home.html')
 
 
 class ViewAllAppointments(ListView):

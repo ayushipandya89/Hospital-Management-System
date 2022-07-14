@@ -83,7 +83,7 @@ class PatientTimeslotsUpdate(forms.ModelForm):
     date = datetime.now().date()
     time = datetime.now()
     current_time = time.strftime("%H:%M:%S")
-    date_query = Appointments.objects.last().date
+    date_query = Appointments.objects.last()
     if date_query == date:
         for i in range(9, 20):
             if i > int(current_time.split(':')[0]):
