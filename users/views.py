@@ -1,11 +1,13 @@
+import json
 from decimal import Decimal
 
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views import View, generic
-from django.views.generic import CreateView, UpdateView, DeleteView, ListView
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView, TemplateView
 
 from appointment.models import Admit, AdmitStaff
 from constants import PRESCRIPTION_SUCCESS_MSG, REGISTER_SUCCESS_MSG, ROLE_SUCCESS_MSG, SPECIALITY_SUCCESS_MSG, \
@@ -45,7 +47,7 @@ class Register(SuccessMessageMixin, CreateView):
             if user_obj.role == 'P':
                 patient = Patient.objects.create(patient=user_obj)
                 patient.save()
-                messages.success(request,REGISTER_SUCCESS_MSG)
+                messages.success(request, REGISTER_SUCCESS_MSG)
             if user_obj.role == 'D' or user_obj.role == 'N':
                 staff = Staff.objects.create(staff=user_obj)
                 staff.save()
@@ -200,7 +202,7 @@ class EnterFeedback(CreateView, SuccessMessageMixin):
         super(EnterFeedback, self).form_valid(form)
 
     def get_success_url(self):
-        messages.success(self.request,FEEDBACK_SUCCESS_MSG)
+        messages.success(self.request, FEEDBACK_SUCCESS_MSG)
         return reverse("Hospital-home")
 
 
@@ -417,26 +419,31 @@ class AddMedicine(CreateView, SuccessMessageMixin):
         return reverse("Hospital-home")
 
 
-class ViewMedicine(ListView):
-    """
-    class for view the list of medicine
-    """
-    model = Medicine
-    template_name = 'users/view_medicine.html'
-    context_object_name = 'all_search_results'
+class SearchMedicine(View):
 
-    def get_queryset(self):
-        result = super(ViewMedicine, self).get_queryset()
-        query = self.request.GET.get('search')
-        print('query:',query)
-        if query:
-            postresult = Medicine.objects.filter(medicine_name__icontains=query)
-            print(postresult,'////////////')
-            result = postresult
+    def get(self, request):
+        topics = Medicine.objects.all().values_list('medicine_name', flat=True)
+        medicine_list = list(topics)
+        return JsonResponse(medicine_list, safe=False)
+
+
+class ViewMedicine(View):
+    def get(self, request):
+        all_data = Medicine.objects.all()
+        context ={
+            'all_data':all_data
+        }
+        return render(request, 'users/view_medicine.html',context)
+
+    def post(self, request):
+        search = request.POST['search']
+        print(search, '[[[[[[[[')
+        if search != " ":
+            search = search.strip()
+            medicine = Medicine.objects.filter(medicine_name__icontains=search)
+            return render(request, 'users/view_medicine.html', {'data': medicine})
         else:
-            postresult = Medicine.objects.all()
-            result = postresult
-        return result
+            return redirect('Hospital-home')
 
 
 class MedicineUpdate(SuccessMessageMixin, UpdateView):

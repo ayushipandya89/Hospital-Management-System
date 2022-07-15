@@ -1,163 +1,163 @@
-{% extends 'Hospital/base.html' %}
-{% block content %}
-	<h1>Admin Home Page</h1>
-    <div class="card-deck">
-        <div class="card" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">Add User</h5>
-            <a href="{% url 'register' %}" class="btn btn-primary">Add</a>
-          </div>
+    {% extends 'Hospital/base.html' %}
+    {% block content %}
+        <h1>Admin Home Page</h1>
+        <div class="card-deck">
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">Add User</h5>
+                <a href="{% url 'register' %}" class="btn btn-primary">Add</a>
+              </div>
+            </div>
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">View/Delete User</h5>
+                <a href="{% url 'view-user' %}" class="btn btn-primary">Go</a>
+              </div>
+            </div>
         </div>
-        <div class="card" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">View/Delete User</h5>
-            <a href="{% url 'view-user' %}" class="btn btn-primary">Go</a>
-          </div>
+    {#    staff details   #}
+        <div class="card-deck" style="margin-top: 30px">
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">Add Staff</h5>
+                <a href="{% url 'register' %}" class="btn btn-primary">Add</a>
+              </div>
+            </div>
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">View/Update/Delete Staff</h5>
+                <a href="{% url 'view-staff' %}" class="btn btn-primary">Go</a>
+              </div>
+            </div>
         </div>
-    </div>
-{#    staff details   #}
-    <div class="card-deck" style="margin-top: 30px">
-        <div class="card" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">Add Staff</h5>
-            <a href="{% url 'register' %}" class="btn btn-primary">Add</a>
-          </div>
+        <div class="card-deck" style="margin-top: 30px">
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">Add Role</h5>
+                <a href="{% url 'add_role' %}" class="btn btn-primary">Add</a>
+              </div>
+            </div>
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">Add Speciality</h5>
+                <a href="{% url 'add_speciality' %}" class="btn btn-primary">Add</a>
+              </div>
+            </div>
         </div>
-        <div class="card" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">View/Update/Delete Staff</h5>
-            <a href="{% url 'view-staff' %}" class="btn btn-primary">Go</a>
-          </div>
+    {#    appointment detail #}
+        <div class="card-deck" style="margin-top: 30px">
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">View appointment</h5>
+                <a href="{% url 'view-all-appointments' %}" class="btn btn-primary">View</a>
+              </div>
+            </div>
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">Delete appointment</h5>
+                <a href="#" class="btn btn-primary">Delete</a>
+              </div>
+            </div>
         </div>
-    </div>
-    <div class="card-deck" style="margin-top: 30px">
-        <div class="card" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">Add Role</h5>
-            <a href="{% url 'add_role' %}" class="btn btn-primary">Add</a>
-          </div>
+    {#    room details #}
+        <div class="card-deck" style="margin-top: 30px">
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">Create Room</h5>
+                <a href="{% url 'room' %}" class="btn btn-primary">Create</a>
+              </div>
+            </div>
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">View Room</h5>
+                <a href="{% url 'view-rooms' %}" class="btn btn-primary">View</a>
+              </div>
+            </div>
         </div>
-        <div class="card" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">Add Speciality</h5>
-            <a href="{% url 'add_speciality' %}" class="btn btn-primary">Add</a>
-          </div>
+        <div class="card-deck" style="margin-top: 30px">
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">Admit Patient</h5>
+                <a href="{% url 'admit-patient' %}" class="btn btn-primary">Admit</a>
+              </div>
+            </div>
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">View Admitted Patient</h5>
+                <a href="{% url 'view-admit-patient' %}" class="btn btn-primary">View</a>
+              </div>
+            </div>
         </div>
-    </div>
-{#    appointment detail #}
-    <div class="card-deck" style="margin-top: 30px">
-        <div class="card" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">View appointment</h5>
-            <a href="{% url 'view-all-appointments' %}" class="btn btn-primary">View</a>
-          </div>
+        <div class="card-deck" style="margin-top: 30px">
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">Discharge Patient</h5>
+                <a href="{% url 'view-discharge-patient' %}" class="btn btn-primary">Go</a>
+              </div>
+            </div>
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">View Discharge Patient</h5>
+                <a href="#" class="btn btn-primary">View</a>
+              </div>
+            </div>
         </div>
-        <div class="card" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">Delete appointment</h5>
-            <a href="#" class="btn btn-primary">Delete</a>
-          </div>
+        <div class="card-deck" style="margin-top: 30px">
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">Add Nurse Duty</h5>
+                <a href="{% url 'duty' %}" class="btn btn-primary">Go</a>
+              </div>
+            </div>
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">View Assigned Duty</h5>
+                <a href="{% url 'view-duty' %}" class="btn btn-primary">View</a>
+              </div>
+            </div>
         </div>
-    </div>
-{#    room details #}
-    <div class="card-deck" style="margin-top: 30px">
-        <div class="card" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">Create Room</h5>
-            <a href="{% url 'room' %}" class="btn btn-primary">Create</a>
-          </div>
+        <div class="card-deck" style="margin-top: 30px">
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">Emergency Case</h5>
+                <a href="{% url 'emergency' %}" class="btn btn-primary">View</a>
+              </div>
+            </div>
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">View emergency cases</h5>
+                <a href="{% url 'view-emergency' %}" class="btn btn-primary">View</a>
+              </div>
+            </div>
         </div>
-        <div class="card" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">View Room</h5>
-            <a href="{% url 'view-rooms' %}" class="btn btn-primary">View</a>
-          </div>
+        <div class="card-deck" style="margin-top: 30px">
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">Create Bill</h5>
+                <a href="{% url 'create-bill' %}" class="btn btn-primary">Create</a>
+              </div>
+            </div>
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">View all bills</h5>
+                <a href="{% url 'view-bill' %}" class="btn btn-primary">View</a>
+              </div>
+            </div>
         </div>
-    </div>
-    <div class="card-deck" style="margin-top: 30px">
-        <div class="card" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">Admit Patient</h5>
-            <a href="{% url 'admit-patient' %}" class="btn btn-primary">Admit</a>
-          </div>
+        <div class="card-deck" style="margin-top: 30px">
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">View all Medicines</h5>
+                <a href="{% url 'view-medicine' %}" class="btn btn-primary">View</a>
+              </div>
+            </div>
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">View all feedback</h5>
+                <a href="{% url 'view-feedback' %}" class="btn btn-primary">View</a>
+              </div>
+            </div>
         </div>
-        <div class="card" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">View Admitted Patient</h5>
-            <a href="{% url 'view-admit-patient' %}" class="btn btn-primary">View</a>
-          </div>
-        </div>
-    </div>
-    <div class="card-deck" style="margin-top: 30px">
-        <div class="card" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">Discharge Patient</h5>
-            <a href="{% url 'view-discharge-patient' %}" class="btn btn-primary">Go</a>
-          </div>
-        </div>
-        <div class="card" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">View Discharge Patient</h5>
-            <a href="#" class="btn btn-primary">View</a>
-          </div>
-        </div>
-    </div>
-    <div class="card-deck" style="margin-top: 30px">
-        <div class="card" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">Add Nurse Duty</h5>
-            <a href="{% url 'duty' %}" class="btn btn-primary">Go</a>
-          </div>
-        </div>
-        <div class="card" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">View Assigned Duty</h5>
-            <a href="{% url 'view-duty' %}" class="btn btn-primary">View</a>
-          </div>
-        </div>
-    </div>
-    <div class="card-deck" style="margin-top: 30px">
-        <div class="card" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">Emergency Case</h5>
-            <a href="{% url 'emergency' %}" class="btn btn-primary">View</a>
-          </div>
-        </div>
-        <div class="card" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">View emergency cases</h5>
-            <a href="{% url 'view-emergency' %}" class="btn btn-primary">View</a>
-          </div>
-        </div>
-    </div>
-    <div class="card-deck" style="margin-top: 30px">
-        <div class="card" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">Create Bill</h5>
-            <a href="{% url 'create-bill' %}" class="btn btn-primary">Create</a>
-          </div>
-        </div>
-        <div class="card" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">View all bills</h5>
-            <a href="{% url 'view-bill' %}" class="btn btn-primary">View</a>
-          </div>
-        </div>
-    </div>
-    <div class="card-deck" style="margin-top: 30px">
-        <div class="card" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">View all Medicines</h5>
-            <a href="{% url 'view-medicine' %}" class="btn btn-primary">View</a>
-          </div>
-        </div>
-        <div class="card" style="width: 18rem;">
-          <div class="card-body">
-            <h5 class="card-title">View all feedback</h5>
-            <a href="{% url 'view-feedback' %}" class="btn btn-primary">View</a>
-          </div>
-        </div>
-    </div>
-{% endblock content %}
+    {% endblock content %}
 
 

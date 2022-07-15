@@ -3,97 +3,62 @@
 {% block title %}Medicine List{% endblock %}
 {% block content %}
     <div class="container">
-        <form class="form-inline my-2 my-lg-0" id="medicine_form">
-            <input class="form-control mr-sm-2" id="medicine" type="search" placeholder="Search as per name" aria-label="Search" name="search" >
-            <datalist id="medicine">
-                {% for data in datalist%}
-                    <option value="{{data}}">
-                {% endfor %}
-            </datalist>
-            <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
+        <form class="form-inline my-2 my-lg-0" method="post" role="search" action="{% url 'view-medicine' %}">
+            {% csrf_token %}
+            <input type="search" class="form-control" id="medicine_form" placeholder="search here.." name="search">
+            <button class="btn btn-outline-primary my-2 my-sm-0" id="medicine_form" type="submit">Search</button>
         </form>
-        <br>
-        <div class="row">
-          <div class="col-sm">
-          <table class="table">
-          <tr>
-            <th>id</th>
-            <th>Name</th>
-            <th>Charge</th>
-            </tr>
-            {% for m in all_search_results %}
+        <div>
+             <div class="row my-4">
+              <div class="col-sm">
+              <table class="table">
               <tr>
-                <td>{{ m.id }}</td>
-                <td>{{ m.medicine_name }}</td>
-                <td>{{ m.charge }}</td>
-                {% if self.request.user.role == 'D' %}
-                    <td> <a href="{% url 'update-medicine' m.id %}""><button type="button" class="btn btn-outline-secondary">Update</button></td>
-                {% endif %}
-              </tr>
-            {% empty %}
-                <h5>Oops !!! No data found...Please enter correct data...</h5>
-            {% endfor %}
-          </table>
-          </div>
+                <th>id</th>
+                <th>Name</th>
+                <th>Charge</th>
+                </tr>
+                {% for m in all_data %}
+                  <tr>
+                    <td>{{ m.id }}</td>
+                    <td>{{ m.medicine_name }}</td>
+                    <td>{{ m.charge }}</td>
+                    {% if self.request.user.role == 'D' %}
+                        <td> <a href="{% url 'update-medicine' m.id %}""><button type="button" class="btn btn-outline-secondary">Update</button></td>
+                    {% endif %}
+                  </tr>
+                {% empty %}
+                    {% for i in data %}
+                       <tr>
+                        <td>{{ i.id }}</td>
+                        <td>{{ i.medicine_name }}</td>
+                        <td>{{ i.charge }}</td>
+                       </tr>
+                    {% endfor %}
+                {% endfor %}
+              </table>
+              </div>
+            </div>
         </div>
     </div>
 {% endblock %}
 
 {% block scripts %}
-    <script>
-        $(document).ready(function () {
-            console.log('start')
-            $("#medicine_form").submit(function (event) {
-            var medicine_name = $("#medicine").val()
-            console.log(medicine_name)
-            event.preventDefault();
-            $.ajax({
-              type: "GET",
-              url: "{% url 'view-medicine' %}",
-              data: {
-                'search': medicine_name
-                },
-              success:  function () {
+  <script>
+    console.log('start')
+    var availableTags = [ ];
 
-               }
-            });
-            return false;
+    $.ajax({
+        method:"GET",
+        url:"{% url 'search-medicine' %}",
+        success: function (response){
+            console.log(response)
+            startAutocomplete(response);
+        }
+    })
+    function startAutocomplete(availableTags) {
+        $("#medicine_form").autocomplete({
+            source: availableTags
         });
-      });
-    </script>
+    }
+  </script>
 {% endblock scripts %}
-
-
-{#        <form method="get" action="#">#}
-{#            <p>Filter: <input type="text" value={{filter}} name="filter"/></p>#}
-{#            <p>order_by: <input type="text" value={{orderby}} name="orderby"/></p>#}
-{#            <p><input type="submit" name="submit" value="submit"/></p>#}
-{#        </form>#}
-{#        <form action="" method="get">#}
-{#            {{ filterset.form.as_p }}#}
-{#            <input type="submit" />#}
-{#          </form>#}
-
-{#        <div class="row">#}
-{#          <div class="col-sm">#}
-{#          <table class="table">#}
-{#          <tr>#}
-{#            <th>id</th>#}
-{#            <th>Name</th>#}
-{#            <th>Charge</th>#}
-{#            </tr>#}
-{#            {% for m in all_search_results %}#}
-{#              <tr>#}
-{#                <td>{{ m.id }}</td>#}
-{#                <td>{{ m.medicine_name }}</td>#}
-{#                <td>{{ m.charge }}</td>#}
-{#                {% if self.request.user.role == 'D' %}#}
-{#                    <td> <a href="{% url 'update-medicine' m.id %}""><button type="button" class="btn btn-outline-secondary">Update</button></td>#}
-{#                {% endif %}#}
-{#              </tr>#}
-{#            {% empty %}#}
-{#                <h5>Oops !!! No data found...Please enter correct data...</h5>#}
-{#            {% endfor %}#}
-{#          </table>#}
-{#          </div>#}
-{#        </div>#}
