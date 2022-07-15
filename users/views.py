@@ -420,7 +420,9 @@ class AddMedicine(CreateView, SuccessMessageMixin):
 
 
 class SearchMedicine(View):
-
+    """
+    class for give data to ajax call for search medicine
+    """
     def get(self, request):
         topics = Medicine.objects.all().values_list('medicine_name', flat=True)
         medicine_list = list(topics)
@@ -428,6 +430,9 @@ class SearchMedicine(View):
 
 
 class ViewMedicine(View):
+    """
+    class for view list of medicines
+    """
     def get(self, request):
         all_data = Medicine.objects.all()
         context ={
@@ -437,7 +442,6 @@ class ViewMedicine(View):
 
     def post(self, request):
         search = request.POST['search']
-        print(search, '[[[[[[[[')
         if search != " ":
             search = search.strip()
             medicine = Medicine.objects.filter(medicine_name__icontains=search)

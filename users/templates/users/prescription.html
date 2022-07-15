@@ -2,7 +2,7 @@
 {% load crispy_forms_filters %}
 {% load crispy_forms_tags %}
 {% block content %}
-{#	<div class="content-section">#}
+	<div class="content-section">
 {#    <form>#}
 {#    <div id="forms">#}
 {#        {{ form.as_p }}#}
@@ -25,8 +25,22 @@
 {% endblock content %}
 
 {% block scripts %}
-    <script>
-        const data = '{{ qs_json }}'
-        console.log(data)
-    </script>
+  <script>
+    console.log('start')
+    var availableTags = [ ];
+
+    $.ajax({
+        method:"GET",
+        url:"{% url 'search-medicine' %}",
+        success: function (response){
+            console.log(response)
+            startAutocomplete(response);
+        }
+    })
+    function startAutocomplete(availableTags) {
+        $("#id_medicine").autocomplete({
+            source: availableTags
+        });
+    }
+  </script>
 {% endblock scripts %}
