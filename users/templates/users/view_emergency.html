@@ -3,6 +3,12 @@
 {% block title %}Emergency List{% endblock %}
 {% block content %}
     <div class="container">
+         <form class="form-inline my-2 my-lg-0" method="post" role="search" action="{% url 'view-emergency' %}">
+            {% csrf_token %}
+            <input type="search" class="form-control" id="view_emergency_form" placeholder="search here.." name="search">
+            <button class="btn btn-outline-primary my-2 my-sm-0" id="medicine_form" type="submit">Search</button>
+        </form>
+        <br>
         <h2> Emergency List </h2>
         <div class="row">
           <div class="col-sm">
@@ -17,7 +23,7 @@
 
 
             </tr>
-            {% for em in emergency %}
+            {% for em in all_data %}
               <tr>
                 <td>{{ em.id }}</td>
                 <td>{{ em.patient.patient }}</td>
@@ -27,9 +33,42 @@
                 <td>{{ em.charge }}</td>
 {#                <td> <a href="{% url 'update-staff-profile' u.id %}""><button type="button" class="btn btn-outline-secondary">Update</button></td>#}
               </tr>
+            {% empty %}
+                {% for em in data %}
+              <tr>
+                <td>{{ em.id }}</td>
+                <td>{{ em.patient.patient }}</td>
+                <td>{{ em.staff }}</td>
+                <td>{{ em.datetime }}</td>
+                <td>{{ em.disease }}</td>
+                <td>{{ em.charge }}</td>
+              </tr>
+            {% endfor %}
             {% endfor %}
           </table>
           </div>
         </div>
     </div>
 {% endblock %}
+
+
+{% block scripts %}
+  <script>
+    console.log('start')
+    var availableTags = [ ];
+
+    $.ajax({
+        method:"GET",
+        url:"{% url 'search_emergency' %}",
+        success: function (response){
+            console.log(response)
+            startAutocomplete(response);
+        }
+    })
+    function startAutocomplete(availableTags) {
+        $("#view_emergency_form").autocomplete({
+            source: availableTags
+        });
+    }
+  </script>
+{% endblock scripts %}

@@ -240,23 +240,44 @@ class EnterFeedback(CreateView, SuccessMessageMixin):
 
     def form_valid(self, form):
         form.instance.user = self.request.user
-        super(EnterFeedback, self).form_valid(form)
+        return  super(EnterFeedback, self).form_valid(form)
 
     def get_success_url(self):
         messages.success(self.request, FEEDBACK_SUCCESS_MSG)
         return reverse("Hospital-home")
 
 
-class ViewFeedback(ListView):
+class SearchFeedback(View):
+    """
+    class for give data to ajax call for search medicine
+    """
+
+    def get(self, request):
+        user = Feedback.objects.all().values_list('user__username', flat=True)
+        user_list = list(user)
+        return JsonResponse(user_list, safe=False)
+
+
+class ViewFeedback(View):
     """
     class for view the list of feedback
     """
-    model = Feedback
-    template_name = 'users/view_feedback.html'
-    context_object_name = 'feedback'
 
-    def get_queryset(self):
-        return self.model.objects.all().order_by('id')
+    def get(self, request):
+        all_data = Feedback.objects.all()
+        context = {
+            'all_data': all_data
+        }
+        return render(request, 'users/view_feedback.html', context)
+
+    def post(self, request):
+        search = request.POST['search']
+        if search != " ":
+            search = search.strip()
+            staff = Feedback.objects.filter(user__username__icontains=search)
+            return render(request, 'users/view_feedback.html', {'data': staff})
+        else:
+            return redirect('Hospital-home')
 
     def dispatch(self, request, *args, **kwargs):
         if is_admin(user=self.request.user):
@@ -424,16 +445,37 @@ class EmergencyCase(CreateView, SuccessMessageMixin):
         return reverse("Hospital-home")
 
 
-class ViewEmergency(ListView):
+class SearchEmergency(View):
+    """
+    class for give data to ajax call for search user
+    """
+
+    def get(self, request):
+        user = Emergency.objects.all().values_list('patient__patient__username', flat=True)
+        user_list = list(user)
+        return JsonResponse(user_list, safe=False)
+
+
+class ViewEmergency(View):
     """
     class for view the list of emergency cases
     """
-    model = Emergency
-    template_name = 'users/view_emergency.html'
-    context_object_name = 'emergency'
 
-    def get_queryset(self):
-        return self.model.objects.all().order_by('id')
+    def get(self, request):
+        all_data = Emergency.objects.all()
+        context = {
+            'all_data': all_data
+        }
+        return render(request, 'users/view_emergency.html', context)
+
+    def post(self, request):
+        search = request.POST['search']
+        if search != " ":
+            search = search.strip()
+            staff = Emergency.objects.filter(patient__patient__username__icontains=search)
+            return render(request, 'users/view_emergency.html', {'data': staff})
+        else:
+            return redirect('Hospital-home')
 
     def dispatch(self, request, *args, **kwargs):
         if is_admin(user=self.request.user):

@@ -3,7 +3,7 @@ from . import views as user_views, views
 from django.contrib.auth import views as auth_views
 
 from .views import ViewUser, ViewStaff, ViewFeedback, ViewEmergency, ViewPrescription, BillView, ViewMedicine, \
-    SearchMedicine, SearchStaff
+    SearchMedicine, SearchStaff, SearchEmergency, SearchFeedback
 
 urlpatterns = [
     path('register/', user_views.Register.as_view(), name='register'),
@@ -35,6 +35,7 @@ urlpatterns = [
     path('<pk>/update_prescription/', user_views.PrescriptionUpdate.as_view(), name='update-prescription'),
     path('emergency/', user_views.EmergencyCase.as_view(), name='emergency'),
     path('view_emergency/', ViewEmergency.as_view(), name='view-emergency'),
+    path('search_emergency/', SearchEmergency.as_view(), name='search_emergency'),
     path('medicine/', user_views.AddMedicine.as_view(), name='add-medicine'),
     path('<pk>/update_medicine/', user_views.MedicineUpdate.as_view(), name='update-medicine'),
     path('search/', SearchMedicine.as_view(), name='search-medicine'),
@@ -43,6 +44,7 @@ urlpatterns = [
     path('view_bill/', BillView.as_view(), name='view-bill'),
     path('bill/<pk>', views.BillDetailView.as_view(), name='bill-detail'),
     path('feedback/', user_views.EnterFeedback.as_view(), name='feedback'),
+    path('search_feedback/', SearchFeedback.as_view(), name='search_feedback'),
     path('view_feedback/', ViewFeedback.as_view(), name='view-feedback'),
     path('', include('Hospital.urls')),
 
