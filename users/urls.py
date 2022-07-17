@@ -3,7 +3,7 @@ from . import views as user_views, views
 from django.contrib.auth import views as auth_views
 
 from .views import ViewUser, ViewStaff, ViewFeedback, ViewEmergency, ViewPrescription, BillView, ViewMedicine, \
-    SearchMedicine
+    SearchMedicine, SearchStaff
 
 urlpatterns = [
     path('register/', user_views.Register.as_view(), name='register'),
@@ -26,7 +26,9 @@ urlpatterns = [
     path('<pk>/update_staff/', user_views.UpdateStaffProfile.as_view(), name='update-staff-profile'),
     path('<pk>/update/', user_views.UpdateProfile.as_view(), name='update-profile'),
     path('<pk>/delete/', user_views.DeleteProfile.as_view(), name='delete-profile'),
+    path('search_user/', SearchStaff.as_view(), name='search_user'),
     path('view_user/', ViewUser.as_view(), name='view-user'),
+    path('search_staff/', SearchStaff.as_view(), name='search_staff'),
     path('view_staff/', ViewStaff.as_view(), name='view-staff'),
     path('prescription/', user_views.PatientPrescription.as_view(), name='prescription'),
     path('view_prescription/', ViewPrescription.as_view(), name='view-prescription'),

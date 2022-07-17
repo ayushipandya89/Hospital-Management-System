@@ -1,4 +1,3 @@
-import json
 from decimal import Decimal
 
 from django.contrib import messages
@@ -124,16 +123,37 @@ class DeleteProfile(SuccessMessageMixin, DeleteView):
         return False
 
 
-class ViewUser(ListView):
+class SearchUser(View):
+    """
+    class for give data to ajax call for search user
+    """
+
+    def get(self, request):
+        user = CustomUser.objects.all().values_list('username', flat=True)
+        user_list = list(user)
+        return JsonResponse(user_list, safe=False)
+
+
+class ViewUser(View):
     """
     class for view the list of customuser
     """
-    model = CustomUser
-    template_name = 'users/view_user.html'
-    context_object_name = 'users'
 
-    def get_queryset(self):
-        return self.model.objects.all().order_by('id')
+    def get(self, request):
+        all_data = CustomUser.objects.all()
+        context = {
+            'all_data': all_data
+        }
+        return render(request, 'users/view_user.html', context)
+
+    def post(self, request):
+        search = request.POST['search']
+        if search != " ":
+            search = search.strip()
+            user = CustomUser.objects.filter(username__icontains=search)
+            return render(request, 'users/view_user.html', {'data': user})
+        else:
+            return redirect('Hospital-home')
 
     def dispatch(self, request, *args, **kwargs):
         if is_admin(user=self.request.user):
@@ -142,16 +162,37 @@ class ViewUser(ListView):
         return render(request, 'appointment/not_admin.html')
 
 
-class ViewStaff(ListView):
+class SearchStaff(View):
+    """
+    class for give data to ajax call for search user
+    """
+
+    def get(self, request):
+        user = Staff.objects.all().values_list('staff__username', flat=True)
+        user_list = list(user)
+        return JsonResponse(user_list, safe=False)
+
+
+class ViewStaff(View):
     """
     class for view the list of customuser
     """
-    model = Staff
-    template_name = 'users/view_staff.html'
-    context_object_name = 'staff'
 
-    def get_queryset(self):
-        return self.model.objects.all().order_by('id')
+    def get(self, request):
+        all_data = Staff.objects.all()
+        context = {
+            'all_data': all_data
+        }
+        return render(request, 'users/view_staff.html', context)
+
+    def post(self, request):
+        search = request.POST['search']
+        if search != " ":
+            search = search.strip()
+            staff = Staff.objects.filter(staff__username__icontains=search)
+            return render(request, 'users/view_staff.html', {'data': staff})
+        else:
+            return redirect('Hospital-home')
 
     def dispatch(self, request, *args, **kwargs):
         if is_admin(user=self.request.user):
@@ -423,6 +464,7 @@ class SearchMedicine(View):
     """
     class for give data to ajax call for search medicine
     """
+
     def get(self, request):
         topics = Medicine.objects.all().values_list('medicine_name', flat=True)
         medicine_list = list(topics)
@@ -433,12 +475,13 @@ class ViewMedicine(View):
     """
     class for view list of medicines
     """
+
     def get(self, request):
         all_data = Medicine.objects.all()
-        context ={
-            'all_data':all_data
+        context = {
+            'all_data': all_data
         }
-        return render(request, 'users/view_medicine.html',context)
+        return render(request, 'users/view_medicine.html', context)
 
     def post(self, request):
         search = request.POST['search']

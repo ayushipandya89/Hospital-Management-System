@@ -137,13 +137,37 @@ class EnterRoomData(SuccessMessageMixin, CreateView):
         return render(request, 'appointment/not_admin.html')
 
 
-class ViewRooms(ListView):
+class SearchRoom(View):
+    """
+    class for give data to ajax call for search user
+    """
+
+    def get(self, request):
+        room = Room.objects.all().values_list('room_type', flat=True)
+        room_list = list(room)
+        return JsonResponse(room_list, safe=False)
+
+
+class ViewRooms(View):
     """
     This class is for view rooms.
     """
-    model = Room
-    template_name = 'appointment/view_rooms.html'
-    context_object_name = 'room'
+
+    def get(self, request):
+        all_data = Room.objects.all()
+        context = {
+            'all_data': all_data
+        }
+        return render(request, 'appointment/view_rooms.html', context)
+
+    def post(self, request):
+        search = request.POST['search']
+        if search != " ":
+            search = search.strip()
+            user = Room.objects.filter(room_type__icontains=search)
+            return render(request, 'appointment/view_rooms.html', {'data': user})
+        else:
+            return redirect('Hospital-home')
 
     def dispatch(self, request, *args, **kwargs):
         if is_admin(user=self.request.user):

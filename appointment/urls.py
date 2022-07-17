@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 from . import views as user_views
 from .views import ViewAppointments, ViewAllAppointments, ViewRooms, ViewAdmitPatient, \
-    ViewNotDischarged, DeleteAppointmentView
+    ViewNotDischarged, DeleteAppointmentView, SearchRoom
 
 urlpatterns = [
     path('appointments/', views.BookAppointments.as_view(), name='book-appointments'),
@@ -12,6 +12,7 @@ urlpatterns = [
     path('<pk>/delete_appointment/', views.DeleteAppointmentView.as_view(), name='delete-appointments'),
     path('view_all_appointment/', ViewAllAppointments.as_view(), name='view-all-appointments'),
     path('rooms/', views.EnterRoomData.as_view(), name='room'),
+    path('search_room/', SearchRoom.as_view(), name='search_room'),
     path('view_rooms/', ViewRooms.as_view(), name='view-rooms'),
     path('admit/', views.EnterAdmitPatient.as_view(), name='admit-patient'),
     path('view_admit/', ViewAdmitPatient.as_view(), name='view-admit-patient'),
