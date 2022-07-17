@@ -14,13 +14,27 @@ class PatientAppointmentForm(forms.ModelForm):
     """
     for making appointment form
     """
+    timeslot = forms.ChoiceField()
 
     class Meta:
         model = Appointments
-        fields = ['user','staff', 'date', 'disease', 'timeslot']
+        fields = ['user', 'staff', 'date', 'disease', 'timeslot']
         widgets = {
             'date': InputDate()
         }
+
+    def __init__(self, *args, **kwargs):
+        super(PatientAppointmentForm, self).__init__(*args, **kwargs)
+        self.fields['timeslot'].queryset = Appointments.objects.none()
+
+        if 'staff' in self.data:
+            try:
+                staff_id = int(self.data.get('staff'))
+                self.fields['timeslot'].queryset = Appointments.objects.filter(staff_id=staff_id).order_by('staff_id')
+            except(ValueError,TypeError):
+                pass
+        elif self.instance.pk:
+            self.fields['timeslot'].queryset = self.instance.staff.timeslot_set.order_by('staff_id')
 
 
 # class PatientAppointmentForm(forms.ModelForm):

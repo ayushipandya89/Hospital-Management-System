@@ -6,6 +6,7 @@ from .views import ViewAppointments, ViewAllAppointments, ViewRooms, ViewAdmitPa
 
 urlpatterns = [
     path('appointments/', views.BookAppointments.as_view(), name='book-appointments'),
+    path('search_timeslot/', views.load_timeslots, name='search_timeslot'),
     path('<pk>/appointment_timeslot/', user_views.AppointmentTimeslotUpdate.as_view(), name='appointment-timeslot'),
     path('view_appointment/', ViewAppointments.as_view(), name='view-appointments'),
     path('<pk>/delete_appointment/', views.DeleteAppointmentView.as_view(), name='delete-appointments'),

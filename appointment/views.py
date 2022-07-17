@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.utils.decorators import method_decorator
@@ -14,15 +15,24 @@ from .forms import PatientAppointmentForm, PatientTimeslotsUpdate, CreateRoomFor
 from .models import Appointments, Room, Admit
 
 
+def load_timeslots(request):
+    fetch_staff = request.GET.get('staff_id')
+    print('fetch_staff:', fetch_staff)
+    fetch_time = Appointments.objects.filter(staff_id=fetch_staff)
+    print('fetch_time:', fetch_time)
+    print(list(fetch_time.values('timeslot')),'................')
+    # return render(request, 'appointment/book_appointments_timeslots.html', {'timeslots': fetch_time})
+    return JsonResponse(list(fetch_time.values('timeslot')), safe=False)
+
+
 class BookAppointments(View, SuccessMessageMixin):
     form_class = PatientAppointmentForm
     template_name = 'appointment/book_appointments.html'
 
     def get(self, request):
         form = PatientAppointmentForm()
-        time = 9
-        context = {'form': form, 'timeslot': time}
-        return render(request, 'users/create_bill.html', context)
+        context = {'form': form}
+        return render(request, 'appointment/book_appointments.html', context)
 
     def post(self, request, *args, **kwargs):
         form = PatientAppointmentForm(request.POST)
