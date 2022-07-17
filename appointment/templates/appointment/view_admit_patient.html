@@ -1,8 +1,14 @@
 {% extends 'Hospital/base.html' %}
 {% load static %}
-{% block title %}Appointment List{% endblock %}
+{% block title %}Admit List{% endblock %}
 {% block content %}
     <div class="container">
+        <form class="form-inline my-2 my-lg-0" method="post" role="search" action="{% url 'view-admit-patient' %}">
+            {% csrf_token %}
+            <input type="search" class="form-control" id="view_admit_form" placeholder="search here.." name="search">
+            <button class="btn btn-outline-primary my-2 my-sm-0" id="medicine_form" type="submit">Search</button>
+        </form>
+        <br>
         <h2> Admit Patient List </h2>
         <div class="row">
           <div class="col-sm">
@@ -14,16 +20,48 @@
             <th>Room No</th>
           </tr>
 
-            {% for admt in admit %}
+            {% for admt in all_data %}
               <tr>
                 <td>{{ admt.id }}</td>
                 <td>{{ admt.patient.patient   }}</td>
                 <td>{{ admt.in_date }}</td>
                 <td>{{ admt.room_id }}</td>
               </tr>
+            {% empty %}
+                {% for admt in data %}
+                  <tr>
+                    <td>{{ admt.id }}</td>
+                    <td>{{ admt.patient.patient   }}</td>
+                    <td>{{ admt.in_date }}</td>
+                    <td>{{ admt.room_id }}</td>
+                  </tr>
+                {% endfor %}
             {% endfor %}
           </table>
           </div>
         </div>
     </div>
 {% endblock %}
+
+
+
+{% block scripts %}
+  <script>
+    console.log('start')
+    var availableTags = [ ];
+
+    $.ajax({
+        method:"GET",
+        url:"{% url 'search_admit' %}",
+        success: function (response){
+            console.log(response)
+            startAutocomplete(response);
+        }
+    })
+    function startAutocomplete(availableTags) {
+        $("#view_admit_form").autocomplete({
+            source: availableTags
+        });
+    }
+  </script>
+{% endblock scripts %}

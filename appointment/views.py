@@ -20,7 +20,7 @@ def load_timeslots(request):
     print('fetch_staff:', fetch_staff)
     fetch_time = Appointments.objects.filter(staff_id=fetch_staff)
     print('fetch_time:', fetch_time)
-    print(list(fetch_time.values('timeslot')),'................')
+    print(list(fetch_time.values('timeslot')), '................')
     # return render(request, 'appointment/book_appointments_timeslots.html', {'timeslots': fetch_time})
     return JsonResponse(list(fetch_time.values('timeslot')), safe=False)
 
@@ -192,14 +192,23 @@ class EnterAdmitPatient(SuccessMessageMixin, CreateView):
         return render(request, 'appointment/not_admin.html')
 
 
-class ViewNotDischarged(ListView):
-    model = Admit
-    template_name = 'appointment/view_not_discharge_patient.html'
-    context_object_name = 'admit'
+class ViewNotDischarged(View):
 
-    def get_queryset(self):
-        query = Admit.objects.filter(out_date__isnull=True)
-        return query
+    def get(self, request):
+        all_data = Admit.objects.filter(out_date__isnull=True)
+        context = {
+            'all_data': all_data
+        }
+        return render(request, 'appointment/view_not_discharge_patient.html', context)
+
+    def post(self, request):
+        search = request.POST['search']
+        if search != " ":
+            search = search.strip()
+            user = Admit.objects.filter(patient__patient__username__icontains=search)
+            return render(request, 'appointment/view_not_discharge_patient.html', {'data': user})
+        else:
+            return redirect('Hospital-home')
 
     def dispatch(self, request, *args, **kwargs):
         if is_admin(user=self.request.user):
@@ -208,13 +217,33 @@ class ViewNotDischarged(ListView):
         return render(request, 'appointment/not_admin.html')
 
 
+class SearchAdmit(View):
+    """
+    class for give data to ajax call for search user
+    """
+
+    def get(self, request):
+        patient = Admit.objects.all().values_list('patient__patient__username', flat=True)
+        patient_list = list(patient)
+        return JsonResponse(patient_list, safe=False)
+
+
 class ViewAdmitPatient(ListView):
-    """
-    used for view all the admitted patient.
-    """
-    model = Admit
-    template_name = 'appointment/view_admit_patient.html'
-    context_object_name = 'admit'
+    def get(self, request):
+        all_data = Admit.objects.all()
+        context = {
+            'all_data': all_data
+        }
+        return render(request, 'appointment/view_admit_patient.html', context)
+
+    def post(self, request):
+        search = request.POST['search']
+        if search != " ":
+            search = search.strip()
+            user = Admit.objects.filter(patient__patient__username__icontains=search)
+            return render(request, 'appointment/view_admit_patient.html', {'data': user})
+        else:
+            return redirect('Hospital-home')
 
     def dispatch(self, request, *args, **kwargs):
         if is_admin(user=self.request.user):
