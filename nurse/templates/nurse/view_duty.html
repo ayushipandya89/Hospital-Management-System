@@ -4,6 +4,12 @@
 {% block content %}
     {% if user.is_superuser %}
         <div class="container">
+            <form class="form-inline my-2 my-lg-0" method="post" role="search" action="{% url 'view-duty' %}">
+                {% csrf_token %}
+                <input type="search" class="form-control" id="view_duty_form" placeholder="search here.." name="search">
+                <button class="btn btn-outline-primary my-2 my-sm-0" id="medicine_form" type="submit">Search</button>
+            </form>
+            <br>
             <h2> Duty List </h2>
             <div class="row">
               <div class="col-sm">
@@ -14,12 +20,20 @@
                 <th>Patient</th>
 
               </tr>
-                {% for duty in nurseduty %}
+                {% for duty in all_data %}
                   <tr>
                     <td>{{ duty.id }}</td>
                     <td>{{ duty.staff }}</td>
                     <td>{% for patient in duty.patient.all %}{{ patient.patient.patient  }}{% endfor %}</td>
                   </tr>
+                {% empty %}
+                    {% for duty in data %}
+                      <tr>
+                        <td>{{ duty.id }}</td>
+                        <td>{{ duty.staff }}</td>
+                        <td>{% for patient in duty.patient.all %}{{ patient.patient.patient  }}{% endfor %}</td>
+                      </tr>
+                    {% endfor %}
                 {% endfor %}
               </table>
               </div>
@@ -27,3 +41,26 @@
         </div>
     {% endif %}
 {% endblock %}
+
+
+
+{% block scripts %}
+  <script>
+    console.log('start')
+    var availableTags = [ ];
+
+    $.ajax({
+        method:"GET",
+        url:"{% url 'search_duty' %}",
+        success: function (response){
+            console.log(response)
+            startAutocomplete(response);
+        }
+    })
+    function startAutocomplete(availableTags) {
+        $("#view_duty_form").autocomplete({
+            source: availableTags
+        });
+    }
+  </script>
+{% endblock scripts %}
