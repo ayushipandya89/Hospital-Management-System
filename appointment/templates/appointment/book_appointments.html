@@ -3,14 +3,15 @@
 {% load crispy_forms_tags %}
 {% block content %}
     <div class="content-section">
-        <form method="POST" id="appointment_form" enctype="multipart/form-data" data-time-url="{% url 'search_timeslot' %}">
+        <form method="POST" id="appointment_form" enctype="multipart/form-data"
+              data-time-url="{% url 'search_timeslot' %}" action="{% url 'book-appointments' %}">
             {% csrf_token %}
             <fieldset class="form-group">
                 <legend class="border-bottom mb-4">Book Appointments</legend>
                 {{ form| crispy }}
             </fieldset>
             <div class="form-group">
-                <button id="" class="btn btn-outline-info" type='button'>Book</button>
+                <button class="btn btn-outline-info" type='button'>Book</button>
             </div>
         </form>
     </div>
@@ -18,29 +19,33 @@
 
 {% block scripts %}
     <script>
-        $("#id_staff").change(function ()
-        {
-            const url = $("#appointment_form").attr("data-time-url");
-            const staffId = $(this).val();
+        $("#id_staff, #id_date").change(function () {
+            const staffId = $("#id_staff").val();
+            const date = $("#id_date").val();
 
-            $.ajax({
-                url: url,
-                data: {
-                    'staff_id': staffId
-                },
-                success:function (data){
-                    console.log(data)
-                    {#$('#id_timeslot').html(data);#}
+            if (date !== "" && staffId !== "") {
+                $.ajax({
+                    url: {% url 'search_timeslot' %},
+                    data: {
+                        'staff_id':staffId,
+                        'date': date,
+                    },
+                    success: function (data) {
+                        console.log(data)
 
-                    let html_data =`<option value="">----------</option>`;
-                    data.forEach(function (timeslots)
-                    {
-                        html_data +=`<option value="${timeslots.timeslot}">${timeslots.timeslot}</option>`
-                    });
-                    console.log(html_data);
-                    $('#id_timeslot').html(html_data);
-                },
-            });
+                        let html_data = `<option value="">----------</option>`;
+                        data.forEach(function (timeslots) {
+                            html_data += `<option value="${timeslots.timeslot}">${timeslots.timeslot}</option>`
+                        });
+                        console.log(html_data);
+                        $('#id_timeslot').html(html_data);
+                    },
+                });
+            }
+            else{
+                alert("Please enter both Staff and Date Details")
+            }
+
         });
     </script>
 {% endblock scripts %}
@@ -48,7 +53,7 @@
 
 {#{% block scripts %}#}
 {#    <script>#}
-        {#id_staff id_date#}
+{#id_staff id_date#}
 {#        $(document).ready(function ()#}
 {#        {#}
 {#            var $staffvar = $('#id_staff');#}

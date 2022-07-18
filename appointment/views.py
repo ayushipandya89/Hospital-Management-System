@@ -17,11 +17,12 @@ from .models import Appointments, Room, Admit
 
 def load_timeslots(request):
     fetch_staff = request.GET.get('staff_id')
+    fetch_date = request.GET.get('date')
+    print('fetch_date:', fetch_date)
     print('fetch_staff:', fetch_staff)
-    fetch_time = Appointments.objects.filter(staff_id=fetch_staff)
+    fetch_time = Appointments.objects.filter(staff_id=fetch_staff).filter(date=fetch_date)
     print('fetch_time:', fetch_time)
     print(list(fetch_time.values('timeslot')), '................')
-    # return render(request, 'appointment/book_appointments_timeslots.html', {'timeslots': fetch_time})
     return JsonResponse(list(fetch_time.values('timeslot')), safe=False)
 
 
