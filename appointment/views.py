@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
@@ -10,6 +12,7 @@ from django.views.generic import CreateView, ListView, UpdateView
 
 from constants import APPOINTMENT_SUCCESS_MSG, ROOM_SUCCESS_MSG, ADMIT_SUCCESS_MSG, DISCHARGE_SUCCESS_MSG, \
     APPOINTMENT_DELETE_MSG
+from users.models import Patient, CustomUser
 from users.views import is_admin
 from .forms import PatientAppointmentForm, PatientTimeslotsUpdate, CreateRoomForm, AdmitPatientForm, DischargeUpdateForm
 from .models import Appointments, Room, Admit
@@ -18,12 +21,31 @@ from .models import Appointments, Room, Admit
 def load_timeslots(request):
     fetch_staff = request.GET.get('staff_id')
     fetch_date = request.GET.get('date')
-    print('fetch_date:', fetch_date)
-    print('fetch_staff:', fetch_staff)
     fetch_time = Appointments.objects.filter(staff_id=fetch_staff).filter(date=fetch_date)
-    print('fetch_time:', fetch_time)
-    print(list(fetch_time.values('timeslot')), '................')
-    return JsonResponse(list(fetch_time.values('timeslot')), safe=False)
+    user_data = []
+    time_slot_choices = []
+    time_list = []
+    for i in fetch_time:
+        time_list.append(i.timeslot)
+    time = datetime.now()
+    date = datetime.now().date()
+    current_time = time.strftime("%H:%M:%S")
+    if str(fetch_date) == str(date):
+        for i in range(9, 20):
+            if i > int(current_time.split(':')[0]):
+                if i != 12:
+                    user_data.append(i)
+                    time_slot_choices.append(f"{i}:00")
+    else:
+        for i in range(9, 20):
+            if i != 12:
+                user_data.append(i)
+                time_slot_choices.append(f"{i}:00")
+    time_list = sorted(time_list)
+    time_slot_choices = sorted(time_slot_choices)
+    b = set(time_slot_choices).difference(time_list)
+    b = list(sorted(b))
+    return JsonResponse(b, safe=False)
 
 
 class BookAppointments(View, SuccessMessageMixin):
@@ -36,44 +58,18 @@ class BookAppointments(View, SuccessMessageMixin):
         return render(request, 'appointment/book_appointments.html', context)
 
     def post(self, request, *args, **kwargs):
+        print(self.request.user)
         form = PatientAppointmentForm(request.POST)
         if form.is_valid():
-            form.save()
+            fetch_patient = Patient.objects.filter(patient_id=self.request.user).first()
+            print(fetch_patient.patient_id)
+            form.instance.user_id = CustomUser.objects.filter(id=fetch_patient.patient_id).first().id
+            appointment_form = form.save(commit=False)
+            appointment_form.save()
             messages.success(request, APPOINTMENT_SUCCESS_MSG)
             return redirect('Hospital-home')
         else:
             return render(request, self.template_name, {'form': form})
-
-
-# class BookAppointments(SuccessMessageMixin, CreateView):
-#     """
-#     This class is for booking appointments.
-#     """
-#     form_class = PatientAppointmentForm
-#     template_name = 'appointment/book_appointments.html'
-#
-#     def form_valid(self, form):
-#         form.instance.user = self.request.user
-#         return super().form_valid(form)
-#
-#     def get_success_url(self):
-#         return reverse("appointment-timeslot", kwargs={'pk': self.object.pk})
-
-
-class AppointmentTimeslotUpdate(SuccessMessageMixin, UpdateView):
-    """
-    This class is for adding the timeslot information.
-    """
-    form_class = PatientTimeslotsUpdate
-    template_name = 'appointment/book_appointments_timeslots.html'
-    success_message = APPOINTMENT_SUCCESS_MSG
-
-    def get_queryset(self):
-        query_set = Appointments.objects.filter(id=self.kwargs['pk'])
-        return query_set
-
-    def get_success_url(self):
-        return reverse("Hospital-home")
 
 
 class ViewAppointments(ListView):
@@ -229,7 +225,7 @@ class SearchAdmit(View):
         return JsonResponse(patient_list, safe=False)
 
 
-class ViewAdmitPatient(ListView):
+class ViewAdmitPatient(View):
     def get(self, request):
         all_data = Admit.objects.all()
         context = {

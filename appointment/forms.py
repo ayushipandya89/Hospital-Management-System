@@ -10,84 +10,26 @@ class InputDate(forms.DateInput):
     input_type = 'date'
 
 
+class CustomChoiceField(forms.ChoiceField):
+
+    def validate(self, value):
+        return value
+
+
 class PatientAppointmentForm(forms.ModelForm):
     """
     for making appointment form
     """
-    timeslot = forms.ChoiceField()
+    timeslot = CustomChoiceField()
 
     class Meta:
         model = Appointments
-        fields = ['user', 'staff', 'date', 'disease', 'timeslot']
+        fields = ['staff', 'date', 'disease', 'timeslot']
         widgets = {
             'date': InputDate()
         }
 
-    def __init__(self, *args, **kwargs):
-        super(PatientAppointmentForm, self).__init__(*args, **kwargs)
-        self.fields['timeslot'].queryset = Appointments.objects.none()
 
-        if 'staff' in self.data:
-            try:
-                staff_id = int(self.data.get('staff'))
-                self.fields['timeslot'].queryset = Appointments.objects.filter(staff_id=staff_id).order_by('staff_id')
-            except(ValueError,TypeError):
-                pass
-        elif self.instance.pk:
-            self.fields['timeslot'].queryset = self.instance.staff.timeslot_set.order_by('staff_id')
-
-
-# class PatientAppointmentForm(forms.ModelForm):
-#     """
-#     for making appointment form
-#     """
-#
-#     class Meta:
-#         model = Appointments
-#         fields = ['staff', 'date', 'disease']
-#         widgets = {
-#             'date': InputDate()
-#         }
-#
-#     def __init__(self, *args, **kwargs):
-#         super(PatientAppointmentForm, self).__init__(*args, **kwargs)
-#         self.fields['staff'].queryset = Staff.objects.filter(is_approve=True).filter(is_available=True)
-#
-#     def clean(self):
-#         cleaned_data = super().clean()
-#         fetch_date = cleaned_data.get("date")
-#         fetch_staff = cleaned_data.get("staff")
-#         fetch_time = Appointments.objects.filter(date=fetch_date).filter(staff=fetch_staff).values('timeslot')
-#         data = []
-#         user_data = []
-#         time_slot_choices = []
-#         time = datetime.now()
-#         date = datetime.now().date()
-#         current_time = time.strftime("%H:%M:%S")
-#         # for displaying the timeslot after the current time
-#         for i in range(9, 20):
-#             if i > int(current_time.split(':')[0]):
-#                 if i != 12:
-#                     user_data.append(i)
-#                     time_slot_choices.append(f"{i}:00")
-#         available_time = []
-#         if int(current_time.split(':')[0]) >= 19:
-#             raise ValidationError('The Hospital is close for today please choose another date or another staff')
-#         else:
-#             if fetch_date == date:
-#                 # gathering the data of available choices
-#                 for i in fetch_time:
-#                     for j in i.values():
-#                         available_time.append(j)
-#                 # for comparing the available choices of timeslot
-#                 result = all(elem in available_time for elem in time_slot_choices)
-#                 if result:
-#                     raise ValidationError('ALl slots are booked for today..Please choose another date')
-#             else:
-#                 if len(data) == 10:
-#                     raise ValidationError('All slots of this date are booked..Please choose another date')
-#
-#
 class PatientTimeslotsUpdate(forms.ModelForm):
     """
     class for taking timeslot for appointment
