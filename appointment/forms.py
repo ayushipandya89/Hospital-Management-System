@@ -82,9 +82,9 @@ class CreateRoomForm(forms.ModelForm):
         cleaned_data = super().clean()
         fetch_charge = cleaned_data.get("charge")
         print(fetch_charge)
-        if fetch_charge <= 0:
+        if fetch_charge < 500:
             raise ValidationError(
-                "charge can not be less than zero"
+                "charge can not be less than 500 rupees"
             )
 
 
@@ -122,7 +122,7 @@ class DischargeUpdateForm(forms.ModelForm):
         cleaned_data = super().clean()
         fetch_charge = cleaned_data.get("charge")
         print(fetch_charge)
-        if fetch_charge <= 0:
+        if fetch_charge < 500:
             raise ValidationError(
-                "charge can not be less than zero"
+                "charge can not be less 500"
             )

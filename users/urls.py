@@ -3,11 +3,10 @@ from . import views as user_views, views
 from django.contrib.auth import views as auth_views
 
 from .views import ViewUser, ViewStaff, ViewFeedback, ViewEmergency, ViewPrescription, BillView, ViewMedicine, \
-    SearchMedicine, SearchStaff, SearchEmergency, SearchFeedback
+    SearchMedicine, SearchStaff, SearchEmergency, SearchFeedback, ViewTodayAppointment
 
 urlpatterns = [
     path('register/', user_views.Register.as_view(), name='register'),
-    # path('add_role/', views.AddRole, name='add_role'),
     path('add_role/', user_views.AddRole.as_view(), name='add_role'),
     path('add_speciality/', user_views.AddSpeciality.as_view(), name='add_speciality'),
     path('login/', auth_views.LoginView.as_view(template_name='users/login.html'), name='login'),
@@ -46,6 +45,7 @@ urlpatterns = [
     path('feedback/', user_views.EnterFeedback.as_view(), name='feedback'),
     path('search_feedback/', SearchFeedback.as_view(), name='search_feedback'),
     path('view_feedback/', ViewFeedback.as_view(), name='view-feedback'),
+    path('view_todays_appointment/', ViewTodayAppointment.as_view(), name='view_todays_appointment'),
     path('', include('Hospital.urls')),
 
 ]

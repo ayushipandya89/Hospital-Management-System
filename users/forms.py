@@ -1,7 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
-from django.forms import inlineformset_factory
 
 from appointment.models import Appointments, Admit
 from .models import CustomUser, Patient, Staff, Feedback, Emergency, Medicine, Prescription, Bill, UserRole, \
@@ -31,10 +30,8 @@ class AddRoleForm(forms.ModelForm):
     """
     class for creating form for adding role in the table
     """
-    print('aai gayu')
 
     class Meta:
-        print(123)
         model = UserRole
         fields = ['role']
 
@@ -121,31 +118,6 @@ class PrescriptionForm(forms.ModelForm):
         fetch_count = cleaned_data.get("count")
         if fetch_count <= 0:
             self._errors["count"] = ["count can npt be less than zero"]
-
-
-# class PrescriptionForm(forms.ModelForm):
-#     """
-#     class for creating prescription form
-#     """
-#     # count = forms.IntegerField()
-#
-#     class Meta:
-#         model = Prescription
-#         fields = ['patient', 'medicine']
-#
-#     def clean(self):
-#         cleaned_data = super().clean()
-#         fetch_medicine = cleaned_data.get("medicine")
-#         # fetch_count = cleaned_data.get("count")
-#         query = Medicine.objects.filter(medicine_name=fetch_medicine)
-#         if not query:
-#             raise ValidationError(
-#                 "You can not prescribe this medicine....please add the medicine first"
-#             )
-#         if fetch_count <= 0:
-#             raise ValidationError(
-#                 "count can not be less than zero"
-#             )
 
 
 class PrescriptionUpdateForm(forms.ModelForm):

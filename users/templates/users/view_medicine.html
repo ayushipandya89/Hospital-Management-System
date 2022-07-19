@@ -22,7 +22,7 @@
                     <td>{{ m.id }}</td>
                     <td>{{ m.medicine_name }}</td>
                     <td>{{ m.charge }}</td>
-                    {% if self.request.user.role == 'D' %}
+                    {% if user.role_id == 1 %}
                         <td> <a href="{% url 'update-medicine' m.id %}""><button type="button" class="btn btn-outline-secondary">Update</button></td>
                     {% endif %}
                   </tr>
@@ -32,6 +32,9 @@
                         <td>{{ i.id }}</td>
                         <td>{{ i.medicine_name }}</td>
                         <td>{{ i.charge }}</td>
+                        {% if user.role_id == 1 %}
+                            <td> <a href="{% url 'update-medicine' i.id %}""><button type="button" class="btn btn-outline-secondary">Update</button></td>
+                        {% endif %}
                        </tr>
                     {% endfor %}
                 {% endfor %}

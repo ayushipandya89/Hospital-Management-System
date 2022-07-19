@@ -34,11 +34,6 @@ class CustomUser(AbstractUser):
         ('F', 'Female'),
         ('O', 'Other')
     )
-    ROLE_CHOICES = (
-        ('D', 'Doctor'),
-        ('P', 'Patient'),
-        ('N', 'Nurse'),
-    )
     email = models.EmailField(null=True)
     phone = PhoneNumberField(null=True, help_text='Please use following format for phone number: +917834442134')
     age = models.IntegerField(null=True, validators=[validate_age])
@@ -65,15 +60,6 @@ class Staff(models.Model):
     """
     class for creating staff tabl.
     """
-    SPECIALITY_CHOICES = (
-        ('MD Doctor', 'MD Doctor'),
-        ('Pediatricians', 'Pediatricians'),
-        ('Cardiologists', 'Cardiologists'),
-        ('Neurologists', 'Neurologists'),
-        ('surgeons', 'surgeons'),
-        ('Orthopedic', 'Orthopedic'),
-        ('Nurse', 'Nurse'),
-    )
     staff = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     salary = models.IntegerField(default=0)
     is_approve = models.BooleanField(default=False)

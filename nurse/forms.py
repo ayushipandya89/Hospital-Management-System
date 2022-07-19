@@ -16,7 +16,7 @@ class DutyForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(DutyForm, self).__init__(*args, **kwargs)
-        self.fields["staff"].queryset = Staff.objects.filter(speciality='Nurse').filter(is_approve=True).filter(
+        self.fields["staff"].queryset = Staff.objects.filter(speciality__speciality='Nurse').filter(is_approve=True).filter(
             is_available=True)
         self.fields["patient"].widget = forms.widgets.CheckboxSelectMultiple()
         self.fields["patient"].queryset = Admit.objects.values_list('patient', flat=True)

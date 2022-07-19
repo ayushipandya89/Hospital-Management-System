@@ -2,44 +2,42 @@
 {% load static %}
 {% block title %}Duty List{% endblock %}
 {% block content %}
-    {% if user.is_superuser %}
-        <div class="container">
-            <form class="form-inline my-2 my-lg-0" method="post" role="search" action="{% url 'view-duty' %}">
-                {% csrf_token %}
-                <input type="search" class="form-control" id="view_duty_form" placeholder="search here.." name="search">
-                <button class="btn btn-outline-primary my-2 my-sm-0" id="medicine_form" type="submit">Search</button>
-            </form>
-            <br>
-            <h2> Duty List </h2>
-            <div class="row">
-              <div class="col-sm">
-              <table class="table">
-              <tr>
-                <th>id</th>
-                <th>Staff</th>
-                <th>Patient</th>
+    <div class="container">
+        <form class="form-inline my-2 my-lg-0" method="post" role="search" action="{% url 'view-duty' %}">
+            {% csrf_token %}
+            <input type="search" class="form-control" id="view_duty_form" placeholder="search here.." name="search">
+            <button class="btn btn-outline-primary my-2 my-sm-0" id="medicine_form" type="submit">Search</button>
+        </form>
+        <br>
+        <h2> Duty List </h2>
+        <div class="row">
+          <div class="col-sm">
+          <table class="table">
+          <tr>
+            <th>id</th>
+            <th>Staff</th>
+            <th>Patient</th>
 
+          </tr>
+            {% for duty in all_data %}
+              <tr>
+                <td>{{ duty.id }}</td>
+                <td>{{ duty.staff }}</td>
+                <td>{% for patient in duty.patient.all %}{{ patient.patient.patient  }}{% endfor %}</td>
               </tr>
-                {% for duty in all_data %}
+            {% empty %}
+                {% for duty in data %}
                   <tr>
                     <td>{{ duty.id }}</td>
                     <td>{{ duty.staff }}</td>
                     <td>{% for patient in duty.patient.all %}{{ patient.patient.patient  }}{% endfor %}</td>
                   </tr>
-                {% empty %}
-                    {% for duty in data %}
-                      <tr>
-                        <td>{{ duty.id }}</td>
-                        <td>{{ duty.staff }}</td>
-                        <td>{% for patient in duty.patient.all %}{{ patient.patient.patient  }}{% endfor %}</td>
-                      </tr>
-                    {% endfor %}
                 {% endfor %}
-              </table>
-              </div>
-            </div>
+            {% endfor %}
+          </table>
+          </div>
         </div>
-    {% endif %}
+    </div>
 {% endblock %}
 
 

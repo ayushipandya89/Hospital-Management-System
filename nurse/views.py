@@ -8,8 +8,7 @@ from django.views.generic import CreateView, ListView
 from constants import DUTY_ASSIGN_MSG
 from nurse.forms import DutyForm
 from nurse.models import NurseDuty
-from users.models import CustomUser
-from users.views import is_admin
+from users.views import is_admin, is_nurse
 
 
 class AssignDuty(SuccessMessageMixin, CreateView):
@@ -45,11 +44,18 @@ class ViewDuty(View):
     """
 
     def get(self, request):
-        all_data = NurseDuty.objects.all()
-        context = {
-            'all_data': all_data
-        }
-        return render(request, 'nurse/view_duty.html', context)
+        user = NurseDuty.objects.filter(staff__staff__username=self.request.user)
+        if user:
+            context = {
+                'all_data': user
+            }
+            return render(request, 'nurse/view_duty.html', context)
+        else:
+            all_data = NurseDuty.objects.all()
+            context = {
+                'all_data': all_data
+            }
+            return render(request, 'nurse/view_duty.html', context)
 
     def post(self, request):
         search = request.POST['search']
@@ -62,6 +68,9 @@ class ViewDuty(View):
 
     def dispatch(self, request, *args, **kwargs):
         if is_admin(user=self.request.user):
+            return super(ViewDuty, self).dispatch(
+                request, *args, **kwargs)
+        elif is_nurse(user=self.request.user):
             return super(ViewDuty, self).dispatch(
                 request, *args, **kwargs)
         return render(request, 'appointment/not_admin.html')

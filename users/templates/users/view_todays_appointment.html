@@ -1,0 +1,45 @@
+{% extends 'Hospital/base.html' %}
+{% load static %}
+{% block title %}appointment List{% endblock %}
+{% block content %}
+    <div class="container">
+        <h2> Today's Appointment List </h2>
+        <div class="row  my-4">
+          <div class="col-sm">
+          <table class="table">
+          <tr>
+            <th>id</th>
+            <th>User Name</th>
+            <th>Date</th>
+            <th>Timeslot</th>
+            <th>Disease</th>
+
+            </tr>
+            {% for u in appointment %}
+              <tr>
+                <td>{{ u.id }}</td>
+                <td>{{ u.user.username }}</td>
+                <td>{{ u.date }}</td>
+                <td>{{ u.timeslot }}</td>
+                <td>{{ u.disease }}</td>
+              </tr>
+{#             {% empty %}#}
+{#                {% for u in data %}#}
+{#                   <tr>#}
+{#                    <td>{{ u.id }}</td>#}
+{#                    <td>{{ u.username }}</td>#}
+{#                    <td>{{ u.email }}</td>#}
+{#                    <td>{{ u.phone }}</td>#}
+{#                    <td>{{ u.age }}</td>#}
+{#                    <td>{{ u.address }}</td>#}
+{#                    <td>{{ u.gender }}</td>#}
+{#                    <td>{{ u.role }}</td>#}
+{#                    <td><a href="{% url 'delete-profile' u.id %}"><button type="button" class="btn btn-outline-danger">Delete</button></td>#}
+{#                  </tr>#}
+{#                {% endfor %}#}
+            {% endfor %}
+          </table>
+          </div>
+        </div>
+    </div>
+{% endblock %}

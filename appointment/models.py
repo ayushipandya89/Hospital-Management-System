@@ -65,13 +65,11 @@ class Admit(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     staff = models.ManyToManyField(Staff, through='AdmitStaff')
     disease = models.CharField(max_length=200)
-    in_date = models.DateField(blank=False)
+    in_date = models.DateField(blank=False, validators=[date_validation])
     out_date = models.DateField(null=True)
     charge = models.IntegerField(null=True)
     is_bill_generated = models.BooleanField(default=False)
 
-    # def __str__(self):
-    #     return f"Patient:{self.patient}"
     def __str__(self):
         return self.patient.patient.username
 

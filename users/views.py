@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 
 from django.contrib import messages
@@ -8,7 +9,7 @@ from django.urls import reverse, reverse_lazy
 from django.views import View, generic
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView, TemplateView
 
-from appointment.models import Admit, AdmitStaff
+from appointment.models import Admit, AdmitStaff, Appointments
 from constants import PRESCRIPTION_SUCCESS_MSG, REGISTER_SUCCESS_MSG, ROLE_SUCCESS_MSG, SPECIALITY_SUCCESS_MSG, \
     PROFILE_UPDATE_MSG, PROFILE_DELETE_MSG, UPDATE_STAFF_PROFILE, NURSE_ERROR_MSG, FEEDBACK_SUCCESS_MSG, \
     PRESCRIPTION_UPDATE_MSG, EMERGENCY_SUCCESS_MSG, MEDICINE_SUCCESS_MSG, MEDICINE_UPDATE_MSG, BILL_SUCCESS_MSG
@@ -25,6 +26,10 @@ def is_admin(user):
 
 def is_doctor(user):
     return CustomUser.objects.filter(username=user).filter(role=1)
+
+
+def is_nurse(user):
+    return CustomUser.objects.filter(username=user).filter(role=3)
 
 
 class Register(SuccessMessageMixin, CreateView):
@@ -81,14 +86,16 @@ class AddSpeciality(CreateView, SuccessMessageMixin):
     """
     form_class = AddSpecialityForm
     template_name = 'users/add_speciality.html'
-    success_url = reverse_lazy('Hospital-home')
-    success_message = SPECIALITY_SUCCESS_MSG
 
     def dispatch(self, request, *args, **kwargs):
         if is_admin(user=self.request.user):
             return super(AddSpeciality, self).dispatch(
                 request, *args, **kwargs)
         return render(request, 'appointment/not_admin.html')
+
+    def get_success_url(self):
+        messages.success(self.request, SPECIALITY_SUCCESS_MSG)
+        return reverse("Hospital-home")
 
 
 class UpdateProfile(SuccessMessageMixin, UpdateView):
@@ -292,7 +299,8 @@ class PatientPrescription(View, SuccessMessageMixin):
 
     def get(self, request):
         form = PrescriptionForm()
-        context = {'form': form}
+        medicines = [meds.medicine_name for meds in Medicine.objects.all()]
+        context = {'form': form, "medicines": medicines}
         return render(request, 'users/prescription.html', context)
 
     def post(self, request, *args, **kwargs):
@@ -330,84 +338,6 @@ class PatientPrescription(View, SuccessMessageMixin):
                 prescribe.save()
             messages.success(request, PRESCRIPTION_SUCCESS_MSG)
             return redirect('Hospital-home')
-
-
-# def form_valid(self, form):
-#     a = self.request.user.id
-#     fetch = Staff.objects.filter(staff=a).first()
-#     # form.instance.staff_id = fetch.id
-#     return super(PatientPrescription, self).form_valid(form)
-
-
-#
-# def get_context_data(self, **kwargs):
-#     print('gvsdhfbjbdbx')
-#     context = super(PatientPrescription, self).get_context_data(**kwargs)
-#     # form = PrescriptionForm()
-#     patient = CustomUser.objects.all()
-#     # context = {'form': form}
-#     context['staff'] = Staff.objects.all()
-#     return context
-
-
-# class PatientPrescription(BaseCreateView, SuccessMessageMixin):
-#     """
-#     class used for adding patient prescription
-#     """
-#     model = Prescription
-#     form_class = PrescriptionForm
-#     template_name = 'users/prescription.html'
-#
-#     def form_valid(self, form):
-#         result = super(PatientPrescription, self).form_valid(form)
-#         questions_formset = QuestionInlineFormSet(data=form.data, instance=self.object, prefix='questions_formset',
-#
-#                                                   )
-#         if questions_formset.is_valid():
-#             questions_formset.save()
-#         return result
-#
-#     def get_context_data(self, **kwargs):
-#         context = super(PatientPrescription, self).get_context_data(**kwargs)
-#         # context['questions_formset'] = QuestionInlineFormSet(prefix='questions_formset')
-#         return context
-# def get(self, request):
-#     form = PrescriptionForm()
-#     patient = CustomUser.objects.all()
-#     print(patient)
-#     context = {'form': form}
-#     return render(request, 'users/create_bill.html', context)
-#
-# def get_context_data(self, **kwargs):
-#     print(1234567891234589)
-#     context = super(PrescriptionForm, self).get_context_data(**kwargs)
-#     fetch_patient = CustomUser.objects.get(id)
-#     print('fetch_patient', fetch_patient)
-#     # fetch_admit = Admit.objects.filter(patient=fetch_bill.patient_id).first()
-#     # fetch_emergency = Emergency.objects.filter(patient=fetch_bill.patient_id).first()
-#     # print('fetch_emergency', fetch_emergency)
-#     context['patient'] = fetch_patient
-
-# def form_valid(self, form):
-#     # query = Staff.objects.filter(staff_id=self.request.user).values_list('id', flat=True)
-#     a = self.request.user.id
-#     fetch = Staff.objects.filter(staff=a).first()
-#     form.instance.staff_id = fetch.id
-#     return super(PatientPrescription, self).form_valid(form)
-#
-# def get_success_url(self):
-#     messages.success(self.request, f"You have successfully submitted prescription ")
-#     return reverse("view-prescription")
-#
-# def dispatch(self, request, *args, **kwargs):
-#     if self.user_has_permissions(request):
-#         return super(PatientPrescription, self).dispatch(
-#             request, *args, **kwargs)
-#     return render(request, 'appointment/not_admin.html')
-#
-# def user_has_permissions(self, request):
-#     return request.user.role_id == 1
-#
 
 
 class PrescriptionUpdate(SuccessMessageMixin, UpdateView):
@@ -537,8 +467,10 @@ class ViewMedicine(View):
 
     def get(self, request):
         all_data = Medicine.objects.all()
+        user = CustomUser.objects.filter(id=self.request.user.id).first()
         context = {
-            'all_data': all_data
+            'all_data': all_data,
+            'user': user
         }
         return render(request, 'users/view_medicine.html', context)
 
@@ -546,8 +478,9 @@ class ViewMedicine(View):
         search = request.POST['search']
         if search != " ":
             search = search.strip()
+            user = CustomUser.objects.filter(id=self.request.user.id).first()
             medicine = Medicine.objects.filter(medicine_name__icontains=search)
-            return render(request, 'users/view_medicine.html', {'data': medicine})
+            return render(request, 'users/view_medicine.html', {'data': medicine, 'user': user})
         else:
             return redirect('Hospital-home')
 
@@ -677,3 +610,16 @@ class BillView(ListView):
         context = super(BillView, self).get_context_data(**kwargs)
         context['bill_list'] = Bill.objects.order_by('id')
         return context
+
+
+class ViewTodayAppointment(ListView):
+    """
+    class for displaying today's appointment for doctor
+    """
+    model = Appointments
+    template_name = 'users/view_todays_appointment.html'
+    context_object_name = 'appointment'
+
+    def get_queryset(self):
+        date = datetime.now().date()
+        return Appointments.objects.filter(staff__staff__username=self.request.user).filter(date=date).order_by('id')

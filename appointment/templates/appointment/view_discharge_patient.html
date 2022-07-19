@@ -1,0 +1,74 @@
+{% extends 'Hospital/base.html' %}
+{% load static %}
+{% block title %}Discharge List{% endblock %}
+{% block content %}
+    <div class="container">
+        <form class="form-inline my-2 my-lg-0" method="post" role="search" action="{% url 'discharge_patient_list' %}">
+            {% csrf_token %}
+            <input type="search" class="form-control" id="view_discharge_form" placeholder="search here.." name="search">
+            <button class="btn btn-outline-primary my-2 my-sm-0" id="medicine_form" type="submit">Search</button>
+        </form>
+        <br>
+        <h2> Discharged Patient List </h2>
+        <div class="row">
+          <div class="col-sm">
+          <table class="table">
+          <tr>
+            <th>id</th>
+            <th>Patient Name</th>
+            <th>Admit Date</th>
+            <th>Room No</th>
+            <th>Discharge date</th>
+            <th>Charge</th>
+
+
+            </tr>
+            {% for adm in all_data %}
+              <tr>
+                <td>{{ adm.id }}</td>
+                <td>{{ adm.patient.patient }}</td>
+                <td>{{ adm.in_date }}</td>
+                <td>{{ adm.room_id }}</td>
+                <td>{{ adm.out_date }}</td>
+                <td>{{ adm.charge }}</td>
+              </tr>
+            {% empty %}
+                {% for adm in data %}
+                  <tr>
+                    <td>{{ adm.id }}</td>
+                    <td>{{ adm.patient.patient }}</td>
+                    <td>{{ adm.in_date }}</td>
+                    <td>{{ adm.room_id }}</td>
+                    <td>{{ adm.out_date }}</td>
+                    <td>{{ adm.charge }}</td>
+                  </tr>
+                {% endfor %}
+            {% endfor %}
+          </table>
+          </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+
+{% block scripts %}
+  <script>
+    console.log('start')
+    var availableTags = [ ];
+
+    $.ajax({
+        method:"GET",
+        url:"{% url 'search_admit' %}",
+        success: function (response){
+            console.log(response)
+            startAutocomplete(response);
+        }
+    })
+    function startAutocomplete(availableTags) {
+        $("#view_discharge_form").autocomplete({
+            source: availableTags
+        });
+    }
+  </script>
+{% endblock scripts %}

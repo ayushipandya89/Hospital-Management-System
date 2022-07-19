@@ -1,12 +1,10 @@
 from datetime import datetime
 
-from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
-from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import CreateView, ListView, UpdateView
 
@@ -14,41 +12,48 @@ from constants import APPOINTMENT_SUCCESS_MSG, ROOM_SUCCESS_MSG, ADMIT_SUCCESS_M
     APPOINTMENT_DELETE_MSG
 from users.models import Patient, CustomUser
 from users.views import is_admin
-from .forms import PatientAppointmentForm, PatientTimeslotsUpdate, CreateRoomForm, AdmitPatientForm, DischargeUpdateForm
+from .forms import PatientAppointmentForm, CreateRoomForm, AdmitPatientForm, DischargeUpdateForm
 from .models import Appointments, Room, Admit
 
 
-def load_timeslots(request):
-    fetch_staff = request.GET.get('staff_id')
-    fetch_date = request.GET.get('date')
-    fetch_time = Appointments.objects.filter(staff_id=fetch_staff).filter(date=fetch_date)
-    user_data = []
-    time_slot_choices = []
-    time_list = []
-    for i in fetch_time:
-        time_list.append(i.timeslot)
-    time = datetime.now()
-    date = datetime.now().date()
-    current_time = time.strftime("%H:%M:%S")
-    if str(fetch_date) == str(date):
-        for i in range(9, 20):
-            if i > int(current_time.split(':')[0]):
+class LoadTimeslots(View):
+    """
+    class for give data to ajax call for loading available  timeslots  from database
+    """
+    def get(self, request):
+        fetch_staff = request.GET.get('staff_id')
+        fetch_date = request.GET.get('date')
+        fetch_time = Appointments.objects.filter(staff_id=fetch_staff).filter(date=fetch_date)
+        user_data = []
+        time_slot_choices = []
+        time_list = []
+        for i in fetch_time:
+            time_list.append(i.timeslot)
+        time = datetime.now()
+        date = datetime.now().date()
+        current_time = time.strftime("%H:%M:%S")
+        if str(fetch_date) == str(date):
+            for i in range(9, 20):
+                if i > int(current_time.split(':')[0]):
+                    if i != 12:
+                        user_data.append(i)
+                        time_slot_choices.append(f"{i}:00")
+        else:
+            for i in range(9, 20):
                 if i != 12:
                     user_data.append(i)
                     time_slot_choices.append(f"{i}:00")
-    else:
-        for i in range(9, 20):
-            if i != 12:
-                user_data.append(i)
-                time_slot_choices.append(f"{i}:00")
-    time_list = sorted(time_list)
-    time_slot_choices = sorted(time_slot_choices)
-    b = set(time_slot_choices).difference(time_list)
-    b = list(sorted(b))
-    return JsonResponse(b, safe=False)
+        time_list = sorted(time_list)
+        time_slot_choices = sorted(time_slot_choices)
+        b = set(time_slot_choices).difference(time_list)
+        b = list(sorted(b))
+        return JsonResponse(b, safe=False)
 
 
 class BookAppointments(View, SuccessMessageMixin):
+    """
+    class for booking appointment
+    """
     form_class = PatientAppointmentForm
     template_name = 'appointment/book_appointments.html'
 
@@ -80,12 +85,17 @@ class ViewAppointments(ListView):
     template_name = 'appointment/view_appointments.html'
     context_object_name = 'appointment'
 
-    @method_decorator(login_required(login_url=reverse_lazy('accounts:login')))
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(self.request, *args, **kwargs)
-
     def get_queryset(self):
-        return self.model.objects.filter(user=self.request.user.id).order_by('-id')
+        staff_query = Appointments.objects.filter(staff__staff__username=self.request.user).order_by('id')
+        patient_query = Appointments.objects.filter(user__username=self.request.user).order_by('id')
+        print(staff_query)
+        print(patient_query)
+        if staff_query:
+            return staff_query
+        elif patient_query:
+            return patient_query
+        else:
+            return Appointments.objects.all()
 
 
 class DeleteAppointmentView(View):
@@ -109,15 +119,6 @@ class DeleteAppointmentView(View):
         return render(self.request, 'Hospital/admin_home.html')
 
 
-class ViewAllAppointments(ListView):
-    """
-        This class is for view patients appointment by doctor.
-    """
-    model = Appointments
-    template_name = 'appointment/view_appointments.html'
-    context_object_name = 'appointment'
-
-
 class EnterRoomData(SuccessMessageMixin, CreateView):
     """
     class for adding room data
@@ -136,7 +137,7 @@ class EnterRoomData(SuccessMessageMixin, CreateView):
 
 class SearchRoom(View):
     """
-    class for give data to ajax call for search user
+    class for give data to ajax call for search rooms
     """
 
     def get(self, request):
@@ -190,6 +191,9 @@ class EnterAdmitPatient(SuccessMessageMixin, CreateView):
 
 
 class ViewNotDischarged(View):
+    """
+    class for display list of admitted patient who are not discharged yet
+    """
 
     def get(self, request):
         all_data = Admit.objects.filter(out_date__isnull=True)
@@ -216,7 +220,7 @@ class ViewNotDischarged(View):
 
 class SearchAdmit(View):
     """
-    class for give data to ajax call for search user
+    class for give data to ajax call for search admit user
     """
 
     def get(self, request):
@@ -226,6 +230,10 @@ class SearchAdmit(View):
 
 
 class ViewAdmitPatient(View):
+    """
+    class for view list of admitted patient
+    """
+
     def get(self, request):
         all_data = Admit.objects.all()
         context = {
@@ -250,11 +258,44 @@ class ViewAdmitPatient(View):
 
 
 class DischargePatient(UpdateView, SuccessMessageMixin):
+    """
+    class for discharge patient from hospital
+    """
     form_class = DischargeUpdateForm
     template_name = 'appointment/discharge_patient.html'
-    success_url = reverse_lazy('Hospital-home')
-    success_message = DISCHARGE_SUCCESS_MSG
 
     def get_queryset(self):
         query_set = Admit.objects.filter(id=self.kwargs['pk'])
         return query_set
+
+    def get_success_url(self):
+        messages.success(self.request, DISCHARGE_SUCCESS_MSG)
+        return reverse("Hospital-home")
+
+
+class ViewDischargePatient(View):
+    """
+    class for displaying list of discharge patient
+    """
+    def get(self, request):
+        all_data = Admit.objects.filter(out_date__isnull=False)
+        context = {
+            'all_data': all_data
+        }
+        return render(request, 'appointment/view_discharge_patient.html', context)
+
+    def post(self, request):
+        search = request.POST['search']
+        if search != " ":
+            search = search.strip()
+            user = Admit.objects.filter(patient__patient__username__icontains=search)
+            return render(request, 'appointment/view_discharge_patient.html', {'data': user})
+        else:
+            return redirect('Hospital-home')
+
+    def dispatch(self, request, *args, **kwargs):
+        if is_admin(user=self.request.user):
+            return super(ViewDischargePatient, self).dispatch(
+                request, *args, **kwargs)
+        return render(request, 'appointment/not_admin.html')
+
