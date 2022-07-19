@@ -114,51 +114,13 @@ class PrescriptionForm(forms.ModelForm):
         self.fields['staff'].queryset = Staff.objects.filter(is_approve=True).filter(is_available=True)
 
     def clean(self):
-        # print('.////////////////////////////')
         cleaned_data = super().clean()
-        print(cleaned_data['patient'], '..................')
         a = Patient.objects.filter(patient__username=cleaned_data['patient']).first()
-        print( a, ':::::::::::::::::::::::::')
+        print('query fetching patient name: ', a)
         cleaned_data['patient'] = a
         fetch_count = cleaned_data.get("count")
         if fetch_count <= 0:
             self._errors["count"] = ["count can npt be less than zero"]
-
-    # def clean(self):
-    #     form_data = self.cleaned_data
-    #     form_data['patient'] = Patient.objects.filter(id=form_data['patient']).first()
-    #     fetch_count = form_data['count']
-    #     if fetch_count <=0:
-    #         self._errors["count"] = ["count can npt be less than zero"]
-
-
-# QuestionInlineFormSet = inlineformset_factory(Prescription, PrescribeMedicine, extra=1, can_delete=False,
-#                                               fields=('medicine', 'count'),
-#                                               # widgets={
-#                                               #     'type': w.Select(attrs={'class': 'form-control'}),
-#                                               #     'text': w.TextInput(attrs={'class': 'form-control'}),
-#                                               # }
-#                                               )
-#
-#
-# class CommonForm:
-#     pass
-#
-#
-# class PrescriptionForm(CommonForm):
-#     """
-#     class for creating prescription form
-#     """
-#
-#     class Meta:
-#         model = Prescription
-#         fields = ['patient', 'medicine']
-
-
-# class PriscribeMedicineForm(forms.ModelForm):
-#     class Meta:
-#         model = PrescribeMedicine
-#         fields = ['medicine', 'count']
 
 
 # class PrescriptionForm(forms.ModelForm):

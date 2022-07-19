@@ -240,7 +240,7 @@ class EnterFeedback(CreateView, SuccessMessageMixin):
 
     def form_valid(self, form):
         form.instance.user = self.request.user
-        return  super(EnterFeedback, self).form_valid(form)
+        return super(EnterFeedback, self).form_valid(form)
 
     def get_success_url(self):
         messages.success(self.request, FEEDBACK_SUCCESS_MSG)
@@ -299,27 +299,44 @@ class PatientPrescription(View, SuccessMessageMixin):
         bill_form = PrescriptionForm(request.POST)
         print(bill_form.errors)
         if bill_form.is_valid():
+            data = {}
+            for p in request.POST:
+                data[p] = request.POST[p]
+            print('data', data)
+            b = {k: v[0] if len(v) == 1 else v for k, v in request.POST.lists()}
+            print('b:', b)
             fetch_patient = request.POST.get('patient')
-            fetch_medicine = request.POST.get('medicine')
-            fetch_count = request.POST.get('count')
-            m = Medicine.objects.filter(medicine_name=fetch_medicine).first()
-            print('m:', m.id)
+            fetch_medicine = request.POST.getlist('medicine')
+            print('fetch_medicine:', fetch_medicine)
+            fetch_count = request.POST.getlist('count')
+            print('fetch_count:', fetch_count)
             patient = Patient.objects.filter(id=fetch_patient).first()
             bill_form.patient = patient
             bill = bill_form.save(commit=False)
             bill.save()
             id_query = Prescription.objects.latest('id')
             print('id_query', id_query)
-            prescribe = PrescribeMedicine.objects.create(prescription=id_query, medicine=m, count=fetch_count)
-            prescribe.save()
+            objs = []
+            if len(fetch_medicine) > 1:
+                for i in range(len(fetch_medicine)):
+                    count = fetch_count[i]
+                    m = Medicine.objects.filter(medicine_name=fetch_medicine[i]).first()
+                    objs.append(PrescribeMedicine(prescription=id_query, medicine=m, count=count))
+                    print('m:', m.id)
+                PrescribeMedicine.objects.bulk_create(objs)
+            else:
+                m = Medicine.objects.filter(medicine_name=fetch_medicine[0]).first()
+                prescribe = PrescribeMedicine.objects.create(prescription=id_query, medicine=m, count=fetch_count)
+                prescribe.save()
             messages.success(request, PRESCRIPTION_SUCCESS_MSG)
             return redirect('Hospital-home')
 
-    # def form_valid(self, form):
-    #     a = self.request.user.id
-    #     fetch = Staff.objects.filter(staff=a).first()
-    #     # form.instance.staff_id = fetch.id
-    #     return super(PatientPrescription, self).form_valid(form)
+
+# def form_valid(self, form):
+#     a = self.request.user.id
+#     fetch = Staff.objects.filter(staff=a).first()
+#     # form.instance.staff_id = fetch.id
+#     return super(PatientPrescription, self).form_valid(form)
 
 
 #

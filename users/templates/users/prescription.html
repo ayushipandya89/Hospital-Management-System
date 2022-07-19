@@ -3,21 +3,32 @@
 {% load crispy_forms_tags %}
 {% block content %}
 	<div class="content-section">
-{#    <form>#}
-{#    <div id="forms">#}
-{#        {{ form.as_p }}#}
-{#    </div>#}
-{#    <button id="add-another">add another</button>#}
-{#    <button class="btn btn-outline-info" type='submit'>Submit</button>#}
-{#    </form>#}
-		<form method="POST" enctype="multipart/form-data">
+		<form method="POST" enctype="multipart/form-data" >
 			{% csrf_token %}
 			<fieldset class="form-group">
 				<legend class="border-bottom mb-4">Prescription Form</legend>
-				{{ form|crispy }}
+                 <div class="form-row">
+                  <div class="form-group col-12">
+                    {{ form.patient|as_crispy_field }}
+                  </div>
+                  <div class="form-group col-12">
+                    {{ form.staff|as_crispy_field }}
+                  </div>
+                </div>
+
+                <div id="medicine_options" class="id_medicine_">
+                    <div class="form-row form">
+                        <div id="div_id_medicine" class="form-group col-6"> <label for="id_medicine" class=" requiredField">
+                        Medicine<span class="asteriskField">*</span> </label> <div> <input type="text" name="medicine" class="textinput textInput form-control" required id="id_medicine"> </div> </div>
+
+                        <div id="div_id_count" class="form-group col-6"> <label for="id_count" class=" requiredField">
+                        Count<span class="asteriskField">*</span> </label> <div> <input type="number" name="count" class="numberinput form-control" required id="id_count"> </div> </div>
+                    </div>
+                </div>
+
 			</fieldset>
 			<div class="form-group">
-{#                <button id="add-another">add another</button>#}
+                <button class="btn btn-outline-info" type='button' id="add_more_fields">add more+</button>
 				<button class="btn btn-outline-info" type='submit'>Submit</button>
 			</div>
 		</form>
@@ -38,9 +49,23 @@
         }
     })
     function startAutocomplete(availableTags) {
+        console.log("fatching")
         $("#id_medicine").autocomplete({
             source: availableTags
         });
     }
   </script>
+
+  <script>
+    let button = document.getElementById('add_more_fields')
+    let form = document.querySelector('.form')
+    let forms = document.getElementById('medicine_options')
+
+    button.addEventListener("click", function() {
+        clone = form.cloneNode(true)
+        forms.appendChild(clone)
+    });
+  </script>
 {% endblock scripts %}
+
+
