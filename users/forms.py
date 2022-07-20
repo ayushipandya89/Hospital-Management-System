@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 
 from appointment.models import Appointments, Admit
 from .models import CustomUser, Patient, Staff, Feedback, Emergency, Medicine, Prescription, Bill, UserRole, \
-    StaffSpeciality, PrescribeMedicine
+    StaffSpeciality
 
 
 class UserRegisterForm(UserCreationForm):
@@ -124,6 +124,7 @@ class PrescriptionUpdateForm(forms.ModelForm):
     """
     This class is used to update fields of prescription.
     """
+    count = forms.IntegerField()
 
     class Meta:
         model = Prescription
@@ -156,6 +157,14 @@ class EmergencyForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(EmergencyForm, self).__init__(*args, **kwargs)
         self.fields['staff'].queryset = Staff.objects.filter(is_approve=True).filter(is_available=True)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        fetch_charge = cleaned_data.get("charge")
+        if fetch_charge < 500:
+            raise ValidationError(
+                "Emergency charge can not be less than 500"
+            )
 
 
 class MedicineForm(forms.ModelForm):

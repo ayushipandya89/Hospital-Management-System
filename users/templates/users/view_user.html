@@ -7,6 +7,16 @@
             {% csrf_token %}
             <input type="search" class="form-control" id="view_user_form" placeholder="search here.." name="search">
             <button class="btn btn-outline-primary my-2 my-sm-0" id="medicine_form" type="submit">Search</button>
+            <div class="optionsDiv ml-5">
+                Filter by Role:
+                <select name="name" id="selectField">
+                    <option value="All" selected>All</option>
+                    {% for role in all_role %}
+                        <option value="{{ role }}" >{{ role }}</option>
+                    {% endfor %}
+                </select>
+                <input type="submit" value="Filter">
+            </div>
         </form>
         <br>
         <h2> User List </h2>

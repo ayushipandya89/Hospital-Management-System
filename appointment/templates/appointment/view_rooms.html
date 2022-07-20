@@ -8,6 +8,16 @@
                 {% csrf_token %}
                 <input type="search" class="form-control" id="view_room_form" placeholder="search here.." name="search">
                 <button class="btn btn-outline-primary my-2 my-sm-0" id="medicine_form" type="submit">Search</button>
+                <div class="optionsDiv ml-5">
+                    Filter by Room-Type:
+                    <select name="name" id="selectField">
+                        <option value="All" selected>All</option>
+                        <option value="General" >General</option>
+                        <option value="Semi-Private" >Semi-Private</option>
+                        <option value="Private" >Private</option>
+                    </select>
+                    <input type="submit" value="Filter">
+                </div>
             </form>
             <br>
             <h2> Room List </h2>

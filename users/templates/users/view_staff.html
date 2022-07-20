@@ -7,6 +7,16 @@
             {% csrf_token %}
             <input type="search" class="form-control" id="view_staff_form" placeholder="search here.." name="search">
             <button class="btn btn-outline-primary my-2 my-sm-0" id="medicine_form" type="submit">Search</button>
+            <div class="optionsDiv ml-5">
+                Filter by Speciality:
+                <select name="name" id="selectField">
+                    <option value="All" selected>All</option>
+                    {% for speciality in all_speciality %}
+                        <option value="{{ speciality }}" >{{ speciality }}</option>
+                    {% endfor %}
+                </select>
+                <input type="submit" value="Filter">
+            </div>
         </form>
         <br>
         <h2> Staff List </h2>

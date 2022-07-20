@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
+from django.db.models import Min, Max
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse, reverse_lazy
@@ -17,7 +18,8 @@ from .forms import UserRegisterForm, UserUpdateForm, PatientRegistrationForm, St
     PrescriptionForm, PrescriptionUpdateForm, CreateBillForm, MedicineUpdateForm, MedicineForm, EmergencyForm, \
     AddRoleForm, AddSpecialityForm
 
-from .models import CustomUser, Patient, Staff, Feedback, Prescription, Emergency, Bill, Medicine, PrescribeMedicine
+from .models import CustomUser, Patient, Staff, Feedback, Prescription, Emergency, Bill, Medicine, PrescribeMedicine, \
+    UserRole, StaffSpeciality
 
 
 def is_admin(user):
@@ -148,17 +150,29 @@ class ViewUser(View):
 
     def get(self, request):
         all_data = CustomUser.objects.all()
+        all_role = UserRole.objects.values_list('role', flat=True)
         context = {
-            'all_data': all_data
+            'all_data': all_data,
+            'all_role': all_role
         }
         return render(request, 'users/view_user.html', context)
 
     def post(self, request):
         search = request.POST['search']
-        if search != " ":
+        filter = request.POST['name']
+        if search != "":
             search = search.strip()
+            all_role = UserRole.objects.values_list('role', flat=True)
             user = CustomUser.objects.filter(username__icontains=search)
-            return render(request, 'users/view_user.html', {'data': user})
+            return render(request, 'users/view_user.html', {'data': user, 'all_role': all_role})
+        elif filter != "":
+            all_role = UserRole.objects.values_list('role', flat=True)
+            if filter == 'All':
+                user = Staff.objects.all()
+            else:
+                query = filter.strip()
+                user = CustomUser.objects.filter(role__role=query)
+            return render(request, 'users/view_user.html', {'data': user, 'all_role': all_role})
         else:
             return redirect('Hospital-home')
 
@@ -187,17 +201,31 @@ class ViewStaff(View):
 
     def get(self, request):
         all_data = Staff.objects.all()
+        all_speciality = StaffSpeciality.objects.values_list('speciality', flat=True)
         context = {
-            'all_data': all_data
+            'all_data': all_data,
+            'all_speciality': all_speciality
         }
         return render(request, 'users/view_staff.html', context)
 
     def post(self, request):
         search = request.POST['search']
-        if search != " ":
+        filter = request.POST['name']
+        print(filter)
+        if search != "":
+            print('in search')
             search = search.strip()
             staff = Staff.objects.filter(staff__username__icontains=search)
-            return render(request, 'users/view_staff.html', {'data': staff})
+            all_speciality = StaffSpeciality.objects.values_list('speciality', flat=True)
+            return render(request, 'users/view_staff.html', {'data': staff, 'all_speciality': all_speciality})
+        elif filter != "":
+            all_speciality = StaffSpeciality.objects.values_list('speciality', flat=True)
+            if filter == 'All':
+                user = Staff.objects.all()
+            else:
+                query = filter.strip()
+                user = Staff.objects.filter(speciality__speciality=query)
+            return render(request, 'users/view_staff.html', {'data': user, 'all_speciality': all_speciality})
         else:
             return redirect('Hospital-home')
 
@@ -262,6 +290,7 @@ class SearchFeedback(View):
     def get(self, request):
         user = Feedback.objects.all().values_list('user__username', flat=True)
         user_list = list(user)
+        print(user_list)
         return JsonResponse(user_list, safe=False)
 
 
@@ -455,9 +484,14 @@ class SearchMedicine(View):
     """
 
     def get(self, request):
+        minPrice = request.GET['minPrice']
+        maxPrice = request.GET['maxPrice']
+        allProducts = Medicine.objects.all().order_by('-id').distinct()
+        allProducts = allProducts.filter(medicineattribute__charge_gte=minPrice)
+        allProducts = allProducts.filter(medicineattribute__charge_lte=maxPrice)
         topics = Medicine.objects.all().values_list('medicine_name', flat=True)
         medicine_list = list(topics)
-        return JsonResponse(medicine_list, safe=False)
+        return JsonResponse(medicine_list, allProducts, safe=False)
 
 
 class ViewMedicine(View):
@@ -468,9 +502,11 @@ class ViewMedicine(View):
     def get(self, request):
         all_data = Medicine.objects.all()
         user = CustomUser.objects.filter(id=self.request.user.id).first()
+        minMaxPrice = Medicine.objects.aggregate(Min('charge'), Max('charge'))
         context = {
             'all_data': all_data,
-            'user': user
+            'user': user,
+            'minMaxPrice': minMaxPrice
         }
         return render(request, 'users/view_medicine.html', context)
 

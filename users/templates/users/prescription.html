@@ -3,6 +3,7 @@
 {% load crispy_forms_tags %}
 {% block content %}
     <div class="content-section">
+
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <fieldset class="form-group">
@@ -16,7 +17,7 @@
                     </div>
                 </div>
 
-                <div id="medicine_options" class="id_medicine_">
+                <div id="medicine_options">
                     <div class="form-row form">
                         <div id="div_id_medicine" class="form-group col-6"><label for="id_medicine"
                                                                                   class=" requiredField">
@@ -62,7 +63,7 @@
         {#    }#}
         {#{/##}
 
-            {#function startAutocomplete(availableTags) {#}
+            {#function stxartAutocomplete(availableTags) {#}
             {#    console.log("fatching")#}
             {#    #}
 

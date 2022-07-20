@@ -160,9 +160,18 @@ class ViewRooms(View):
 
     def post(self, request):
         search = request.POST['search']
-        if search != " ":
+        filter = request.POST['name']
+        print(filter)
+        if search != "":
             search = search.strip()
             user = Room.objects.filter(room_type__icontains=search)
+            return render(request, 'appointment/view_rooms.html', {'data': user})
+        elif filter != "":
+            if filter == 'All':
+                user = Room.objects.all()
+            else:
+                query = filter.strip()
+                user = Room.objects.filter(room_type=query)
             return render(request, 'appointment/view_rooms.html', {'data': user})
         else:
             return redirect('Hospital-home')
