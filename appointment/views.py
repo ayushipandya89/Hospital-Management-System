@@ -160,17 +160,16 @@ class ViewRooms(View):
 
     def post(self, request):
         search = request.POST['search']
-        filter = request.POST['name']
-        print(filter)
+        query_filter = request.POST['name']
         if search != "":
             search = search.strip()
             user = Room.objects.filter(room_type__icontains=search)
             return render(request, 'appointment/view_rooms.html', {'data': user})
-        elif filter != "":
-            if filter == 'All':
+        elif query_filter != "":
+            if query_filter == 'All':
                 user = Room.objects.all()
             else:
-                query = filter.strip()
+                query = query_filter.strip()
                 user = Room.objects.filter(room_type=query)
             return render(request, 'appointment/view_rooms.html', {'data': user})
         else:
@@ -252,10 +251,19 @@ class ViewAdmitPatient(View):
 
     def post(self, request):
         search = request.POST['search']
-        if search != " ":
+        query_filter = request.POST['name']
+        if search != "":
             search = search.strip()
             user = Admit.objects.filter(patient__patient__username__icontains=search)
             return render(request, 'appointment/view_admit_patient.html', {'data': user})
+        elif query_filter != "":
+            if query_filter == 'All':
+                user = Admit.objects.all()
+            else:
+                query = query_filter.strip()
+                user = Admit.objects.filter(room__room_type=query)
+            return render(request, 'appointment/view_admit_patient.html', {'data': user})
+
         else:
             return redirect('Hospital-home')
 
@@ -295,10 +303,19 @@ class ViewDischargePatient(View):
 
     def post(self, request):
         search = request.POST['search']
-        if search != " ":
+        query_filter = request.POST['name']
+        if search != "":
             search = search.strip()
             user = Admit.objects.filter(patient__patient__username__icontains=search)
             return render(request, 'appointment/view_discharge_patient.html', {'data': user})
+        elif query_filter != "":
+            if query_filter == 'All':
+                user = Admit.objects.filter(out_date__isnull=False)
+            else:
+                query = query_filter.strip()
+                user = Admit.objects.filter(room__room_type=query).filter(out_date__isnull=False)
+            return render(request, 'appointment/view_discharge_patient.html', {'data': user})
+
         else:
             return redirect('Hospital-home')
 

@@ -159,18 +159,18 @@ class ViewUser(View):
 
     def post(self, request):
         search = request.POST['search']
-        filter = request.POST['name']
+        query_filter = request.POST['name']
         if search != "":
             search = search.strip()
             all_role = UserRole.objects.values_list('role', flat=True)
             user = CustomUser.objects.filter(username__icontains=search)
             return render(request, 'users/view_user.html', {'data': user, 'all_role': all_role})
-        elif filter != "":
+        elif query_filter != "":
             all_role = UserRole.objects.values_list('role', flat=True)
-            if filter == 'All':
+            if query_filter == 'All':
                 user = Staff.objects.all()
             else:
-                query = filter.strip()
+                query = query_filter.strip()
                 user = CustomUser.objects.filter(role__role=query)
             return render(request, 'users/view_user.html', {'data': user, 'all_role': all_role})
         else:
@@ -210,20 +210,18 @@ class ViewStaff(View):
 
     def post(self, request):
         search = request.POST['search']
-        filter = request.POST['name']
-        print(filter)
+        query_filter = request.POST['name']
         if search != "":
-            print('in search')
             search = search.strip()
             staff = Staff.objects.filter(staff__username__icontains=search)
             all_speciality = StaffSpeciality.objects.values_list('speciality', flat=True)
             return render(request, 'users/view_staff.html', {'data': staff, 'all_speciality': all_speciality})
-        elif filter != "":
+        elif query_filter != "":
             all_speciality = StaffSpeciality.objects.values_list('speciality', flat=True)
-            if filter == 'All':
+            if query_filter == 'All':
                 user = Staff.objects.all()
             else:
-                query = filter.strip()
+                query = query_filter.strip()
                 user = Staff.objects.filter(speciality__speciality=query)
             return render(request, 'users/view_staff.html', {'data': user, 'all_speciality': all_speciality})
         else:
@@ -270,7 +268,6 @@ class EnterFeedback(CreateView, SuccessMessageMixin):
 
     def get_queryset(self):
         query_set = CustomUser.objects.filter(id=self.kwargs['pk'])
-        print(query_set)
         return query_set
 
     def form_valid(self, form):
