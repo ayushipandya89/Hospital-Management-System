@@ -290,7 +290,6 @@ class SearchFeedback(View):
     def get(self, request):
         user = Feedback.objects.all().values_list('user__username', flat=True)
         user_list = list(user)
-        print(user_list)
         return JsonResponse(user_list, safe=False)
 
 
@@ -334,32 +333,25 @@ class PatientPrescription(View, SuccessMessageMixin):
 
     def post(self, request, *args, **kwargs):
         bill_form = PrescriptionForm(request.POST)
-        print(bill_form.errors)
         if bill_form.is_valid():
             data = {}
             for p in request.POST:
                 data[p] = request.POST[p]
-            print('data', data)
             b = {k: v[0] if len(v) == 1 else v for k, v in request.POST.lists()}
-            print('b:', b)
             fetch_patient = request.POST.get('patient')
             fetch_medicine = request.POST.getlist('medicine')
-            print('fetch_medicine:', fetch_medicine)
             fetch_count = request.POST.getlist('count')
-            print('fetch_count:', fetch_count)
             patient = Patient.objects.filter(id=fetch_patient).first()
             bill_form.patient = patient
             bill = bill_form.save(commit=False)
             bill.save()
             id_query = Prescription.objects.latest('id')
-            print('id_query', id_query)
             objs = []
             if len(fetch_medicine) > 1:
                 for i in range(len(fetch_medicine)):
                     count = fetch_count[i]
                     m = Medicine.objects.filter(medicine_name=fetch_medicine[i]).first()
                     objs.append(PrescribeMedicine(prescription=id_query, medicine=m, count=count))
-                    print('m:', m.id)
                 PrescribeMedicine.objects.bulk_create(objs)
             else:
                 m = Medicine.objects.filter(medicine_name=fetch_medicine[0]).first()
@@ -470,7 +462,6 @@ class SearchMedicine(View):
     def get(self, request):
         topics = Medicine.objects.all().values_list('medicine_name', flat=True)
         medicine_list = list(topics)
-        print(medicine_list)
         return JsonResponse(medicine_list, safe=False)
 
 
@@ -536,18 +527,12 @@ class CreateBill(View, SuccessMessageMixin):
         return render(request, 'users/create_bill.html', context)
 
     def post(self, request, *args, **kwargs):
-        print("Start")
         bill_form = CreateBillForm(request.POST)
-        print("before form")
-        print(bill_form.errors)
         if bill_form.is_valid():
-            print("its valid !!")
             fetch_patient = request.POST.get('patient')
             fetch_staff_charge = request.POST.get('staff_charge')
             fetch_other_charge = request.POST.get('other_charge')
             patient = Patient.objects.filter(id=fetch_patient).first()
-            print("1: ", fetch_staff_charge)
-            print("2: ", fetch_other_charge)
             bill_form.patient = patient
             bill = bill_form.save(commit=False)
             fetch_medicine = Prescription.objects.filter(patient=fetch_patient).first()
@@ -561,17 +546,10 @@ class CreateBill(View, SuccessMessageMixin):
                 bill.room_charge = admit.room.charge
             for emergency in emergency_obj:
                 total += emergency.charge
-                print('emergency :', emergency.charge)
                 bill.emergency_charge = emergency.charge
             if fetch_medicine:
-                print('in medicine')
-                print('medicine:', fetch_medicine.medicine)
                 charge = Medicine.objects.filter(medicine_name=fetch_medicine.medicine).first()
-                print(charge)
-                print('charge:', charge.charge)
-                print('dose:', fetch_medicine.count)
                 medicine_charge = charge.charge * fetch_medicine.count
-                print(medicine_charge)
                 bill.medicine_charge = medicine_charge
 
             total += Decimal(fetch_staff_charge) + Decimal(fetch_other_charge) + Decimal(medicine_charge) + Decimal(
@@ -591,24 +569,15 @@ class BillDetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super(BillDetailView, self).get_context_data(**kwargs)
         fetch_bill = Bill.objects.get(id=self.object.id)
-        print('fetch_bill', fetch_bill.id)
         fetch_admit = Admit.objects.filter(patient=fetch_bill.patient_id).first()
         fetch_emergency = Emergency.objects.filter(patient=fetch_bill.patient_id).first()
-        print('fetch_emergency', fetch_emergency)
         if fetch_emergency:
-            # print(fetch_emergency.staff)
             context['emergency_staff'] = fetch_emergency.staff
         if fetch_admit:
-            # print('its in!!!')
             fetch_staff = AdmitStaff.objects.get(id=fetch_admit.pk)
-            # print(fetch_staff.staff, '......')
-            # print(fetch_bill.patient_id, '123456789')
-            # print(fetch_admit.pk, '[[[[[[[[[[[[[[[[[[[[[[[[[')
             context['patient'] = fetch_admit.patient
             context['staff'] = fetch_staff.staff
             context['disease'] = fetch_admit.disease
-            print(context['patient'])
-        print(context)
         context['bill_id'] = fetch_bill.id
         return context
 
