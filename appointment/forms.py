@@ -105,6 +105,15 @@ class AdmitPatientForm(forms.ModelForm):
         self.fields["staff"].widget = forms.widgets.CheckboxSelectMultiple()
         self.fields["staff"].queryset = Staff.objects.filter(is_approve=True).filter(is_available=True)
 
+    def clean(self):
+        cleaned_data = super().clean()
+        fetch_room = cleaned_data.get("room")
+        available_room = Admit.objects.filter(out_date__isnull=True).filter(room=fetch_room)
+        print(available_room)
+        if available_room:
+            raise ValidationError(
+                "This room already have patient..please choose another"
+            )
 
 class DischargeUpdateForm(forms.ModelForm):
     """

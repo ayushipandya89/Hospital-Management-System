@@ -3,7 +3,6 @@
 {% block title %}Prescription List{% endblock %}
 {% block content %}
     <div class="container">
-
         <h2> Prescription List </h2>
         <div class="row">
           <div class="col-sm">
@@ -17,14 +16,13 @@
 
 
             </tr>
-            {% for pre in prescription %}
+            {% for pre in prescribe %}
               <tr>
-                <td>{{ pre.id }}</td>
-                <td>{{ pre.staff }}</td>
-                <td>{{ pre.patient.patient }}</td>
-                <td>{{ pre.medicine }}</td>
+                <td>{{ pre.prescription.id }}</td>
+                <td>{{ pre.prescription.staff }}</td>
+                <td>{{ pre.prescription.patient.patient }}</td>
+                <td>{{ pre.medicine.medicine_name }}</td>
                 <td>{{ pre.count }}</td>
-                <td> <a href="{% url 'update-prescription' pre.id %}""><button type="button" class="btn btn-outline-secondary">Update</button></td>
               </tr>
             {% endfor %}
           </table>
@@ -32,44 +30,3 @@
         </div>
     </div>
 {% endblock %}
-
-{##}
-{#<p>Price</p>#}
-{#        <input type="text" name="min_price" maxlength="4" size="3" >#}
-{#        to <input type="text" name="max_price" maxlength="4" size="3">#}
-{#        <input type="submit" value="Go">#}
-{#        <div id="priceFilterTemplate" data-win-control="WinJS.Binding.Template">#}
-{#            <div class="price-filter list-group-item list-group-item-action" aria-current="true">#}
-{#           <p>Price</p>#}
-{#           <label for="min_value">Min:</label>#}
-{#           <input class="price-box" type="text" name="min_value" id="min_value" value="10">#}
-{#           <input class="price-box" type="range" name="minimum" id="minimum" value="10" min="5" max="5000" step="10">#}
-{#           <script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js">#}
-{#               $(document).ready(function(){#}
-{#                    $('#minimum').change(function(){#}
-{#                        var new_val= $(this).val();#}
-{#                        $('#min_value').val(new_val);#}
-{##}
-{#                    });#}
-{#               });#}
-{#           </script>#}
-{#       </div>#}
-{#            <div class="customized-price">#}
-{#                <span class='price-label'>Price less than:#}
-{#                    <b>$11</b>#}
-{#                </span>#}
-{#                <span id="priceSlider" data-win-control="Telerik.UI.RadSlider" data-win-options="{#}
-{#                    tickPlacement: 'none',#}
-{#                    min: 1,#}
-{#                    max: 11,#}
-{#                    onslide: FilterTemplate.updatePriceLabel,#}
-{#                    onchange: FilterTemplate.updatePriceLabel,#}
-{#                    tooltip: { enabled: false }#}
-{#                }"></span>#}
-{##}
-{#                <button class="k-button" type="submit">Filter</button>#}
-{#                <div class="t-filter-buttons">#}
-{#                    <button class="k-button" type="reset">Clear filter</button>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}

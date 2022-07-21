@@ -32,7 +32,6 @@ urlpatterns = [
     path('view_staff/', ViewStaff.as_view(), name='view-staff'),
     path('prescription/', user_views.PatientPrescription.as_view(), name='prescription'),
     path('view_prescription/', ViewPrescription.as_view(), name='view-prescription'),
-    path('<pk>/update_prescription/', user_views.PrescriptionUpdate.as_view(), name='update-prescription'),
     path('emergency/', user_views.EmergencyCase.as_view(), name='emergency'),
     path('view_emergency/', ViewEmergency.as_view(), name='view-emergency'),
     path('search_emergency/', SearchEmergency.as_view(), name='search_emergency'),

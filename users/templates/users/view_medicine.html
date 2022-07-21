@@ -3,27 +3,11 @@
 {% block title %}Medicine List{% endblock %}
 {% block content %}
     <div class="container">
-        <div class="card mb-4">
-            <h6 class="card-header">Price</h6>
-            <div class="list-group list-group-flush">
-                <li class="list-group-item">
-                    <input type="range" value="{{ minMaxPrice.charge__min }}" max="{{ minMaxPrice.charge__max }}"  min="{{ minMaxPrice.charge__min }}"  id="rangeInput"  oninput="maxPrice.value=this.value" />
-                    <p>{{ minMaxPrice.charge__min }}-{{ minMaxPrice.charge__max }}</p>
-                </li>
-                <li class="list-group-item">
-                    Max:<input type="number" value="{{ minMaxPrice.charge__min }}" max="{{ minMaxPrice.charge__max }}" min="{{ minMaxPrice.charge__min }}"  onkeyup="rangeInput.value=this.value"  id="maxPrice"  />
-                    <button  class="btn btn-outline-primary btn-sm">Filter</button>
-                </li>
-            </div>
-        </div>
         <form class="form-inline my-2 my-lg-0" method="post" role="search" action="{% url 'view-medicine' %}">
             {% csrf_token %}
             <input type="search" class="form-control" id="medicine_form" placeholder="search here.." name="search">
             <button class="btn btn-outline-primary my-2 my-sm-0" id="medicine_form" type="submit">Search</button>
-            <p>Price</p>
-            <input type="text" name="min_price" maxlength="4" size="3" >
-            to <input type="text" name="max_price" maxlength="4" size="3">
-            <input type="submit" value="Go">
+
         </form>
         <div>
              <div class="row my-4">

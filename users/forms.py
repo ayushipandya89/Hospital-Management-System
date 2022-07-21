@@ -120,31 +120,6 @@ class PrescriptionForm(forms.ModelForm):
             self._errors["count"] = ["count can npt be less than zero"]
 
 
-class PrescriptionUpdateForm(forms.ModelForm):
-    """
-    This class is used to update fields of prescription.
-    """
-    count = forms.IntegerField()
-
-    class Meta:
-        model = Prescription
-        fields = ['medicine']
-
-    def clean(self):
-        cleaned_data = super().clean()
-        fetch_medicine = cleaned_data.get("medicine")
-        # fetch_count = cleaned_data.get("count")
-        query = Medicine.objects.filter(medicine_name=fetch_medicine)
-        if not query:
-            raise ValidationError(
-                "You can not prescribe this medicine....please add the medicine first"
-            )
-        # if fetch_count <= 0:
-        #     raise ValidationError(
-        #         "count can not be less than zero"
-        #     )
-
-
 class EmergencyForm(forms.ModelForm):
     """
     This class is used for emergency cases forms.

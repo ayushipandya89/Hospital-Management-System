@@ -47,27 +47,29 @@
 
 {% block scripts %}
     <script>
-        var medicines = $("#meds").val();
-        console.log(medicines);
-        $(".div_class_medicine").autocomplete({
-            source: medicines
+        {#var medicines = $("#meds").val();#}
+        {#console.log(medicines);#}
+        {#$(".div_class_medicine").autocomplete({#}
+        {#    source: medicines#}
+        {#/});#}
+        console.log('start')
+        var availableTags = [];
+        $.ajax({
+            method:"GET",
+            url:"{% url 'search-medicine' %}",
+            success: function (response) {
+                startAutocomplete(response)
+            }
         });
-        {#var availableTags = [ ];#}
-        {##}
-        {#$.ajax({#}
-        {#    method:"GET",#}
-        {#    url:"{% url 'search-medicine' %}",#}
-        {#    success: function (response){#}
-        {#        console.log(response)#}
-        {#        startAutocomplete(response);#}
-        {#    }#}
-        {#{/##}
-
+        function startAutocomplete(availableTags) {
+            $("#id_medicine").autocomplete({
+                source: availableTags
+            });
+        }
             {#function stxartAutocomplete(availableTags) {#}
             {#    console.log("fatching")#}
-            {#    #}
-
-        {##/}#}
+            {#    $("#div_id_medicine").autocomplete({#}
+            {#    source: availableTags#}
     </script>
 
     <script>

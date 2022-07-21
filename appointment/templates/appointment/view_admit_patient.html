@@ -36,6 +36,11 @@
                 <td>{{ admt.patient.patient   }}</td>
                 <td>{{ admt.in_date }}</td>
                 <td>{{ admt.room_id }}</td>
+                {% if role.role_id == 1 %}
+                    <td> <a href="{% url 'discharge_by_doctor' admt.id %}"><button type="button" class="btn btn-outline-secondary">Discharge Request</button></td>
+                  {% elif role.role_id == 4 %}
+                    <td> <a href="{% url 'discharge-patient' admt.id %}""><button type="button" class="btn btn-outline-secondary">Discharge</button></td>
+                {% endif %}
               </tr>
             {% empty %}
                 {% for admt in data %}
@@ -44,6 +49,9 @@
                     <td>{{ admt.patient.patient   }}</td>
                     <td>{{ admt.in_date }}</td>
                     <td>{{ admt.room_id }}</td>
+                    {% if role.role_id == 1 %}
+                        <td> <a href="{% url 'discharge_by_doctor' admt.id %}"><button type="submit" class="btn btn-outline-secondary">Discharge</button></td>
+                    {% endif %}
                   </tr>
                 {% endfor %}
             {% endfor %}

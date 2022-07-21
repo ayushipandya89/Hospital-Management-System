@@ -9,17 +9,18 @@ from django.views import View
 from django.views.generic import CreateView, ListView, UpdateView
 
 from constants import APPOINTMENT_SUCCESS_MSG, ROOM_SUCCESS_MSG, ADMIT_SUCCESS_MSG, DISCHARGE_SUCCESS_MSG, \
-    APPOINTMENT_DELETE_MSG
+    APPOINTMENT_DELETE_MSG, DISCHARGE_BY_DOCTOR_MSG
 from users.models import Patient, CustomUser
-from users.views import is_admin
+from users.views import is_admin, is_doctor
 from .forms import PatientAppointmentForm, CreateRoomForm, AdmitPatientForm, DischargeUpdateForm
-from .models import Appointments, Room, Admit
+from .models import Appointments, Room, Admit, Notification
 
 
 class LoadTimeslots(View):
     """
     class for give data to ajax call for loading available  timeslots  from database
     """
+
     def get(self, request):
         fetch_staff = request.GET.get('staff_id')
         fetch_date = request.GET.get('date')
@@ -198,34 +199,6 @@ class EnterAdmitPatient(SuccessMessageMixin, CreateView):
         return render(request, 'appointment/not_admin.html')
 
 
-class ViewNotDischarged(View):
-    """
-    class for display list of admitted patient who are not discharged yet
-    """
-
-    def get(self, request):
-        all_data = Admit.objects.filter(out_date__isnull=True)
-        context = {
-            'all_data': all_data
-        }
-        return render(request, 'appointment/view_not_discharge_patient.html', context)
-
-    def post(self, request):
-        search = request.POST['search']
-        if search != " ":
-            search = search.strip()
-            user = Admit.objects.filter(patient__patient__username__icontains=search)
-            return render(request, 'appointment/view_not_discharge_patient.html', {'data': user})
-        else:
-            return redirect('Hospital-home')
-
-    def dispatch(self, request, *args, **kwargs):
-        if is_admin(user=self.request.user):
-            return super(ViewNotDischarged, self).dispatch(
-                request, *args, **kwargs)
-        return render(request, 'appointment/not_admin.html')
-
-
 class SearchAdmit(View):
     """
     class for give data to ajax call for search admit user
@@ -243,9 +216,11 @@ class ViewAdmitPatient(View):
     """
 
     def get(self, request):
-        all_data = Admit.objects.all()
+        role = CustomUser.objects.filter(id=self.request.user.id).first()
+        all_data = Admit.objects.filter(out_date__isnull=True)
         context = {
-            'all_data': all_data
+            'all_data': all_data,
+            'role': role
         }
         return render(request, 'appointment/view_admit_patient.html', context)
 
@@ -254,11 +229,11 @@ class ViewAdmitPatient(View):
         query_filter = request.POST['name']
         if search != "":
             search = search.strip()
-            user = Admit.objects.filter(patient__patient__username__icontains=search)
+            user = Admit.objects.filter(patient__patient__username__icontains=search).filter(out_date__isnull=True)
             return render(request, 'appointment/view_admit_patient.html', {'data': user})
         elif query_filter != "":
             if query_filter == 'All':
-                user = Admit.objects.all()
+                user = Admit.objects.filter(out_date__isnull=True)
             else:
                 query = query_filter.strip()
                 user = Admit.objects.filter(room__room_type=query)
@@ -269,6 +244,9 @@ class ViewAdmitPatient(View):
 
     def dispatch(self, request, *args, **kwargs):
         if is_admin(user=self.request.user):
+            return super(ViewAdmitPatient, self).dispatch(
+                request, *args, **kwargs)
+        elif is_doctor(user=self.request.user):
             return super(ViewAdmitPatient, self).dispatch(
                 request, *args, **kwargs)
         return render(request, 'appointment/not_admin.html')
@@ -294,6 +272,7 @@ class ViewDischargePatient(View):
     """
     class for displaying list of discharge patient
     """
+
     def get(self, request):
         all_data = Admit.objects.filter(out_date__isnull=False)
         context = {
@@ -325,3 +304,14 @@ class ViewDischargePatient(View):
                 request, *args, **kwargs)
         return render(request, 'appointment/not_admin.html')
 
+
+class DischargeByDoctor(View):
+
+    def get(self, request, pk):
+        print(pk)
+        fetch_id = Admit.objects.filter(id=pk).first()
+        print(fetch_id.id)
+        patient = Notification.objects.create(patient_id=fetch_id.id)
+        patient.save()
+        messages.success(request, DISCHARGE_BY_DOCTOR_MSG)
+        return redirect('Hospital-home')

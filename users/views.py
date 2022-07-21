@@ -1,9 +1,7 @@
 import io
 from datetime import datetime
 from decimal import Decimal
-from io import BytesIO
-from django.http import HttpResponse
-from django.template.loader import get_template, render_to_string
+from django.template.loader import get_template
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Min, Max
@@ -11,16 +9,16 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views import View, generic
-from django.views.generic import CreateView, UpdateView, DeleteView, ListView, TemplateView
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 from xhtml2pdf import pisa
 
 from appointment.models import Admit, AdmitStaff, Appointments
 from constants import PRESCRIPTION_SUCCESS_MSG, REGISTER_SUCCESS_MSG, ROLE_SUCCESS_MSG, SPECIALITY_SUCCESS_MSG, \
     PROFILE_UPDATE_MSG, PROFILE_DELETE_MSG, UPDATE_STAFF_PROFILE, NURSE_ERROR_MSG, FEEDBACK_SUCCESS_MSG, \
-    PRESCRIPTION_UPDATE_MSG, EMERGENCY_SUCCESS_MSG, MEDICINE_SUCCESS_MSG, MEDICINE_UPDATE_MSG, BILL_SUCCESS_MSG
+    EMERGENCY_SUCCESS_MSG, MEDICINE_SUCCESS_MSG, MEDICINE_UPDATE_MSG, BILL_SUCCESS_MSG
 from . import models
 from .forms import UserRegisterForm, UserUpdateForm, PatientRegistrationForm, StaffUpdateForm, FeedbackForm, \
-    PrescriptionForm, PrescriptionUpdateForm, CreateBillForm, MedicineUpdateForm, MedicineForm, EmergencyForm, \
+    PrescriptionForm, CreateBillForm, MedicineUpdateForm, MedicineForm, EmergencyForm, \
     AddRoleForm, AddSpecialityForm
 
 from .models import CustomUser, Patient, Staff, Feedback, Prescription, Emergency, Bill, Medicine, PrescribeMedicine, \
@@ -331,7 +329,7 @@ class PatientPrescription(View, SuccessMessageMixin):
     def get(self, request):
         form = PrescriptionForm()
         medicines = [meds.medicine_name for meds in Medicine.objects.all()]
-        context = {'form': form, "medicines": medicines}
+        context = {'form': form}
         return render(request, 'users/prescription.html', context)
 
     def post(self, request, *args, **kwargs):
@@ -371,32 +369,16 @@ class PatientPrescription(View, SuccessMessageMixin):
             return redirect('Hospital-home')
 
 
-class PrescriptionUpdate(SuccessMessageMixin, UpdateView):
-    """
-    This class is for update the profile information.
-    """
-    form_class = PrescriptionUpdateForm
-    template_name = 'users/prescription_update.html'
-    success_message = PRESCRIPTION_UPDATE_MSG
-
-    def get_queryset(self):
-        query_set = Prescription.objects.filter(id=self.kwargs['pk'])
-        return query_set
-
-    def get_success_url(self):
-        return reverse('view-prescription')
-
-
-class ViewPrescription(ListView):
+class ViewPrescription(View):
     """
     class for view the list of prescription
     """
-    model = Prescription
-    template_name = 'users/view_prescription.html'
-    context_object_name = 'prescription'
 
-    def get_queryset(self):
-        return self.model.objects.all().order_by('id')
+    def get(self, request):
+        query1 = Prescription.objects.all().order_by('id')
+        query2 = PrescribeMedicine.objects.all().order_by('id')
+        context = {'prescription': query1, 'prescribe': query2}
+        return render(request, 'users/view_prescription.html', context)
 
     def dispatch(self, request, *args, **kwargs):
         if is_doctor(user=self.request.user):
@@ -486,14 +468,10 @@ class SearchMedicine(View):
     """
 
     def get(self, request):
-        minPrice = request.GET['minPrice']
-        maxPrice = request.GET['maxPrice']
-        allProducts = Medicine.objects.all().order_by('-id').distinct()
-        allProducts = allProducts.filter(medicineattribute__charge_gte=minPrice)
-        allProducts = allProducts.filter(medicineattribute__charge_lte=maxPrice)
         topics = Medicine.objects.all().values_list('medicine_name', flat=True)
         medicine_list = list(topics)
-        return JsonResponse(medicine_list, allProducts, safe=False)
+        print(medicine_list)
+        return JsonResponse(medicine_list, safe=False)
 
 
 class ViewMedicine(View):
