@@ -263,6 +263,15 @@ class DischargePatient(UpdateView, SuccessMessageMixin):
         query_set = Admit.objects.filter(id=self.kwargs['pk'])
         return query_set
 
+    def form_valid(self, form, *args, **kwargs):
+        print(self.request)
+        print(self.kwargs['pk'])
+        fetch_id = Notification.objects.filter(patient=self.kwargs['pk']).first()
+        print(fetch_id)
+        fetch_id.discharge = True
+        fetch_id.save()
+        return super().form_valid(form)
+
     def get_success_url(self):
         messages.success(self.request, DISCHARGE_SUCCESS_MSG)
         return reverse("Hospital-home")
@@ -315,3 +324,31 @@ class DischargeByDoctor(View):
         patient.save()
         messages.success(request, DISCHARGE_BY_DOCTOR_MSG)
         return redirect('Hospital-home')
+
+
+class DischargebyAdminView(View):
+    """
+    class for display list of admitted patient who are not discharged yet
+    """
+
+    def get(self, request):
+        all_data = Notification.objects.filter(discharge=False)
+        context = {
+            'all_data': all_data
+        }
+        return render(request, 'appointment/discharge_by_admin.html', context)
+
+    def post(self, request):
+        search = request.POST['search']
+        if search != " ":
+            search = search.strip()
+            user = Notification.objects.filter(patient__patient__patient__username__icontains=search).filter(discharge=False)
+            return render(request, 'appointment/discharge_by_admin.html', {'data': user})
+        else:
+            return redirect('Hospital-home')
+
+    def dispatch(self, request, *args, **kwargs):
+        if is_admin(user=self.request.user):
+            return super(DischargebyAdminView, self).dispatch(
+                request, *args, **kwargs)
+        return render(request, 'appointment/not_admin.html')
