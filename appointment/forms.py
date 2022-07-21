@@ -115,6 +115,7 @@ class AdmitPatientForm(forms.ModelForm):
                 "This room already have patient..please choose another"
             )
 
+
 class DischargeUpdateForm(forms.ModelForm):
     """
     This class is used to discharge patient form
