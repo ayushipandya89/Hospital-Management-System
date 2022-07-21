@@ -1,0 +1,69 @@
+{% extends 'Hospital/base.html' %}
+{% load static %}
+{% block title %}Discharge List{% endblock %}
+{% block content %}
+    <div class="container">
+        <form class="form-inline my-2 my-lg-0" method="post" role="search" action="{% url 'view-discharge-patient' %}">
+            {% csrf_token %}
+            <input type="search" class="form-control" id="view_discharge_form" placeholder="search here.." name="search">
+            <button class="btn btn-outline-primary my-2 my-sm-0" id="medicine_form" type="submit">Search</button>
+        </form>
+        <br>
+        <h2> Discharge List </h2>
+        <div class="row">
+          <div class="col-sm">
+          <table class="table">
+          <tr>
+            <th>id</th>
+            <th>Patient Name</th>
+            <th>Admit Date</th>
+            <th>Room No</th>
+
+            </tr>
+            {% for adm in all_data %}
+              <tr>
+                <td>{{ adm.patient.id  }}</td>
+                <td>{{ adm.patient.patient }}</td>
+                <td>{{ adm.patient.in_date }}</td>
+                <td>{{ adm.patient.room_id }}</td>
+                <td> <a href="{% url 'discharge-patient' adm.patient.id  %}""><button type="button" class="btn btn-outline-secondary">Discharge</button></td>
+              </tr>
+            {% empty %}
+                {% for adm in data %}
+                  <tr>
+                    <td>{{ adm.patient.id  }}</td>
+                    <td>{{ adm.patient.patient }}</td>
+                    <td>{{ adm.patient.in_date }}</td>
+                    <td>{{ adm.patient.room_id }}</td>
+                    <td> <a href="{% url 'discharge-patient' adm.patient.id  %}""><button type="button" class="btn btn-outline-secondary">Discharge</button></td>
+                  </tr>
+                {% endfor %}
+            {% endfor %}
+          </table>
+          </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+
+{% block scripts %}
+  <script>
+    console.log('start')
+    var availableTags = [ ];
+
+    $.ajax({
+        method:"GET",
+        url:"{% url 'search_admit' %}",
+        success: function (response){
+            console.log(response)
+            startAutocomplete(response);
+        }
+    })
+    function startAutocomplete(availableTags) {
+        $("#view_discharge_form").autocomplete({
+            source: availableTags
+        });
+    }
+  </script>
+{% endblock scripts %}
