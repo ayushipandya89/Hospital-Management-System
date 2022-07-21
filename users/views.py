@@ -675,31 +675,30 @@ def render_to_pdf(template_src, context_dict):
     return
 
 
-# class GeneratePdf(View):
-#     def get(self, request, *args, **kwargs):
-#         # print(self.request['id'],';;;;;;;;;;;;;;;;;;;;;;;;')
-#         data = Bill.objects.get(id=self.request.user)
-#         open('templates/temp.html', "w").write(render_to_string('users/bill_detail.html', {'data': data}))
-#
-#         # Converting the HTML template into a PDF file
-#         pdf = html_to_pdf('temp.html')
-#
-#         # rendering the template
-#         return HttpResponse(pdf, content_type='application/pdf')
+class DownloadPdfView(View):
+    def get(self, request, pk):
+        bill_details = models.Bill.objects.filter(patient=pk).order_by('-id')[:1]
+        patient_details = models.CustomUser.objects.filter(patient=pk).order_by('-id')[:1]
+        dict = {
+            'id': bill_details[0].id,
+            'patientName': bill_details[0].patient.patient.username,
+            'address': patient_details[0].address,
+            'mobile': patient_details[0].phone,
+            'medicineCost': bill_details[0].medicine_charge,
+            'roomCharge': bill_details[0].room_charge,
+            'doctorFee': bill_details[0].staff_charge,
+            'OtherCharge': bill_details[0].other_charge,
+            'total': bill_details[0].total_charge,
+        }
+        return render_to_pdf('users/download_bill.html', dict)
 
-def download_pdf_view(request, pk):
-    bill_details = models.Bill.objects.filter(patient=pk).order_by('-id')[:1]
-    patient_details = models.CustomUser.objects.filter(patient=pk).order_by('-id')[:1]
-    dict = {
-        'id': bill_details[0].id,
-        'patientName': bill_details[0].patient.patient.username,
-        'address': patient_details[0].address,
-        'mobile': patient_details[0].phone,
-        # 'symptoms': dischargeDetails[0].symptoms,
-        'medicineCost': bill_details[0].medicine_charge,
-        'roomCharge': bill_details[0].room_charge,
-        'doctorFee': bill_details[0].staff_charge,
-        'OtherCharge': bill_details[0].other_charge,
-        'total': bill_details[0].total_charge,
-    }
-    return render_to_pdf('users/download_bill.html', dict)
+
+class ViewBill(ListView):
+    model = Bill
+    template_name = 'users/view_bill.html'
+    context_object_name = 'bill'
+
+    def get_queryset(self):
+        print(self.request.user)
+        query_set = Bill.objects.filter(patient__patient__username=self.request.user)
+        return query_set
