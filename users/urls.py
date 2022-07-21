@@ -3,7 +3,7 @@ from . import views as user_views, views
 from django.contrib.auth import views as auth_views
 
 from .views import ViewUser, ViewStaff, ViewFeedback, ViewEmergency, ViewPrescription, BillView, ViewMedicine, \
-    SearchMedicine, SearchStaff, SearchEmergency, SearchFeedback, ViewTodayAppointment
+    SearchMedicine, SearchStaff, SearchEmergency, SearchFeedback, ViewTodayAppointment, download_pdf_view
 
 urlpatterns = [
     path('register/', user_views.Register.as_view(), name='register'),
@@ -46,6 +46,7 @@ urlpatterns = [
     path('search_feedback/', SearchFeedback.as_view(), name='search_feedback'),
     path('view_feedback/', ViewFeedback.as_view(), name='view-feedback'),
     path('view_todays_appointment/', ViewTodayAppointment.as_view(), name='view_todays_appointment'),
+    path('pdf/<pk>/', download_pdf_view,name='download_bill'),
     path('', include('Hospital.urls')),
 
 ]

@@ -1,6 +1,9 @@
+import io
 from datetime import datetime
 from decimal import Decimal
-
+from io import BytesIO
+from django.http import HttpResponse
+from django.template.loader import get_template, render_to_string
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Min, Max
@@ -9,11 +12,13 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views import View, generic
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView, TemplateView
+from xhtml2pdf import pisa
 
 from appointment.models import Admit, AdmitStaff, Appointments
 from constants import PRESCRIPTION_SUCCESS_MSG, REGISTER_SUCCESS_MSG, ROLE_SUCCESS_MSG, SPECIALITY_SUCCESS_MSG, \
     PROFILE_UPDATE_MSG, PROFILE_DELETE_MSG, UPDATE_STAFF_PROFILE, NURSE_ERROR_MSG, FEEDBACK_SUCCESS_MSG, \
     PRESCRIPTION_UPDATE_MSG, EMERGENCY_SUCCESS_MSG, MEDICINE_SUCCESS_MSG, MEDICINE_UPDATE_MSG, BILL_SUCCESS_MSG
+from . import models
 from .forms import UserRegisterForm, UserUpdateForm, PatientRegistrationForm, StaffUpdateForm, FeedbackForm, \
     PrescriptionForm, PrescriptionUpdateForm, CreateBillForm, MedicineUpdateForm, MedicineForm, EmergencyForm, \
     AddRoleForm, AddSpecialityForm
@@ -608,23 +613,25 @@ class BillDetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super(BillDetailView, self).get_context_data(**kwargs)
         fetch_bill = Bill.objects.get(id=self.object.id)
+        print('fetch_bill', fetch_bill.id)
         fetch_admit = Admit.objects.filter(patient=fetch_bill.patient_id).first()
         fetch_emergency = Emergency.objects.filter(patient=fetch_bill.patient_id).first()
         print('fetch_emergency', fetch_emergency)
         if fetch_emergency:
-            print(fetch_emergency.staff)
+            # print(fetch_emergency.staff)
             context['emergency_staff'] = fetch_emergency.staff
         if fetch_admit:
-            print('its in!!!')
+            # print('its in!!!')
             fetch_staff = AdmitStaff.objects.get(id=fetch_admit.pk)
-            print(fetch_staff.staff, '......')
-            print(fetch_bill.patient_id, '123456789')
-            print(fetch_admit.pk, '[[[[[[[[[[[[[[[[[[[[[[[[[')
+            # print(fetch_staff.staff, '......')
+            # print(fetch_bill.patient_id, '123456789')
+            # print(fetch_admit.pk, '[[[[[[[[[[[[[[[[[[[[[[[[[')
             context['patient'] = fetch_admit.patient
             context['staff'] = fetch_staff.staff
             context['disease'] = fetch_admit.disease
             print(context['patient'])
         print(context)
+        context['bill_id'] = fetch_bill.id
         return context
 
 
@@ -656,3 +663,43 @@ class ViewTodayAppointment(ListView):
     def get_queryset(self):
         date = datetime.now().date()
         return Appointments.objects.filter(staff__staff__username=self.request.user).filter(date=date).order_by('id')
+
+
+def render_to_pdf(template_src, context_dict):
+    template = get_template(template_src)
+    html = template.render(context_dict)
+    result = io.BytesIO()
+    pdf = pisa.pisaDocument(io.BytesIO(html.encode("ISO-8859-1")), result)
+    if not pdf.err:
+        return HttpResponse(result.getvalue(), content_type='application/pdf')
+    return
+
+
+# class GeneratePdf(View):
+#     def get(self, request, *args, **kwargs):
+#         # print(self.request['id'],';;;;;;;;;;;;;;;;;;;;;;;;')
+#         data = Bill.objects.get(id=self.request.user)
+#         open('templates/temp.html', "w").write(render_to_string('users/bill_detail.html', {'data': data}))
+#
+#         # Converting the HTML template into a PDF file
+#         pdf = html_to_pdf('temp.html')
+#
+#         # rendering the template
+#         return HttpResponse(pdf, content_type='application/pdf')
+
+def download_pdf_view(request, pk):
+    bill_details = models.Bill.objects.filter(patient=pk).order_by('-id')[:1]
+    patient_details = models.CustomUser.objects.filter(patient=pk).order_by('-id')[:1]
+    dict = {
+        'id': bill_details[0].id,
+        'patientName': bill_details[0].patient.patient.username,
+        'address': patient_details[0].address,
+        'mobile': patient_details[0].phone,
+        # 'symptoms': dischargeDetails[0].symptoms,
+        'medicineCost': bill_details[0].medicine_charge,
+        'roomCharge': bill_details[0].room_charge,
+        'doctorFee': bill_details[0].staff_charge,
+        'OtherCharge': bill_details[0].other_charge,
+        'total': bill_details[0].total_charge,
+    }
+    return render_to_pdf('users/download_bill.html', dict)
