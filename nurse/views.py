@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import CreateView, ListView
+from django.views.generic import CreateView
 
 from constants import DUTY_ASSIGN_MSG
 from nurse.forms import DutyForm
@@ -44,14 +44,14 @@ class ViewDuty(View):
     """
 
     def get(self, request):
-        user = NurseDuty.objects.filter(staff__staff__username=self.request.user)
+        user = NurseDuty.objects.filter(staff__staff__username=self.request.user).order_by('id')
         if user:
             context = {
                 'all_data': user
             }
             return render(request, 'nurse/view_duty.html', context)
         else:
-            all_data = NurseDuty.objects.all()
+            all_data = NurseDuty.objects.all().order_by('id')
             context = {
                 'all_data': all_data
             }
@@ -61,7 +61,7 @@ class ViewDuty(View):
         search = request.POST['search']
         if search != " ":
             search = search.strip()
-            user = NurseDuty.objects.filter(staff__staff__username__icontains=search)
+            user = NurseDuty.objects.filter(staff__staff__username__icontains=search).order_by('id')
             return render(request, 'nurse/view_duty.html', {'data': user})
         else:
             return redirect('Hospital-home')

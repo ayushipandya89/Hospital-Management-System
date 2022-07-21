@@ -152,7 +152,7 @@ class ViewUser(View):
     """
 
     def get(self, request):
-        all_data = CustomUser.objects.all()
+        all_data = CustomUser.objects.all().order_by('id')
         all_role = UserRole.objects.values_list('role', flat=True)
         context = {
             'all_data': all_data,
@@ -166,7 +166,7 @@ class ViewUser(View):
         if search != "":
             search = search.strip()
             all_role = UserRole.objects.values_list('role', flat=True)
-            user = CustomUser.objects.filter(username__icontains=search)
+            user = CustomUser.objects.filter(username__icontains=search).order_by('id')
             return render(request, 'users/view_user.html', {'data': user, 'all_role': all_role})
         elif query_filter != "":
             all_role = UserRole.objects.values_list('role', flat=True)
@@ -174,7 +174,7 @@ class ViewUser(View):
                 user = Staff.objects.all()
             else:
                 query = query_filter.strip()
-                user = CustomUser.objects.filter(role__role=query)
+                user = CustomUser.objects.filter(role__role=query).order_by('id')
             return render(request, 'users/view_user.html', {'data': user, 'all_role': all_role})
         else:
             return redirect('Hospital-home')
@@ -203,7 +203,7 @@ class ViewStaff(View):
     """
 
     def get(self, request):
-        all_data = Staff.objects.all()
+        all_data = Staff.objects.all().order_by('id')
         all_speciality = StaffSpeciality.objects.values_list('speciality', flat=True)
         context = {
             'all_data': all_data,
@@ -216,7 +216,7 @@ class ViewStaff(View):
         query_filter = request.POST['name']
         if search != "":
             search = search.strip()
-            staff = Staff.objects.filter(staff__username__icontains=search)
+            staff = Staff.objects.filter(staff__username__icontains=search).order_by('id')
             all_speciality = StaffSpeciality.objects.values_list('speciality', flat=True)
             return render(request, 'users/view_staff.html', {'data': staff, 'all_speciality': all_speciality})
         elif query_filter != "":
@@ -225,7 +225,7 @@ class ViewStaff(View):
                 user = Staff.objects.all()
             else:
                 query = query_filter.strip()
-                user = Staff.objects.filter(speciality__speciality=query)
+                user = Staff.objects.filter(speciality__speciality=query).order_by('id')
             return render(request, 'users/view_staff.html', {'data': user, 'all_speciality': all_speciality})
         else:
             return redirect('Hospital-home')
@@ -299,7 +299,7 @@ class ViewFeedback(View):
     """
 
     def get(self, request):
-        all_data = Feedback.objects.all()
+        all_data = Feedback.objects.all().order_by('id')
         context = {
             'all_data': all_data
         }
@@ -309,7 +309,7 @@ class ViewFeedback(View):
         search = request.POST['search']
         if search != " ":
             search = search.strip()
-            staff = Feedback.objects.filter(user__username__icontains=search)
+            staff = Feedback.objects.filter(user__username__icontains=search).order_by('id')
             return render(request, 'users/view_feedback.html', {'data': staff})
         else:
             return redirect('Hospital-home')
@@ -414,7 +414,7 @@ class ViewEmergency(View):
     """
 
     def get(self, request):
-        all_data = Emergency.objects.all()
+        all_data = Emergency.objects.all().order_by('id')
         context = {
             'all_data': all_data
         }
@@ -424,7 +424,7 @@ class ViewEmergency(View):
         search = request.POST['search']
         if search != " ":
             search = search.strip()
-            staff = Emergency.objects.filter(patient__patient__username__icontains=search)
+            staff = Emergency.objects.filter(patient__patient__username__icontains=search).order_by('id')
             return render(request, 'users/view_emergency.html', {'data': staff})
         else:
             return redirect('Hospital-home')
@@ -471,13 +471,11 @@ class ViewMedicine(View):
     """
 
     def get(self, request):
-        all_data = Medicine.objects.all()
+        all_data = Medicine.objects.all().order_by('id')
         user = CustomUser.objects.filter(id=self.request.user.id).first()
-        minMaxPrice = Medicine.objects.aggregate(Min('charge'), Max('charge'))
         context = {
             'all_data': all_data,
             'user': user,
-            'minMaxPrice': minMaxPrice
         }
         return render(request, 'users/view_medicine.html', context)
 
@@ -486,7 +484,7 @@ class ViewMedicine(View):
         if search != " ":
             search = search.strip()
             user = CustomUser.objects.filter(id=self.request.user.id).first()
-            medicine = Medicine.objects.filter(medicine_name__icontains=search)
+            medicine = Medicine.objects.filter(medicine_name__icontains=search).order_by('id')
             return render(request, 'users/view_medicine.html', {'data': medicine, 'user': user})
         else:
             return redirect('Hospital-home')
@@ -647,5 +645,5 @@ class ViewBill(ListView):
 
     def get_queryset(self):
         print(self.request.user)
-        query_set = Bill.objects.filter(patient__patient__username=self.request.user)
+        query_set = Bill.objects.filter(patient__patient__username=self.request.user).order_by('id')
         return query_set

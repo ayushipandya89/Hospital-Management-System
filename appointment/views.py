@@ -64,11 +64,9 @@ class BookAppointments(View, SuccessMessageMixin):
         return render(request, 'appointment/book_appointments.html', context)
 
     def post(self, request, *args, **kwargs):
-        print(self.request.user)
         form = PatientAppointmentForm(request.POST)
         if form.is_valid():
             fetch_patient = Patient.objects.filter(patient_id=self.request.user).first()
-            print(fetch_patient.patient_id)
             form.instance.user_id = CustomUser.objects.filter(id=fetch_patient.patient_id).first().id
             appointment_form = form.save(commit=False)
             appointment_form.save()
@@ -89,8 +87,6 @@ class ViewAppointments(ListView):
     def get_queryset(self):
         staff_query = Appointments.objects.filter(staff__staff__username=self.request.user).order_by('id')
         patient_query = Appointments.objects.filter(user__username=self.request.user).order_by('id')
-        print(staff_query)
-        print(patient_query)
         if staff_query:
             return staff_query
         elif patient_query:
@@ -153,7 +149,7 @@ class ViewRooms(View):
     """
 
     def get(self, request):
-        all_data = Room.objects.all()
+        all_data = Room.objects.all().order_by('id')
         context = {
             'all_data': all_data
         }
@@ -164,14 +160,14 @@ class ViewRooms(View):
         query_filter = request.POST['name']
         if search != "":
             search = search.strip()
-            user = Room.objects.filter(room_type__icontains=search)
+            user = Room.objects.filter(room_type__icontains=search).order_by('id')
             return render(request, 'appointment/view_rooms.html', {'data': user})
         elif query_filter != "":
             if query_filter == 'All':
-                user = Room.objects.all()
+                user = Room.objects.all().order_by('id')
             else:
                 query = query_filter.strip()
-                user = Room.objects.filter(room_type=query)
+                user = Room.objects.filter(room_type=query).order_by('id')
             return render(request, 'appointment/view_rooms.html', {'data': user})
         else:
             return redirect('Hospital-home')
@@ -217,7 +213,7 @@ class ViewAdmitPatient(View):
 
     def get(self, request):
         role = CustomUser.objects.filter(id=self.request.user.id).first()
-        all_data = Admit.objects.filter(out_date__isnull=True)
+        all_data = Admit.objects.filter(out_date__isnull=True).order_by('id')
         context = {
             'all_data': all_data,
             'role': role
@@ -229,14 +225,14 @@ class ViewAdmitPatient(View):
         query_filter = request.POST['name']
         if search != "":
             search = search.strip()
-            user = Admit.objects.filter(patient__patient__username__icontains=search).filter(out_date__isnull=True)
+            user = Admit.objects.filter(patient__patient__username__icontains=search).filter(out_date__isnull=True).order_by('id')
             return render(request, 'appointment/view_admit_patient.html', {'data': user})
         elif query_filter != "":
             if query_filter == 'All':
-                user = Admit.objects.filter(out_date__isnull=True)
+                user = Admit.objects.filter(out_date__isnull=True).order_by('id')
             else:
                 query = query_filter.strip()
-                user = Admit.objects.filter(room__room_type=query)
+                user = Admit.objects.filter(room__room_type=query).order_by('id')
             return render(request, 'appointment/view_admit_patient.html', {'data': user})
 
         else:
@@ -264,10 +260,7 @@ class DischargePatient(UpdateView, SuccessMessageMixin):
         return query_set
 
     def form_valid(self, form, *args, **kwargs):
-        print(self.request)
-        print(self.kwargs['pk'])
         fetch_id = Notification.objects.filter(patient=self.kwargs['pk']).first()
-        print(fetch_id)
         fetch_id.discharge = True
         fetch_id.save()
         return super().form_valid(form)
@@ -283,7 +276,7 @@ class ViewDischargePatient(View):
     """
 
     def get(self, request):
-        all_data = Admit.objects.filter(out_date__isnull=False)
+        all_data = Admit.objects.filter(out_date__isnull=False).order_by('id')
         context = {
             'all_data': all_data
         }
@@ -294,14 +287,14 @@ class ViewDischargePatient(View):
         query_filter = request.POST['name']
         if search != "":
             search = search.strip()
-            user = Admit.objects.filter(patient__patient__username__icontains=search)
+            user = Admit.objects.filter(patient__patient__username__icontains=search).order_by('id')
             return render(request, 'appointment/view_discharge_patient.html', {'data': user})
         elif query_filter != "":
             if query_filter == 'All':
-                user = Admit.objects.filter(out_date__isnull=False)
+                user = Admit.objects.filter(out_date__isnull=False).order_by('id')
             else:
                 query = query_filter.strip()
-                user = Admit.objects.filter(room__room_type=query).filter(out_date__isnull=False)
+                user = Admit.objects.filter(room__room_type=query).filter(out_date__isnull=False).order_by('id')
             return render(request, 'appointment/view_discharge_patient.html', {'data': user})
 
         else:
@@ -315,11 +308,11 @@ class ViewDischargePatient(View):
 
 
 class DischargeByDoctor(View):
-
+    """
+    saving discharge request in notification module
+    """
     def get(self, request, pk):
-        print(pk)
         fetch_id = Admit.objects.filter(id=pk).first()
-        print(fetch_id.id)
         patient = Notification.objects.create(patient_id=fetch_id.id)
         patient.save()
         messages.success(request, DISCHARGE_BY_DOCTOR_MSG)
@@ -332,7 +325,7 @@ class DischargebyAdminView(View):
     """
 
     def get(self, request):
-        all_data = Notification.objects.filter(discharge=False)
+        all_data = Notification.objects.filter(discharge=False).order_by('id')
         context = {
             'all_data': all_data
         }
@@ -342,7 +335,7 @@ class DischargebyAdminView(View):
         search = request.POST['search']
         if search != " ":
             search = search.strip()
-            user = Notification.objects.filter(patient__patient__patient__username__icontains=search).filter(discharge=False)
+            user = Notification.objects.filter(patient__patient__patient__username__icontains=search).filter(discharge=False).order_by('id')
             return render(request, 'appointment/discharge_by_admin.html', {'data': user})
         else:
             return redirect('Hospital-home')
