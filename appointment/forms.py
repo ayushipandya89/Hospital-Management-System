@@ -70,6 +70,7 @@ class CreateRoomForm(forms.ModelForm):
     """
     class for entering the rooms date
     """
+
     class Meta:
         model = Room
         fields = ['charge', 'AC', 'is_ICU', 'room_type']
