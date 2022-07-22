@@ -4,7 +4,6 @@ from decimal import Decimal
 from django.template.loader import get_template
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
-from django.db.models import Min, Max
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse, reverse_lazy
@@ -53,11 +52,11 @@ class Register(SuccessMessageMixin, CreateView):
         form = self.form_class(request.POST)
         if form.is_valid():
             user_obj = form.save(commit=True)
-            if user_obj.role == 'P':
+            if user_obj.role.role == 'Patient':
                 patient = Patient.objects.create(patient=user_obj)
                 patient.save()
                 messages.success(request, REGISTER_SUCCESS_MSG)
-            if user_obj.role == 'D' or user_obj.role == 'N':
+            if user_obj.role.role == 'Doctor' or user_obj.role.role == 'Nurse':
                 staff = Staff.objects.create(staff=user_obj)
                 staff.save()
                 messages.success(request, REGISTER_SUCCESS_MSG)
