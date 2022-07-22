@@ -70,9 +70,9 @@ class CreateRoomForm(forms.ModelForm):
     """
     class for entering the rooms date
     """
-    fetch_admin = CustomUser.objects.filter(is_superuser=True)
-    if not fetch_admin:
-        raise ValidationError('You are not admin you can not edit this form')
+    # fetch_admin = CustomUser.objects.filter(is_superuser=True)
+    # if not fetch_admin:
+    #     raise ValidationError('You are not admin you can not edit this form')
 
     class Meta:
         model = Room
