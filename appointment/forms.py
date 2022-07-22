@@ -39,16 +39,16 @@ class PatientTimeslotsUpdate(forms.ModelForm):
     date = datetime.now().date()
     time = datetime.now()
     current_time = time.strftime("%H:%M:%S")
-    # date_query = Appointments.objects.last()
-    # if date_query == date:
-    #     for i in range(9, 20):
-    #         if i > int(current_time.split(':')[0]):
-    #             if i != 12:
-    #                 time_slot_choices.append((f"{i}:00", f"{i}:00"))
-    # else:
-    #     for i in range(9, 20):
-    #         if i != 12:
-    #             time_slot_choices.append((f"{i}:00", f"{i}:00"))
+    date_query = Appointments.objects.last()
+    if date_query == date:
+        for i in range(9, 20):
+            if i > int(current_time.split(':')[0]):
+                if i != 12:
+                    time_slot_choices.append((f"{i}:00", f"{i}:00"))
+    else:
+        for i in range(9, 20):
+            if i != 12:
+                time_slot_choices.append((f"{i}:00", f"{i}:00"))
     timeslot = forms.ChoiceField(choices=time_slot_choices)
 
     class Meta:
