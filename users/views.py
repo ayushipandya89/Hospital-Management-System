@@ -253,8 +253,8 @@ class UpdateStaffProfile(SuccessMessageMixin, UpdateView):
         data = self.request.POST
         fetch_speciality = data.get('speciality')
         fetch_pk = get_object_or_404(Staff, id=self.kwargs.get('pk'))
-        query = CustomUser.objects.filter(username=fetch_pk).values_list('role__role', flat=True)
-        if query[0] == 'Nurse' and fetch_speciality != 'Nurse':
+        query = CustomUser.objects.filter(username=fetch_pk).values_list('role', flat=True)
+        if query[0] == 3 and fetch_speciality != 3:
             messages.error(self.request, NURSE_ERROR_MSG)
             return self.form_invalid(form)
         else:
