@@ -3,7 +3,6 @@ from django import urls
 from django.urls import reverse
 from pytest_django.asserts import assertTemplateUsed
 
-from tests.conftest import create_user
 from users.models import CustomUser
 
 
@@ -78,9 +77,25 @@ def test_create_user_fail(client, create_admin_role):
 
 
 @pytest.mark.django_db
-def test_login_success(client, create_user):
-    a = CustomUser.objects.filter(username=create_user).exists()
-    assert a
+def test_login_success(client):
+    data = {
+        'username': 'Ayushi',
+        'password': 'Qwertyuioop@0987'
+    }
+    url = reverse('login')
+    response = client.post(url, data=data, format='multipart/form-data')
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_login_fail(client):
+    data = {
+        'username': 'abc',
+        'password': 'abc@123',
+    }
+    url = reverse('login')
+    response = client.post(url, data=data, format='multipart/form-data')
+    assert response.status_code == 200
 
 
 @pytest.mark.django_db
@@ -93,3 +108,10 @@ def test_login_fail_username(client, create_user):
 def test_login_fail_password(client, create_user):
     a = CustomUser.objects.filter(username=create_user).filter(password='abcd').exists()
     assert a == False
+
+
+@pytest.mark.django_db
+def test_user_logout(client, authenticated_user):
+    url = urls.reverse('logout')
+    response = client.get(url)
+    assert response.status_code == 200

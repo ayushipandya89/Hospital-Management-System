@@ -71,7 +71,6 @@ class AddRole(CreateView, SuccessMessageMixin):
     """
     class for adding data in role table
     """
-    print('its in')
     form_class = AddRoleForm
     template_name = 'users/add_role.html'
     success_url = reverse_lazy('Hospital-home')
