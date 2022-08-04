@@ -58,9 +58,9 @@ class ViewDuty(View):
             return render(request, 'nurse/view_duty.html', context)
 
     def post(self, request):
-        search = request.POST['search']
-        if search != " ":
-            search = search.strip()
+        fetch_search = request.POST['search']
+        if fetch_search != " ":
+            search = fetch_search.strip()
             user = NurseDuty.objects.filter(staff__staff__username__icontains=search).order_by('id')
             return render(request, 'nurse/view_duty.html', {'data': user})
         else:

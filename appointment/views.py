@@ -225,7 +225,8 @@ class ViewAdmitPatient(View):
         query_filter = request.POST['name']
         if search != "":
             search = search.strip()
-            user = Admit.objects.filter(patient__patient__username__icontains=search).filter(out_date__isnull=True).order_by('id')
+            user = Admit.objects.filter(patient__patient__username__icontains=search).filter(
+                out_date__isnull=True).order_by('id')
             return render(request, 'appointment/view_admit_patient.html', {'data': user})
         elif query_filter != "":
             if query_filter == 'All':
@@ -311,6 +312,7 @@ class DischargeByDoctor(View):
     """
     saving discharge request in notification module
     """
+
     def get(self, request, pk):
         fetch_id = Admit.objects.filter(id=pk).first()
         patient = Notification.objects.create(patient_id=fetch_id.id)
@@ -335,7 +337,8 @@ class DischargebyAdminView(View):
         search = request.POST['search']
         if search != " ":
             search = search.strip()
-            user = Notification.objects.filter(patient__patient__patient__username__icontains=search).filter(discharge=False).order_by('id')
+            user = Notification.objects.filter(patient__patient__patient__username__icontains=search).filter(
+                discharge=False).order_by('id')
             return render(request, 'appointment/discharge_by_admin.html', {'data': user})
         else:
             return redirect('Hospital-home')
