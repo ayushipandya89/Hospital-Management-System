@@ -384,6 +384,7 @@ class EmergencyCase(CreateView, SuccessMessageMixin):
     form_class = EmergencyForm
     template_name = 'users/emergency.html'
 
+
     def dispatch(self, request, *args, **kwargs):
         if is_admin(user=self.request.user):
             return super(EmergencyCase, self).dispatch(
